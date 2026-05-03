@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Espace Jeux</title>
+    <script src="../../scripts/settings-apply.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="games.css">
+    <script src="../../components/mc-game-card.js" defer></script>
+</head>
+<body class="games-body">
+
+<div class="games-orb games-orb--left" aria-hidden="true"></div>
+<div class="games-orb games-orb--right" aria-hidden="true"></div>
+
+<main class="games-container">
+    <header class="games-header">
+        <a href="patient-selection.html" class="btn-back" aria-label="Retour au choix du patient">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Choix du patient
+        </a>
+
+        <p class="games-kicker">Espace Jeux MemoClair</p>
+        <h1 class="games-title">Quelle activité proposer à <span id="games-patient-name">Marcel</span> ?</h1>
+        <p class="games-subtitle" id="games-subtitle">
+            Sélectionnez une séance courte, centrée sur les repères encore disponibles et jamais vécue comme un test.
+        </p>
+
+        <div class="games-pills">
+            <span class="games-pill" id="games-stage-pill">Repères concrets</span>
+            <span class="games-pill" id="games-attention-pill">5 min</span>
+            <span class="games-pill games-pill--warm" id="games-theme-pill">Famille, quotidien</span>
+        </div>
+    </header>
+
+    <section class="games-brief">
+        <article class="games-brief__card">
+            <p class="games-brief__eyebrow">Cadre de séance</p>
+            <h2 class="games-brief__title">Stimuler sans corriger</h2>
+            <ul class="games-brief__list" id="games-brief-list">
+                <li>Formats très courts et repères visuels stables</li>
+                <li>Adaptation silencieuse selon le rythme observé</li>
+                <li>Feedbacks rassurants, sans score visible</li>
+            </ul>
+        </article>
+
+        <article class="games-brief__card games-brief__card--warm">
+            <p class="games-brief__eyebrow">Suggestion du moment</p>
+            <h2 class="games-brief__title" id="games-recommendation-title">Commencer par une activité simple</h2>
+            <p class="games-brief__text" id="games-recommendation-text">
+                Pour cette séance, un jeu très concret ou un souvenir personnel connu peut aider à démarrer doucement.
+            </p>
+        </article>
+    </section>
+
+    <section class="games-list">
+        <mc-game-card
+                card-title="Associations du Quotidien"
+                desc="Repérez des objets familiers, leur contexte naturel et l'ordre d'une petite routine."
+                href="game-a.html"
+                icon-type="associations"
+                focus="Mémoire sémantique et procédurale"
+                duration="5 à 8 min"
+                memory-axis="Objets, contexte, séquence"
+                bullets="Objets du quotidien|Choix concrets|Routine remise dans l'ordre">
+        </mc-game-card>
+
+        <mc-game-card
+                card-title="Mémoire &amp; Réminiscence"
+                desc="Laissez revenir une personne, un lieu, une ambiance ou une émotion à partir de souvenirs personnels."
+                href="game-b.html"
+                icon-type="memoire"
+                focus="Mémoire autobiographique ancienne"
+                duration="5 à 10 min"
+                memory-axis="Souvenirs, émotions, conversation"
+                bullets="Supports personnels ou génériques|Relances progressives|Mode duo accompagné"
+                duo>
+        </mc-game-card>
+    </section>
+</main>
+
+<script src="games.js"></script>
+</body>
+</html>

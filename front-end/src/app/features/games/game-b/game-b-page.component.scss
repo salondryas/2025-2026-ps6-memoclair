@@ -1,0 +1,360 @@
+:host {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent;
+  font-family: Arial, Roboto, "Open Sans", sans-serif;
+  color: #1f2937;
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 80px minmax(0, 1fr);
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  height: 100%;
+  overflow: hidden;
+  gap: 12px;
+  padding: 12px;
+}
+
+.sidebar {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+}
+
+.sidebar-right {
+  justify-content: center;
+}
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 880px;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  height: 24px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.5s ease;
+}
+
+.progress-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0;
+  color: #64748b;
+}
+
+.game-panel {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.game-container {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.main-game-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px;
+  gap: 18px;
+  height: 100%;
+}
+
+.question-text {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(36px, 3vw, 44px);
+  line-height: 1.2;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.media-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+}
+
+.media-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+.memory-image {
+  width: 100%;
+  max-height: 25vh;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.media-meta {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.meta-pill {
+  display: inline-flex;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6e4ff;
+  background: #ffffff;
+  font-weight: 700;
+  color: #1e3a8a;
+  font-size: 0.9rem;
+}
+
+.meta-caption {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.choices-grid {
+  display: flex;              /* On passe en mode Flexbox */
+  flex-direction: row;        /* Sur une seule ligne */
+  justify-content: center;    /* On centre les choix */
+  align-items: stretch;       /* Ils auront tous la même hauteur */
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 16px auto;
+  gap: 30px;                  /* L'espacement parfait (tu peux ajuster cette valeur) */
+}
+
+/* On s'assure que les cartes se partagent bien l'espace */
+.choice-card {
+  flex: 1;                    /* Chaque carte prend la même largeur */
+  /* ... (Garde le reste de ton CSS pour .choice-card ici : border, padding, etc.) ... */
+}
+
+.choice-btn {
+  position: relative;
+  min-height: 100px;
+  border: 2px solid #d1d5db;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.choice-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.15);
+}
+
+.choice-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.choice-label {
+  line-height: 1.25;
+}
+
+.choice-btn.correct {
+  border: 3px solid #34a853;
+  background: #f1fbf3;
+}
+
+.choice-btn.wrong {
+  border: 2px solid #cbd5e1;
+  background: #f3f4f6;
+  opacity: 0.6;
+}
+
+.choice-btn.auto-highlight {
+  border: 3px solid #22c55e !important;
+  background: #ecfdf3 !important;
+  animation: autoPulse 0.9s ease-in-out infinite;
+  opacity: 1 !important;
+}
+
+.check {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.6rem;
+  color: #2f855a;
+  font-weight: 800;
+}
+
+@keyframes autoPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+  50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.1); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.assist-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.assist-btn {
+  width: 100%;
+  min-height: 64px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  background: #eef2f7;
+  border: 2px solid #d4dde9;
+  color: #1e293b;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.assist-btn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.assist-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.assist-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.read-btn {
+  background: #e8f0fe;
+  border-color: #93c5fd;
+}
+
+.hint-btn {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.skip-btn {
+  background: #fecdd3;
+  border-color: #fca5a5;
+}
+
+.feedback-box {
+  margin: 0;
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid #d6e4ff;
+  background: #f3f8ff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: visible;
+}
+
+.is-empty {
+  visibility: hidden;
+}
+
+.assist-btn:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: minmax(0, 1fr) 180px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .choices-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-right {
+    justify-content: center;
+  }
+
+  .choices-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* --- CACHER LA MASCOTTE DE L'INDICE DANS LE JEU B --- */
+::ng-deep .no-mascot-banner .mascot-img {
+  display: none !important; /* Cache l'image de la mascotte */
+}
+
+::ng-deep .no-mascot-banner .hint-container {
+  padding: 12px 24px !important; /* Réduit l'espace vide laissé par l'image */
+  margin: 0 auto 16px auto !important;
+  max-width: 600px;
+}

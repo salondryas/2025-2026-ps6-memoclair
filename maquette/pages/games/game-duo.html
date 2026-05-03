@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Partage de Souvenirs</title>
+    <script src="../../scripts/settings-apply.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="game-duo.css">
+</head>
+<body class="duo-body">
+
+<main class="duo-layout">
+    <header class="game-header">
+        <a href="games.html" class="btn-back">
+            <span aria-hidden="true">←</span> Retour aux jeux
+        </a>
+
+        <div class="game-header__content">
+            <p class="game-kicker">Mode duo · réminiscence accompagnée</p>
+            <h1 class="main-title">Partager un souvenir à deux</h1>
+            <p class="game-subtitle">
+                L'aidant choisit une posture douce, la personne accompagnée peut répondre ou simplement rester avec le souvenir.
+            </p>
+        </div>
+
+        <div class="game-header__status">
+            <span class="status-pill" id="duo-patient-pill">Marcel</span>
+            <span class="status-pill status-pill--warm" id="duo-counter">Moment 1 / 3</span>
+        </div>
+    </header>
+
+    <section class="duo-stage">
+        <article class="shared-media-zone">
+            <div class="shared-media-zone__meta">
+                <span class="memory-source" id="duo-source">Souvenir personnel</span>
+                <span class="duo-caption" id="duo-caption">Photo de famille</span>
+            </div>
+
+            <div id="media-container" class="duo-media"></div>
+            <h2 class="shared-question" id="question-text">Chargement...</h2>
+            <p class="shared-helper" id="shared-helper">Prenez le temps de regarder ou d'écouter avant de relancer.</p>
+        </article>
+
+        <section class="split-interaction-zone">
+            <div class="player-zone aidant-zone">
+                <p class="zone-eyebrow">Pour l'aidant</p>
+                <h3 class="zone-title">Choisir une posture douce</h3>
+                <p class="support-intro" id="support-intro">Choisissez une manière apaisante d'accompagner ce souvenir.</p>
+                <div class="support-list" id="support-list"></div>
+                <div class="duo-actions">
+                    <button class="duo-action-btn" id="btn-answer-with" type="button">Je réponds avec lui</button>
+                    <button class="duo-action-btn duo-action-btn--ghost" id="btn-pass-round" type="button">On passe sans insister</button>
+                </div>
+            </div>
+
+            <div class="player-zone accueilli-zone">
+                <p class="zone-eyebrow">Pour <span id="duo-patient-name">Marcel</span></p>
+                <h3 class="zone-title">Laisser venir ce qui revient</h3>
+                <div class="choices" id="choices-accueilli"></div>
+                <p class="patient-note" id="patient-note">Une impression, un lieu ou un simple “je ne sais plus” sont deja des reponses valables.</p>
+            </div>
+        </section>
+    </section>
+
+    <div id="duo-feedback" class="feedback-overlay hidden">
+        <div class="feedback-content">
+            <div class="feedback-icon" id="feedback-icon">💬</div>
+            <h2 id="feedback-message">On continue doucement</h2>
+            <p id="feedback-submessage">Texte dynamique</p>
+            <button id="btn-next" class="btn-primary" type="button">Passer au souvenir suivant</button>
+        </div>
+    </div>
+</main>
+
+<script src="game-duo.js"></script>
+</body>
+</html>

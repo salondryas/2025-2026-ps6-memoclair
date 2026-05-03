@@ -1,0 +1,126 @@
+/* src/pages/game-memory/game-memory.css */
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-large);
+    text-align: center;
+    width: 100%;
+}
+
+/* --- HEADER --- */
+.game-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.btn-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: var(--font-size-text);
+    text-decoration: none;
+    color: #D32F2F; /* Rouge doux pour signifier "Arrêter" */
+    background-color: #FFEBEE;
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background-color: #FFCDD2;
+    transform: scale(1.05);
+}
+
+.main-title {
+    font-size: var(--font-size-title);
+    color: var(--color-text);
+    margin-top: 5rem;
+}
+
+/* --- PLATEAU DE JEU (Grille) --- */
+.memory-board {
+    display: grid;
+    /* 3 colonnes de taille égale, qui s'adaptent à l'écran */
+    grid-template-columns: repeat(3, 250px);
+    justify-content: center;
+    gap: 3rem; /* Grand espace entre les cartes pour éviter les erreurs de clic */
+}
+
+/* --- LES CARTES (Composant de base) --- */
+.memory-card {
+    width: 250px;
+    height: 250px; /* Cartes parfaitement carrées et massives */
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Image à l'intérieur de la carte */
+.card-image {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+/* ÉTAT 1 : Carte Cachée */
+.memory-card--hidden {
+    background-color: var(--color-primary); /* Vert foncé rassurant */
+    border: 6px solid #1e4f33;
+    box-shadow: 0 8px 0 #1e4f33; /* Effet "bouton 3D" très cliquable */
+}
+
+.memory-card--hidden:hover, .memory-card--hidden:focus {
+    transform: translateY(4px); /* S'enfonce légèrement au clic */
+    box-shadow: 0 4px 0 #1e4f33;
+}
+
+.card-pattern {
+    font-size: 5rem;
+    color: white;
+    opacity: 0.8;
+}
+
+/* ÉTAT 2 : Carte Retournée (Image visible) */
+.memory-card--revealed {
+    background-color: white;
+    border: 6px solid var(--color-secondary); /* Bordure bleue pour montrer qu'elle est active */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    transform: scale(1.05); /* La carte grossit légèrement pour capter l'attention */
+}
+
+/* ÉTAT 3 : Paire Validée (Succès) */
+.memory-card--matched {
+    background-color: #E8F5E9; /* Vert très clair */
+    border: 6px solid #4CAF50; /* Bordure verte de succès */
+    cursor: default; /* On ne peut plus cliquer dessus */
+    opacity: 0.9;
+}
+
+/* Badge de renforcement positif (très important en IHM Senior) */
+.match-badge {
+    position: absolute;
+    bottom: 10px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}

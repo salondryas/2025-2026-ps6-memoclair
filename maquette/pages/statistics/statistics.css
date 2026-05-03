@@ -1,0 +1,429 @@
+.stats-body {
+    background:
+        radial-gradient(circle at top left, rgba(95, 138, 111, 0.08), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(215, 168, 87, 0.12), transparent 28%),
+        #F5F3EF;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 2.4rem 2rem 4rem;
+    width: 100%;
+}
+
+.patient-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    border-radius: 24px;
+    padding: 1rem 1.2rem;
+}
+
+.patient-bar select {
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    padding: 0.7rem 1rem;
+    background: white;
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+.warning-card {
+    background: linear-gradient(180deg, rgba(255, 247, 232, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+    border: 1px solid var(--color-warm-border);
+    color: #6B5A3C;
+    border-radius: 24px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-weight: 500;
+    box-shadow: var(--shadow-soft);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sessions-count {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #9CA3AF;
+}
+
+.global-section {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 30px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-line);
+}
+
+.donuts-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem;
+}
+
+.donut-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 24px;
+    padding: 1.25rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 246, 242, 0.96) 100%);
+    border: 1px solid var(--color-line);
+}
+
+.donut-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.donut-svg {
+    width: 140px;
+    height: 140px;
+    transform: rotate(-90deg);
+}
+
+/* Cercle de fond gris */
+.donut-bg {
+    fill: none;
+    stroke: #F0F0F0;
+    stroke-width: 14;
+}
+
+/* Arc de remplissage simple */
+.donut-fill {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: butt;
+    stroke-dasharray: 0 314.16;
+    transition: stroke-dasharray 0.7s ease;
+}
+
+/* Segments multi */
+.donut-seg {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: butt;
+    stroke-dasharray: 0 314.16;
+    transition: stroke-dasharray 0.7s ease, stroke-dashoffset 0.7s ease;
+}
+
+/* Valeur centrale */
+.donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+}
+
+.donut-pct {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #333;
+    line-height: 1;
+}
+
+.donut-unit {
+    font-size: 0.72rem;
+    color: #9CA3AF;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.donut-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #444;
+    text-align: center;
+    margin: 0;
+}
+
+.donut-sub {
+    font-size: 0.8rem;
+    color: #9CA3AF;
+    text-align: center;
+    margin: 0;
+}
+
+/* Légendes donut multi */
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    color: #555;
+}
+
+.donut-legend > span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.dot-faces     { background: #E07070; }
+.dot-objects   { background: #D4A96A; }
+.dot-souvenirs { background: #7B9FD4; }
+.dot-gameA     { background: #D4A96A; }
+.dot-gameB     { background: #6B8F71; }
+
+/* ── SECTION SESSIONS ── */
+.sessions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.session-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 22px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-line);
+    transition: border-color 0.2s, transform 0.2s ease;
+}
+
+.session-card:hover {
+    border-color: var(--color-primary-mid);
+    transform: translateY(-1px);
+}
+
+.session-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.session-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.session-date {
+    font-weight: 700;
+    color: #333;
+    font-size: 1rem;
+}
+
+.session-game {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+.session-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Badges */
+.badge-duration {
+    background: #F0F0F0;
+    color: #666;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+}
+
+.badge-score {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+}
+
+.badge-support {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+}
+
+.score-good { background: #E8F5E9; color: #2E7D32; }
+.score-mid  { background: #FFF3E0; color: #8B5E00; }
+.score-low  { background: #FFEBEE; color: #C62828; }
+.support-soft { background: #E8F5E9; color: #2E7D32; }
+.support-mid  { background: #FFF3E0; color: #8B5E00; }
+.support-high { background: #FFEBEE; color: #C62828; }
+
+.badge-anxiety {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+}
+
+.anx-1 { background: #E8F5E9; color: #2E7D32; }
+.anx-2 { background: #E8F5E9; color: #4A7A50; }
+.anx-3 { background: #FFF3E0; color: #8B5E00; }
+.anx-4 { background: #FFEBEE; color: #C62828; }
+.anx-5 { background: #FFEBEE; color: #B71C1C; }
+
+/* Corps de la card */
+.session-card-body {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(95, 138, 111, 0.12);
+}
+
+.col-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9CA3AF;
+    margin: 0 0 0.6rem 0;
+}
+
+.errors-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.error-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.error-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.error-faces    .error-dot { background: #E07070; }
+.error-objects  .error-dot { background: #D4A96A; }
+.error-souvenirs .error-dot { background: #7B9FD4; }
+
+.error-none {
+    font-size: 0.9rem;
+    color: #6B8F71;
+    font-weight: 600;
+}
+
+.indicator-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: #555;
+    font-size: 0.92rem;
+}
+
+.indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6B8F71;
+    flex-shrink: 0;
+}
+
+.assistance-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.asst-yes { color: #D4A96A; }
+.asst-no  { color: #6B8F71; }
+
+.anxiety-mention {
+    font-size: 0.82rem;
+    color: #9CA3AF;
+    margin: 0.4rem 0 0 0;
+    font-style: italic;
+}
+
+.support-reading {
+    font-size: 0.92rem;
+    color: #666;
+    margin: 0;
+}
+
+.next-step {
+    margin-top: 0.5rem;
+    color: var(--color-text);
+    line-height: 1.5;
+}
+
+@media (max-width: 680px) {
+    .donuts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .session-card-body {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-page {
+        padding: 1.5rem 1rem 3rem;
+    }
+}

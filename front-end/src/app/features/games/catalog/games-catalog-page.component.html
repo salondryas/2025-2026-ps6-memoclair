@@ -1,0 +1,76 @@
+<main class="catalog">
+
+  <!-- Header épuré : patient + contexte -->
+  <header class="catalog-header">
+    <div class="catalog-nav">
+      <a routerLink="/games/patient-selection" class="btn-back" aria-label="Retour à la sélection d'accueilli">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Retour
+      </a>
+    </div>
+
+    <h1 class="catalog-patient">
+      {{ (patientName$ | async)?.firstName ?? '...' }}
+    </h1>
+
+    <div class="catalog-context">
+      <span class="context-pill">{{ stageLabel }}</span>
+      <span class="context-pill">⏱ {{ attentionMinutes }} min max</span>
+      <span class="context-pill context-pill--warm">{{ themeLabel }}</span>
+    </div>
+  </header>
+
+  <!-- Bandeau recommandation (1 ligne, aucun texte explicatif) -->
+  <div class="reco-banner" *ngIf="recoTitle">
+    <span class="reco-star">⭐</span>
+    <span class="reco-label">Suggéré maintenant :</span>
+    <strong class="reco-title">{{ recoTitle }}</strong>
+  </div>
+
+  <!-- Grille des jeux -->
+  <section class="catalog-grid" aria-label="Jeux disponibles">
+
+    <article
+      *ngFor="let game of games"
+      class="game-card"
+      [class.is-recommended]="isRecommended(game)">
+
+      <!-- Icône + Titre -->
+      <div class="game-card__header">
+        <div class="game-card__icon" aria-hidden="true">{{ getIcon(game.id) }}</div>
+        <h2 class="game-card__title">{{ game.title }}</h2>
+      </div>
+
+      <!-- Tags visuels -->
+      <div class="game-card__tags" role="list">
+        <span class="tag" role="listitem">⏱ {{ game.duration }}</span>
+        <span class="tag" role="listitem">🧠 {{ game.memoryAxis }}</span>
+        <span class="tag" role="listitem">👁 Visuel</span>
+        <span *ngIf="game.duo" class="tag tag--duo" role="listitem">👥 Mode duo</span>
+      </div>
+
+      <!-- Toggle duo (uniquement sur les jeux compatibles) -->
+      <div *ngIf="game.id === 'game-b'" class="duo-toggle">
+        <label class="toggle-switch" aria-label="Activer le mode duo">
+          <input type="checkbox" [(ngModel)]="duoMode" />
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="duo-toggle__label">Jouer en duo</span>
+        <span *ngIf="isDuoEnabledFor(game)" class="duo-active">👥 Activé</span>
+      </div>
+
+      <!-- Bouton action massif -->
+      <a [routerLink]="getGameRoute(game)" class="btn-jouer"
+         [class.btn-jouer--recommended]="isRecommended(game)"
+         [class.btn-jouer--duo]="isDuoEnabledFor(game)">
+        {{ getPrimaryActionLabel(game) }}
+      </a>
+
+    </article>
+
+  </section>
+
+</main>

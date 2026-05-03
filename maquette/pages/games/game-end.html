@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Fin de séance</title>
+    <script src="../../scripts/settings-apply.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="game-end.css">
+</head>
+<body>
+
+<main class="end-container">
+
+    <!-- Illustration -->
+    <div class="end-illustration" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+            <!-- Cercle de fond -->
+            <circle cx="100" cy="100" r="90" fill="#EEF5EF"/>
+            <!-- Étoiles décoratives -->
+            <circle cx="36"  cy="44"  r="7"  fill="#FAD07A" opacity="0.8"/>
+            <circle cx="168" cy="38"  r="5"  fill="#FAD07A" opacity="0.7"/>
+            <circle cx="24"  cy="140" r="4"  fill="#A8C4A2" opacity="0.8"/>
+            <circle cx="178" cy="148" r="6"  fill="#FAD07A" opacity="0.7"/>
+            <!-- Cœur principal -->
+            <path d="M100 148 C100 148 48 114 48 78 C48 60 62 50 78 50 C88 50 96 56 100 62 C104 56 112 50 122 50 C138 50 152 60 152 78 C152 114 100 148 100 148 Z"
+                  fill="#A8C4A2"/>
+            <!-- Cœur intérieur pour la profondeur -->
+            <path d="M100 138 C100 138 58 108 58 78 C58 66 68 58 80 58 C89 58 96 63 100 69 C104 63 111 58 120 58 C132 58 142 66 142 78 C142 108 100 138 100 138 Z"
+                  fill="#7FB584" opacity="0.5"/>
+        </svg>
+    </div>
+
+    <!-- Message principal -->
+    <p class="end-kicker">Séance MemoClair</p>
+    <h1 class="end-title">Merci pour ce moment</h1>
+    <p class="end-subtitle" id="end-subtitle">La séance d'aujourd'hui est terminée.</p>
+    <p class="end-message">Vous pouvez revenir plus tard pour un autre souvenir, une autre routine ou un nouveau moment à deux.</p>
+
+    <div class="end-summary">
+        <p class="end-summary__eyebrow">Dernière activité</p>
+        <h2 class="end-summary__title" id="end-session-title">Moment MemoClair</h2>
+        <p class="end-summary__text" id="end-session-note">
+            Un moment court, guidé et sans mise en échec visible.
+        </p>
+    </div>
+
+<!--    &lt;!&ndash; Durée de la session &ndash;&gt; on doit pas l'affiché a l'accuilli-->
+<!--    <div class="end-duration" id="end-duration" hidden>-->
+<!--        <span class="end-duration__icon" aria-hidden="true">⏱️</span>-->
+<!--        <span class="end-duration__text" id="duration-text">Session : 0 min</span>-->
+<!--    </div>-->
+
+    <!-- Actions -->
+    <div class="end-actions">
+        <a href="games.html" class="btn-primary">
+            Revenir aux jeux
+        </a>
+        <a href="../index/index.html" class="btn-secondary">
+            Retour à l'accueil
+        </a>
+    </div>
+
+</main>
+
+<script src="game-end.js"></script>
+</body>
+</html>

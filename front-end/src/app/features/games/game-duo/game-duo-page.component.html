@@ -1,0 +1,164 @@
+<!-- États loading / erreur / médias insuffisants -->
+<div *ngIf="pageState === 'loading'" class="state-screen">
+  <div class="state-box">
+    <div class="state-icon">🌿</div>
+    <h1>Préparation de la séance</h1>
+    <p>Analyse des souvenirs en cours…</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<div *ngIf="pageState === 'not-enough-media'" class="state-screen state-screen--warn">
+  <div class="state-box">
+    <div class="state-icon">📷</div>
+    <h1>Médias insuffisants</h1>
+    <p>Il faut <strong>{{ duoRequired }} médias</strong> — cet accueilli en a <strong>{{ mediaCount }}</strong>.</p>
+    <div class="state-actions">
+      <a routerLink="/caregiver/media" class="btn-primary">Aller à la médiathèque</a>
+      <a routerLink="/games" class="btn-ghost">Retour aux jeux</a>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="pageState === 'error'" class="state-screen">
+  <div class="state-box">
+    <div class="state-icon">⚠️</div>
+    <h1>Erreur de génération</h1>
+    <p>{{ errorMessage }}</p>
+    <div class="state-actions">
+      <button class="btn-primary" (click)="retry()" type="button">Réessayer</button>
+      <a routerLink="/games" class="btn-ghost">Retour aux jeux</a>
+    </div>
+  </div>
+</div>
+
+<!-- Jeu -->
+<ng-container *ngIf="pageState === 'ready'">
+
+  <!-- Fin de séance -->
+  <div *ngIf="state.finished" class="state-screen">
+    <div class="state-box">
+      <div class="state-icon">🌿</div>
+      <h1>Séance terminée</h1>
+      <p>Merci d'avoir partagé ces souvenirs ensemble.</p>
+      <a routerLink="/games" class="btn-primary">Retour aux jeux</a>
+    </div>
+  </div>
+
+  <div *ngIf="!state.finished" class="duo-page">
+
+    <!-- Barre bleue fine -->
+    <div class="top-progress">
+      <div class="top-progress__fill"
+           [style.width.%]="((state.roundIndex + 1) / state.rounds.length) * 100"></div>
+    </div>
+
+    <!-- Header -->
+    <app-game-header
+      [patientName]="(patient$ | async)?.firstName ?? ''"
+      title="Mode Duo — Réminiscence"
+      [canGoNext]="!state.showFeedback"
+      (nextClicked)="pass()">
+    </app-game-header>
+
+    <!-- Dots de progression -->
+    <div class="dots-bar">
+      <span *ngFor="let i of dots"
+            class="dot"
+            [class.dot--done]="i < state.roundIndex"
+            [class.dot--active]="i === state.roundIndex">
+      </span>
+    </div>
+
+    <!-- Layout principal : haut (image+question) + bas (deux moitiés) -->
+    <main class="duo-main">
+
+      <!-- Zone haute : image + question -->
+      <div class="top-zone">
+        <div class="media-wrap">
+          <img *ngIf="round.mediaType === 'image'"
+               [src]="round.mediaSrc" [alt]="round.mediaAlt" class="media-img" />
+          <app-large-audio-controls
+            *ngIf="round.mediaType === 'audio'"
+            [src]="round.mediaSrc">
+          </app-large-audio-controls>
+        </div>
+        <h2 class="question">{{ round.question }}</h2>
+      </div>
+
+      <!-- Zone basse : deux moitiés avec barre verticale -->
+      <div class="split-zone">
+
+        <!-- Moitié gauche — Aidant -->
+        <div class="half half--aidant">
+          <p class="col-label">Pour l'aidant</p>
+          <button *ngFor="let c of round.choicesAidant; let i = index"
+                  class="pill"
+                  [class.pill--active]="state.aidantChoice === i"
+                  [disabled]="state.showFeedback"
+                  (click)="pickAidant(i)" type="button">
+            {{ c }}
+          </button>
+        </div>
+
+        <!-- Barre verticale -->
+        <div class="divider-vert"></div>
+
+        <!-- Moitié droite — Patient -->
+        <div class="half half--patient">
+          <p class="col-label" *ngIf="patient$ | async as p">Pour {{ p.firstName }}</p>
+          <button *ngFor="let c of round.choicesAccueilli; let i = index"
+                  class="pill pill--patient"
+                  [class.pill--active]="state.accueilliChoice === i"
+                  [disabled]="state.showFeedback"
+                  (click)="pickAccueilli(i)" type="button">
+            {{ c }}
+          </button>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Overlay feedback -->
+    <div *ngIf="state.showFeedback" class="feedback-overlay">
+      <div class="feedback-card">
+
+        <ng-container *ngIf="state.passed">
+          <div class="fb-icon">🌿</div>
+          <h2>On passe en douceur</h2>
+          <div class="fb-reveal">La réponse : <strong>{{ round.choicesAccueilli[round.correctIndex] }}</strong></div>
+        </ng-container>
+
+        <ng-container *ngIf="!state.passed && state.isCorrect">
+          <div class="fb-icon">🎉</div>
+          <h2>Bonne réponse !</h2>
+          <p>{{ round.feedbackCorrect }}</p>
+        </ng-container>
+
+        <ng-container *ngIf="!state.passed && state.agreed && !state.isCorrect">
+          <div class="fb-icon">💬</div>
+          <h2>D'accord… mais pas tout à fait</h2>
+          <div class="fb-reveal">La réponse : <strong>{{ round.choicesAccueilli[round.correctIndex] }}</strong></div>
+        </ng-container>
+
+        <ng-container *ngIf="!state.passed && !state.agreed">
+          <div class="fb-icon">🤔</div>
+          <h2>Pas la même réponse</h2>
+          <div class="fb-reveal">La réponse : <strong>{{ round.choicesAccueilli[round.correctIndex] }}</strong></div>
+        </ng-container>
+
+        <div class="fb-actions">
+          <button class="btn-ghost" (click)="replayRound()" type="button">
+            💬 On en discute
+          </button>
+          <button class="btn-primary" (click)="nextRound()" type="button">
+            {{ isLastRound ? 'Terminer la séance' : 'Suivant →' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ng-container>

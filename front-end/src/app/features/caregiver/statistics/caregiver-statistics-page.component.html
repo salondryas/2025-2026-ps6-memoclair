@@ -1,0 +1,141 @@
+<mc-caregiver-shell>
+  <main class="stats-page">
+
+    <!-- ── DONUTS ── -->
+    <section class="global-section">
+      <h2 class="section-title">Repères de séance</h2>
+      <div class="donuts-row">
+
+        <!-- Donut 1 : Séances complètes -->
+        <div class="donut-card">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 120 120" class="donut-svg">
+              <circle class="donut-bg" cx="60" cy="60" r="50"/>
+              <circle class="donut-fill" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.completionPct)"
+                style="stroke:#6B8F71"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">{{ donutStats.completionPct }}</span>
+              <span class="donut-unit">%</span>
+            </div>
+          </div>
+          <p class="donut-label">Séances menées jusqu'au bout</p>
+          <p class="donut-sub">{{ donutStats.completedCount }} séance(s) sur {{ donutStats.totalCount }}</p>
+        </div>
+
+        <!-- Donut 2 : Besoin d'accompagnement (multi-segment) -->
+        <div class="donut-card">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 120 120" class="donut-svg">
+              <circle class="donut-bg" cx="60" cy="60" r="50"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.hintsPct)"
+                [style.stroke-dashoffset]="multiOffset([])"
+                style="stroke:#E07070"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.guidancePct)"
+                [style.stroke-dashoffset]="multiOffset([donutStats.hintsPct])"
+                style="stroke:#D4A96A"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.earlyStopPct)"
+                [style.stroke-dashoffset]="multiOffset([donutStats.hintsPct, donutStats.guidancePct])"
+                style="stroke:#7B9FD4"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">{{ donutStats.totalSupportSignals }}</span>
+              <span class="donut-unit">signaux</span>
+            </div>
+          </div>
+          <p class="donut-label">Besoin d'accompagnement</p>
+          <div class="donut-legend">
+            <span class="legend-row"><span class="legend-dot dot-hints"></span>Indices {{ donutStats.hintsPct }}&nbsp;%</span>
+            <span class="legend-row"><span class="legend-dot dot-guidance"></span>Guidage verbal {{ donutStats.guidancePct }}&nbsp;%</span>
+            <span class="legend-row"><span class="legend-dot dot-stop"></span>Arrêts précoces {{ donutStats.earlyStopPct }}&nbsp;%</span>
+          </div>
+        </div>
+
+        <!-- Donut 3 : Répartition par jeu (multi-segment) -->
+        <div class="donut-card">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 120 120" class="donut-svg">
+              <circle class="donut-bg" cx="60" cy="60" r="50"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.gameAPct)"
+                [style.stroke-dashoffset]="multiOffset([])"
+                style="stroke:#D4A96A"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.gameBPct)"
+                [style.stroke-dashoffset]="multiOffset([donutStats.gameAPct])"
+                style="stroke:#6B8F71"/>
+              <circle class="donut-seg" cx="60" cy="60" r="50"
+                [style.stroke-dasharray]="arc(donutStats.gameDuoPct)"
+                [style.stroke-dashoffset]="multiOffset([donutStats.gameAPct, donutStats.gameBPct])"
+                style="stroke:#9B7FD4"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">{{ donutStats.totalCount }}</span>
+              <span class="donut-unit">sessions</span>
+            </div>
+          </div>
+          <p class="donut-label">Répartition par jeu</p>
+          <div class="donut-legend">
+            <span class="legend-row"><span class="legend-dot dot-game-a"></span>Associations {{ donutStats.gameAPct }}&nbsp;%</span>
+            <span class="legend-row"><span class="legend-dot dot-game-b"></span>Réminiscence {{ donutStats.gameBPct }}&nbsp;%</span>
+            <span class="legend-row" *ngIf="donutStats.gameDuoPct > 0"><span class="legend-dot dot-game-duo"></span>Mode duo {{ donutStats.gameDuoPct }}&nbsp;%</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SESSIONS ── -->
+    <section class="sessions-section">
+      <h2 class="section-title">Sessions <span class="sessions-count">({{ donutStats.totalCount }})</span></h2>
+
+      <!-- État vide -->
+      <div *ngIf="sessionHistory.length === 0" class="empty-state">
+        <span class="empty-icon">🎮</span>
+        <p>Aucune séance enregistrée pour cet accueilli.</p>
+        <a routerLink="/games" class="empty-cta">Lancer une séance</a>
+      </div>
+
+      <div class="sessions-list">
+        <article *ngFor="let item of sessionHistory; trackBy: trackByDate" class="session-card">
+          <div class="session-card-header">
+            <div class="session-meta">
+              <span class="session-date">{{ item.dateLabel }}</span>
+              <span class="session-game">{{ item.gameLabel }}</span>
+            </div>
+            <div class="session-badges">
+              <span class="badge-duration">{{ item.durationLabel }}</span>
+            </div>
+          </div>
+
+          <div class="session-card-body">
+            <div class="session-col">
+              <h4 class="col-title">Repères observés</h4>
+              <ul class="indicator-list">
+                <li *ngFor="let ind of item.indicators" class="indicator-item">
+                  <span class="indicator-dot"></span>{{ ind }}
+                </li>
+              </ul>
+            </div>
+            <div class="session-col">
+              <h4 class="col-title">Pour la prochaine séance</h4>
+              <textarea
+                class="session-note"
+                placeholder="Ajouter une note soignant…"
+                [value]="getNote(item.sessionId)"
+                (input)="saveNote(item.sessionId, $any($event.target).value)"
+                rows="4">
+              </textarea>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+
+  </main>
+</mc-caregiver-shell>

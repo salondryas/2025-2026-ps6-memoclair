@@ -1,0 +1,112 @@
+<mc-caregiver-shell>
+  <main class="media-page">
+
+    <!-- Titre seul -->
+    <header class="media-page__hero">
+      <p class="media-page__kicker">Espace aidant</p>
+      <h1>Médiathèque souvenir</h1>
+    </header>
+
+    <!-- Progression duo -->
+    <section class="media-card" [class.media-card--success]="duoReady" [class.media-card--progress]="!duoReady">
+      <p class="duo-progress-label">{{ duoProgress }}</p>
+      <div class="duo-progress-bar">
+        <div class="duo-progress-bar__fill" [style.width.%]="(mediaItems.length / duoRequired) * 100"></div>
+      </div>
+    </section>
+
+    <!-- Formulaire d'ajout -->
+    <section class="media-card">
+      <h3 class="media-card__title">
+        <span class="media-card__icon">➕</span> Ajouter un média
+      </h3>
+
+      <form class="media-form" (ngSubmit)="addMediaItem()">
+
+        <!-- Description (remplace titre + note clinique) -->
+        <label class="media-field media-field--desc">
+          <span class="media-field__icon">✏️</span>
+          <textarea
+            name="description"
+            [(ngModel)]="form.description"
+            rows="3"
+            [disabled]="uploading"
+            placeholder="Décrivez ce souvenir : qui, quoi, où, quand… (ex : Anniversaire de Paul en 2018 avec ses enfants)"></textarea>
+        </label>
+
+        <div class="media-grid">
+          <label class="media-field">
+            <span>Type de média</span>
+            <select name="kind" [(ngModel)]="form.kind" [disabled]="uploading">
+              <option *ngFor="let option of kindOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </label>
+
+          <label class="media-field">
+            <span>Type d'indice</span>
+            <select name="cueType" [(ngModel)]="form.cueType" [disabled]="uploading">
+              <option *ngFor="let option of cueOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="media-field">
+          <span>Fichier (image ou audio)</span>
+          <label class="file-picker">
+            <input type="file" accept="image/*,audio/*" (change)="onFileSelected($event)" [disabled]="uploading" aria-label="Choisir un fichier">
+            <span class="file-picker__button">Choisir un fichier</span>
+            <span class="file-picker__name">{{ fileInputLabel }}</span>
+          </label>
+        </div>
+
+        <p *ngIf="validationMessage" class="media-message media-message--error">
+          {{ validationMessage }}
+        </p>
+
+        <button type="submit" class="media-form__submit" [disabled]="uploading">
+          {{ uploading ? 'Envoi en cours…' : 'Ajouter à la médiathèque' }}
+        </button>
+        <p *ngIf="saveStatus" class="media-message media-message--success">{{ saveStatus }}</p>
+      </form>
+    </section>
+
+    <!-- Liste des médias -->
+    <section class="media-card">
+      <h3 class="media-card__title">
+        <span class="media-card__icon">🗂️</span>
+        Médias de {{ currentPatient.firstName }}
+        <span class="media-count">{{ mediaItems.length }}</span>
+      </h3>
+
+      <p *ngIf="emptyState" class="media-empty">
+        Aucun média enregistré pour cet accueilli.
+      </p>
+
+      <div *ngIf="!emptyState" class="media-library">
+        <article *ngFor="let item of mediaItems; trackBy: trackByMediaId" class="media-item">
+          <div class="media-item__icon" [class.media-item__icon--audio]="item.kind === 'audio'">
+            {{ item.kind === 'audio' ? '🎵' : '📷' }}
+          </div>
+
+          <div class="media-item__content">
+            <div class="media-item__meta">
+              <h4>{{ item.title }}</h4>
+              <span class="media-tag">{{ item.cueType }}</span>
+              <span class="media-tag media-tag--soft">{{ item.kind }}</span>
+            </div>
+            <p class="media-item__note">{{ item.clinicalNote }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="media-item__delete"
+            (click)="deleteMediaItem(item.id)"
+            [attr.aria-label]="'Supprimer ' + item.title">
+            Supprimer
+          </button>
+        </article>
+      </div>
+    </section>
+
+  </main>
+</mc-caregiver-shell>

@@ -1,0 +1,12 @@
+.brand-img {
+  height: 135px;
+  width: auto;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+}
+
+.brand-img:hover {
+  transform: scale(1.05);
+}

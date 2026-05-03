@@ -1,0 +1,159 @@
+/* ══════════════════════════════════════════
+   Host & fond
+══════════════════════════════════════════ */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════
+   Conteneur
+══════════════════════════════════════════ */
+.role-page {
+  flex: 1;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+/* ══════════════════════════════════════════
+   Topbar logo + accueil
+══════════════════════════════════════════ */
+.role-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 2rem;
+}
+
+.role-logo {
+  height: 221px;
+  width: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover { transform: scale(1.04); }
+}
+
+.btn-back {
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #556360;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid #d1d5db;
+  padding: 1rem 1.8rem;
+  border-radius: 999px;
+  transition: background 0.18s;
+
+  &:hover { background: #e3ede7; color: #1e3028; }
+}
+
+/* ══════════════════════════════════════════
+   Titre — court et direct
+══════════════════════════════════════════ */
+.role-title {
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 900;
+  color: #1e3028;
+  margin: 0;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   Grille 2 cartes — identique à la home
+══════════════════════════════════════════ */
+.role-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 900px;
+  gap: 40px;
+}
+
+/* ══════════════════════════════════════════
+   Carte de rôle — style identique à la home
+══════════════════════════════════════════ */
+.role-card {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
+    background: #ffffff;
+    outline: none;
+  }
+}
+
+/* ── Image visuelle principale ── */
+.role-card__visual {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+
+  img {
+    height: 300px;
+    object-fit: contain;
+    margin-bottom: 24px;
+    transition: transform 0.4s ease;
+  }
+
+  .role-card:hover & img {
+    transform: scale(1.06);
+  }
+}
+
+/* ── Nom du rôle ── */
+.role-card__name {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+/* ══════════════════════════════════════════
+   Responsive tablette
+══════════════════════════════════════════ */
+@media (max-width: 700px) {
+  .role-cards { grid-template-columns: 1fr; gap: 2rem; }
+  .role-card__visual img { height: 200px; }
+  .role-card__name { font-size: 1.8rem; }
+}
+
+@media (max-width: 480px) {
+  :host { padding: 1.5rem 1rem; }
+  .role-title { font-size: 2.4rem; }
+  .role-card__visual img { height: 160px; }
+}

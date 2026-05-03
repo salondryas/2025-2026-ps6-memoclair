@@ -1,0 +1,212 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+/* ═══════════════ Vinyle ═══════════════ */
+.vinyl-zone {
+  position: relative;
+  width: clamp(200px, 20vh, 350px);
+  height: clamp(200px, 20vh, 350px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl {
+  position: absolute;
+  width: clamp(200px, 20vh, 350px);
+  height: clamp(200px, 20vh, 350px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center,
+      #111 0%,  #111 8%,
+      #c0392b 8%,  #c0392b 21%,
+      #111 21%, #111 28%,
+      #252525 28%, #252525 30%,
+      #111 30%, #111 44%,
+      #252525 44%, #252525 46%,
+      #111 46%, #111 60%,
+      #252525 60%, #252525 62%,
+      #111 62%, #111 78%,
+      #252525 78%, #252525 80%,
+      #111 80%
+    );
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.05);
+
+  &--spinning { animation: spin-vinyl 4s linear infinite; }
+}
+
+.vinyl-label {
+  position: absolute;
+  width: clamp(88px, 12vh, 130px);
+  height: clamp(88px, 12vh, 130px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #e74c3c 0%, #922b21 100%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.45);
+}
+
+.vinyl-hole {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #050505;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+@keyframes spin-vinyl {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ═══════════════ Bouton Play ═══════════════ */
+.btn-play {
+  position: relative;
+  z-index: 3;
+  width: clamp(80px, 10vh, 110px);
+  height: clamp(80px, 10vh, 110px);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: 3px solid rgba(255,255,255,0.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 5px rgba(59,130,246,0.25), 0 8px 28px rgba(59,130,246,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 8px rgba(59,130,246,0.3), 0 12px 32px rgba(59,130,246,0.6);
+  }
+
+  &:active { transform: scale(0.95); }
+
+  svg polygon { transform: translateX(2px); }
+}
+
+/* ═══════════════ Skip + Waveform ═══════════════ */
+.skip-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.btn-skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 20px;
+  padding: 18px 28px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover { background: #2563eb; transform: scale(1.05); }
+  &:active { transform: scale(0.95); }
+
+  svg { stroke: #fff; flex-shrink: 0; }
+}
+
+/* ═══════════════ Waveform CSS ═══════════════ */
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 54px;
+  width: 150px;
+}
+
+.wave-bar {
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3b82f6, #10b981);
+  height: 6px;
+  opacity: 0.5;
+  transition: height 0.2s;
+}
+
+/* Barres statiques avec hauteurs variées */
+.wave-bar:nth-child(odd)  { height: 14px; }
+.wave-bar:nth-child(even) { height: 22px; }
+.wave-bar:nth-child(3n)   { height: 32px; }
+.wave-bar:nth-child(5n)   { height: 18px; }
+
+/* Animation active */
+.waveform--active .wave-bar {
+  opacity: 1;
+  animation: wave-pulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes wave-pulse {
+  from { height: 6px; }
+  to   { height: 38px; }
+}
+
+/* ═══════════════ Barre de progression ═══════════════ */
+.progress-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: clamp(280px, 38vh, 420px);
+}
+
+.time {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1e293b;
+  background: rgba(255,255,255,0.88);
+  padding: 6px 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+  min-width: 64px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.timeline-track {
+  flex: 1;
+  height: 12px;
+  background: rgba(30, 41, 59, 0.2);
+  border-radius: 999px;
+  position: relative;
+  overflow: visible;
+}
+
+.timeline-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  border-radius: 999px;
+  pointer-events: none;
+  transition: width 0.2s linear;
+}
+
+.timeline-input {
+  position: absolute;
+  inset: -6px 0;
+  width: 100%;
+  height: calc(100% + 12px);
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}

@@ -1,0 +1,283 @@
+.familial-body {
+    background:
+        radial-gradient(circle at top left, rgba(95, 138, 111, 0.1), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(215, 168, 87, 0.12), transparent 28%),
+        #F8F5EF;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.navbar-familial {
+    background: rgba(255, 255, 255, 0.84);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 30px rgba(29, 40, 34, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    min-height: 84px;
+    border-bottom: 1px solid var(--color-line);
+}
+
+.navbar-familial__logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    text-decoration: none;
+}
+
+.navbar-familial__logo span {
+    color: var(--color-secondary);
+}
+
+.navbar-familial__center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.persona-select {
+    min-width: 190px;
+    padding: 0.85rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: rgba(255, 255, 255, 0.92);
+    font-weight: 700;
+    color: var(--color-accent-brown);
+}
+
+.btn-return {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    background-color: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--color-line);
+}
+
+.dashboard-container {
+    width: min(100%, 1120px);
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.dashboard-header {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.76);
+    border-radius: 34px;
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    padding: 2.4rem 2rem;
+}
+
+.dashboard-kicker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.dashboard-title {
+    font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+    color: var(--color-text);
+}
+
+.dashboard-subtitle {
+    max-width: 760px;
+    margin: 0.8rem auto 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+.dashboard-highlight {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.highlight-card {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 28px;
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem;
+}
+
+.highlight-card--warm {
+    background: linear-gradient(180deg, rgba(255, 246, 231, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+.highlight-card__eyebrow {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.55rem;
+}
+
+.highlight-card__title {
+    font-size: 1.55rem;
+    margin-bottom: 0.55rem;
+}
+
+.highlight-card__text {
+    color: var(--color-text-muted);
+    line-height: 1.65;
+}
+
+.family-theme-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.25rem 0 0.9rem;
+}
+
+.family-theme {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--color-warm-border);
+    color: var(--color-accent-brown);
+    font-weight: 700;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.family-action {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 30px;
+    padding: 1.7rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-line);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.family-action--soft {
+    background: linear-gradient(180deg, rgba(255, 247, 232, 0.95) 0%, rgba(255, 255, 255, 0.88) 100%);
+}
+
+.family-action--wide {
+    grid-column: span 2;
+}
+
+.action-card__icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(95, 138, 111, 0.08);
+    border: 1px solid var(--color-line);
+    font-size: 1.9rem;
+    margin-bottom: 1rem;
+}
+
+.action-card__title {
+    font-size: 1.6rem;
+    margin-bottom: 0.7rem;
+}
+
+.action-card__text {
+    color: var(--color-text-muted);
+    line-height: 1.65;
+}
+
+.btn-family {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 62px;
+    background-color: var(--color-secondary);
+    color: #4C3C24;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border-radius: 18px;
+    font-size: 1rem;
+    font-weight: 800;
+    box-shadow: 0 14px 26px rgba(215, 168, 87, 0.24);
+}
+
+.btn-family--ghost {
+    background: rgba(95, 138, 111, 0.1);
+    color: var(--color-primary-dark);
+    box-shadow: none;
+}
+
+.family-guidance-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.family-guidance-list li {
+    display: flex;
+    gap: 0.75rem;
+    line-height: 1.6;
+}
+
+.family-guidance-list li::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    margin-top: 0.55rem;
+    flex-shrink: 0;
+}
+
+.patient-name-display {
+    color: var(--color-accent-brown);
+    font-weight: 700;
+}
+
+@media (max-width: 860px) {
+    .dashboard-highlight,
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .family-action--wide {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 760px) {
+    .navbar-familial {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+        padding: 1rem;
+    }
+
+    .dashboard-container {
+        padding: 1.5rem 1rem 3rem;
+    }
+}

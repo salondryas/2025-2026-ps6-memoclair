@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Mémoire &amp; Réminiscence</title>
+    <script src="../../scripts/settings-apply.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="game-b.css">
+</head>
+<body class="memory-body">
+
+<main class="game-container">
+
+    <header class="game-header">
+        <a href="games.html" class="btn-back" aria-label="Retour aux jeux">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Retour aux jeux
+        </a>
+
+        <div class="game-header__content">
+            <p class="game-kicker">Jeu B · souvenir et réminiscence</p>
+            <h1 class="game-title">Mémoire &amp; Réminiscence</h1>
+            <p class="game-subtitle">
+                Laissez revenir une personne, un lieu, une ambiance ou une émotion.
+                Il n'est jamais nécessaire de retrouver une réponse exacte.
+            </p>
+        </div>
+
+        <div class="game-header__status">
+            <span class="status-pill" id="patient-pill">Marcel</span>
+            <span class="status-pill status-pill--warm" id="memory-counter">Souvenir 1 / 3</span>
+        </div>
+    </header>
+
+    <section class="memory-layout">
+        <article class="memory-stage">
+            <div class="memory-meta">
+                <span class="memory-source" id="memory-source">Souvenir personnel</span>
+                <span class="memory-caption" id="memory-caption">Photo personnelle</span>
+            </div>
+
+            <div class="photo-frame" id="memory-frame" role="img" aria-label="Support de souvenir"></div>
+        </article>
+
+        <aside class="memory-guide">
+            <p class="memory-guide__eyebrow">Réminiscence guidée</p>
+            <h2 class="memory-question" id="memory-question">Chargement...</h2>
+            <p class="memory-helper" id="memory-helper">Prenez votre temps. Une impression ou un souvenir partiel suffisent.</p>
+
+            <div class="memory-prompts" id="memory-prompts" aria-label="Repères de conversation"></div>
+
+            <div class="memory-support-box" id="memory-support-box">
+                Vous pouvez simplement dire si ce souvenir semble familier, agréable ou lointain.
+            </div>
+        </aside>
+    </section>
+
+    <section class="memory-actions-panel">
+        <section class="choices" id="choices-container" aria-label="Choisissez la proposition qui vous convient"></section>
+
+        <div class="memory-actions">
+            <button class="btn-soft-hint" id="btn-soft-hint" type="button">Besoin d'un repère doux</button>
+            <button class="btn-passer" id="btn-passer" type="button">Passer ce souvenir</button>
+        </div>
+    </section>
+
+    <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+</main>
+
+<script src="game-b.js"></script>
+</body>
+</html>

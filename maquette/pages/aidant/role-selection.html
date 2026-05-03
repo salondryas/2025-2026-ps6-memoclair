@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Votre Rôle</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="role-selection.css">
+</head>
+<body class="role-body">
+
+<div class="role-orb role-orb--left" aria-hidden="true"></div>
+<div class="role-orb role-orb--right" aria-hidden="true"></div>
+
+<main class="role-container">
+    <header class="role-header">
+        <a href="../index/index.html" class="btn-back">
+            <span aria-hidden="true">←</span> Accueil
+        </a>
+        <p class="role-kicker">Parcours guidé, sans configuration lourde</p>
+        <h1 class="main-title">Choisissez l'espace qui correspond à votre usage</h1>
+        <p class="subtitle">
+            MemoClair sépare l'accompagnement professionnel et les moments en famille pour garder un parcours
+            simple, rassurant et réellement adapté à la personne accompagnée.
+        </p>
+        <div class="role-highlights">
+            <span class="role-highlight">Pas de compte à créer</span>
+            <span class="role-highlight">Sessions courtes</span>
+            <span class="role-highlight">Jamais de mise en échec visible</span>
+        </div>
+    </header>
+
+    <section class="role-cards">
+        <a href="profile.html" class="role-card card--medical" id="role-medical">
+            <div class="role-card__top">
+                <span class="role-card__badge">Professionnel</span>
+                <span class="role-card__icon" aria-hidden="true">🩺</span>
+            </div>
+            <h2 class="role-card__title">Soignant / structure</h2>
+            <p class="role-card__text">
+                Préparez des séances adaptées, ajustez les repères patient et consultez les observations utiles
+                pour la séance suivante.
+            </p>
+            <ul class="role-card__list">
+                <li>Profil patient en cinq repères clairs</li>
+                <li>Médias et thèmes de réminiscence</li>
+                <li>Vue d'observation pour le suivi d'équipe</li>
+            </ul>
+            <div class="role-card__footer">
+                <span class="role-card__meta">Accueil de jour, EHPAD, SSIAD, cabinet</span>
+                <span class="role-card__arrow">Ouvrir l'espace professionnel</span>
+            </div>
+        </a>
+
+        <a href="../aidant/dashboard-familial.html" class="role-card card--family" id="role-family">
+            <div class="role-card__top">
+                <span class="role-card__badge">Famille</span>
+                <span class="role-card__icon" aria-hidden="true">🤝</span>
+            </div>
+            <h2 class="role-card__title">Proche / aidant familial</h2>
+            <p class="role-card__text">
+                Ajoutez quelques souvenirs, préparez un moment à deux et lancez rapidement une activité sans entrer
+                dans une logique de bilan.
+            </p>
+            <ul class="role-card__list">
+                <li>Album souvenir simple à enrichir</li>
+                <li>Conseils de relance en mode duo</li>
+                <li>Repères doux, sans chiffres anxiogènes</li>
+            </ul>
+            <div class="role-card__footer">
+                <span class="role-card__meta">Pensé pour des proches non spécialistes</span>
+                <span class="role-card__arrow">Ouvrir l'espace famille</span>
+            </div>
+        </a>
+    </section>
+
+    <section class="role-note">
+        <p>
+            Patient sélectionné actuellement : <strong data-current-patient>Marcel</strong>.
+            Ce choix pourra être modifié à tout moment dans l'application.
+        </p>
+    </section>
+</main>
+
+<script src="role-selection.js"></script>
+</body>
+</html>

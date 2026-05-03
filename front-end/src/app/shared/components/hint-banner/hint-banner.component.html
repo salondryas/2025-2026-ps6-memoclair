@@ -1,0 +1,7 @@
+<div class="hint-container">
+  <div class="hint-content">
+    <img src="assets/UI/Mascotte-homme-indice.png" alt="Guide" class="mascot-img" />
+    <span class="hint-text">{{ hint ? '💡 Indice : ' + hint : '💡 Prenez votre temps...' }}</span>
+  </div>
+  <button *ngIf="!hint" class="hint-action-btn" (click)="hintRequested.emit()">Demander un indice</button>
+</div>

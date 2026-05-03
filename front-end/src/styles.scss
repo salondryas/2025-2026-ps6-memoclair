@@ -1,0 +1,51 @@
+:root {
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, "Segoe UI", Roboto, sans-serif;
+  color: #22302a;
+  background-color: #f8fafc;
+  background-image: url('/assets/UI/global-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.caregiver-role-switch {
+  margin: 2rem 0 0;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.caregiver-role-switch a {
+  color: #3f6b52;
+  font-weight: 750;
+}

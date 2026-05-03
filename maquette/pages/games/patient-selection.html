@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Qui va jouer ?</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="patient-selection.css">
+</head>
+<body class="selection-body">
+
+<div class="selection-orb selection-orb--left" aria-hidden="true"></div>
+<div class="selection-orb selection-orb--right" aria-hidden="true"></div>
+
+<main class="selection-container">
+    <header class="selection-header">
+        <a href="../index/index.html" class="btn-back">
+            <span aria-hidden="true">←</span> Accueil
+        </a>
+        <p class="selection-kicker">Séance du jour</p>
+        <h1 class="main-title">Pour qui prépare-t-on ce moment ?</h1>
+        <p class="selection-subtitle">
+            Choisissez le patient pour adapter automatiquement le rythme, les repères visuels
+            et le type de stimulation proposé dans les jeux.
+        </p>
+    </header>
+
+    <section class="selection-overview">
+        <article class="selection-overview__card">
+            <p class="selection-overview__label">Dernier profil ouvert</p>
+            <strong class="selection-overview__value" id="last-patient">Marcel</strong>
+            <p class="selection-overview__text">Vous pourrez changer de patient à tout moment depuis les espaces jeux et aidant.</p>
+        </article>
+        <article class="selection-overview__card selection-overview__card--warm">
+            <p class="selection-overview__label">Principe MemoClair</p>
+            <strong class="selection-overview__value">Des repères, pas des scores</strong>
+            <p class="selection-overview__text">Les activités s'ajustent en silence pour préserver l'engagement et éviter toute mise en échec visible.</p>
+        </article>
+    </section>
+
+    <section class="patient-grid">
+        <button class="patient-card card--advance" data-patient="Marcel" data-id="marcel" type="button">
+            <div class="patient-card__head">
+                <div class="patient-card__avatar">M</div>
+                <div class="patient-card__meta">
+                    <span class="patient-card__stage">Repères visuels forts</span>
+                    <h2 class="patient-card__name">Marcel</h2>
+                </div>
+            </div>
+            <p class="patient-card__text">
+                Sessions très courtes, peu de choix, objets familiers et relances douces.
+            </p>
+            <div class="patient-card__tags">
+                <span class="patient-tag">Temps court</span>
+                <span class="patient-tag">Grandes cibles</span>
+                <span class="patient-tag">Routine simple</span>
+            </div>
+            <span class="patient-card__cta">Préparer la séance</span>
+        </button>
+
+        <button class="patient-card card--moderate" data-patient="Jean" data-id="jean" type="button">
+            <div class="patient-card__head">
+                <div class="patient-card__avatar">J</div>
+                <div class="patient-card__meta">
+                    <span class="patient-card__stage">Contexte guidé</span>
+                    <h2 class="patient-card__name">Jean</h2>
+                </div>
+            </div>
+            <p class="patient-card__text">
+                Associations concrètes, réminiscence accompagnée et séquences de routine avec guidage léger.
+            </p>
+            <div class="patient-card__tags">
+                <span class="patient-tag">3 choix max</span>
+                <span class="patient-tag">Relance discrète</span>
+                <span class="patient-tag">Variété modérée</span>
+            </div>
+            <span class="patient-card__cta">Préparer la séance</span>
+        </button>
+
+        <button class="patient-card card--light" data-patient="Paul" data-id="paul" type="button">
+            <div class="patient-card__head">
+                <div class="patient-card__avatar">P</div>
+                <div class="patient-card__meta">
+                    <span class="patient-card__stage">Exploration plus riche</span>
+                    <h2 class="patient-card__name">Paul</h2>
+                </div>
+            </div>
+            <p class="patient-card__text">
+                Séances plus longues, contextes variés et réminiscence plus autonome avec thèmes personnels.
+            </p>
+            <div class="patient-card__tags">
+                <span class="patient-tag">4 choix possibles</span>
+                <span class="patient-tag">Séquences complètes</span>
+                <span class="patient-tag">Thèmes porteurs</span>
+            </div>
+            <span class="patient-card__cta">Préparer la séance</span>
+        </button>
+    </section>
+</main>
+
+<script src="patient-selection.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<div class="app-container" [class.high-contrast]="state.profile.highContrastEnabled">
+  <app-game-header
+    [patientName]="(patientName$ | async)?.firstName ?? ''"
+    title="Association et Quotidien"
+    [canGoNext]="!state.finished"
+    (nextClicked)="onNext()"
+  ></app-game-header>
+
+  <section *ngIf="!state.finished" class="main-layout">
+    <main class="game-panel">
+      <div class="game-container main-game-area" [class.transitioning]="isTransitioning">
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="progressPercent"></div>
+          </div>
+          <p class="progress-value">{{ state.index + 1 }}/{{ state.questions.length }}</p>
+        </div>
+
+        <img *ngIf="question.type === 'multiple-choice'" [src]="question.promptImage" alt="Objet principal" class="prompt-image" />
+
+        <h2 class="question-text" 
+            [class.chrono-title]="question.type === 'chrono-order'"
+            [style.fontSize.em]="state.profile.textSize">
+          {{ question.prompt }}
+        </h2>
+
+        <app-hint-banner
+          [hint]="state.hint"
+          (hintRequested)="onHint()"
+          [class.chrono-mode-banner]="question.type === 'chrono-order'">
+        </app-hint-banner>
+
+        <div class="feedback-box" [class.is-empty]="!state.feedback">
+          {{ state.feedback || '&nbsp;' }}
+        </div>
+
+        <!-- MODE CHOIX MULTIPLE -->
+        <ng-container *ngIf="question.type === 'multiple-choice'">
+          <div class="choices-grid">
+            <app-choice-card
+              *ngFor="let c of shuffledChoices"
+              [choice]="c"
+              [isCorrect]="isCorrectChoice(c.id)"
+              [isWrong]="isWrongSelectedChoice(c.id)"
+              [isAutoHighlighted]="isAutoHighlighted(c.id)"
+              [isDisabled]="state.locked"
+              [style.fontSize.em]="state.profile.textSize"
+              (cardClicked)="onChoose(c.id)"
+            ></app-choice-card>
+          </div>
+        </ng-container>
+
+        <!-- MODE ORDRE CHRONOLOGIQUE -->
+        <ng-container *ngIf="question.type === 'chrono-order'">
+          <div class="chrono-layout">
+            <div class="zones-grid">
+              <div
+                *ngFor="let zone of placedSteps; let i = index"
+                class="zone-card"
+                [class.filled]="zone !== null"
+                (click)="zone && onChronoStepClick(zone, true)"
+              >
+                <img *ngIf="zone" [src]="zone.image" alt="Étape {{ i + 1 }}" class="zone-image" />
+                <span *ngIf="!zone" class="zone-placeholder">{{ i + 1 }}</span>
+              </div>
+            </div>
+
+            <div class="steps-row">
+              <div
+                *ngFor="let step of availableSteps"
+                class="step-card"
+                [class.hint-levitation]="step.isHinted"
+                (click)="onChronoStepClick(step, false)"
+              >
+                <img [src]="step.image" alt="Choix" />
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </main>
+
+    <aside class="sidebar sidebar-right">
+      <div class="assist-actions">
+        <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="state.profile.audioReadingEnabled">
+          🔊 Lire la question
+        </button>
+        <button type="button" class="assist-btn pause-btn" (click)="onTogglePause()">
+          {{ isPaused ? "▶ Reprendre" : "⏸ Pause" }}
+        </button>
+      </div>
+    </aside>
+  </section>
+</div>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Associations du Quotidien</title>
+    <script src="../../scripts/settings-apply.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="game-a.css">
+</head>
+<body class="daily-body">
+
+<main class="game-container">
+
+    <header class="game-header">
+        <a href="games.html" class="btn-back">
+            <span aria-hidden="true">←</span> Retour aux jeux
+        </a>
+        <div class="game-header__content">
+            <p class="game-kicker">Jeu A · repères du quotidien</p>
+            <h1 class="game-title">Associations du Quotidien</h1>
+            <p class="game-subtitle">
+                Une séance courte pour retrouver des objets familiers, leur contexte naturel
+                et l'ordre de petits gestes du quotidien.
+            </p>
+        </div>
+        <div class="game-header__status">
+            <span class="status-pill" id="patient-pill">Marcel</span>
+            <span class="status-pill status-pill--warm" id="question-counter">Étape 1 / 3</span>
+        </div>
+    </header>
+
+    <section class="game-stage">
+        <article class="focus-panel">
+            <div class="focus-panel__meta">
+                <span class="focus-chip" id="activity-type">Repère visuel</span>
+                <span class="focus-chip focus-chip--warm" id="activity-axis">Objet familier</span>
+            </div>
+
+            <div class="focus-panel__visual" id="visual-panel" aria-live="polite"></div>
+
+            <h2 class="game-instruction" id="game-instruction">Chargement...</h2>
+            <p class="game-helper" id="game-helper">Prenez votre temps. Un repère partiel suffit.</p>
+        </article>
+
+        <aside class="support-panel">
+            <div class="support-card">
+                <p class="support-card__eyebrow">Repère du moment</p>
+                <p class="support-card__text" id="support-reassurance">
+                    On peut avancer calmement, un geste ou un objet à la fois.
+                </p>
+            </div>
+
+            <div class="support-card">
+                <p class="support-card__eyebrow">Ce qu'on stimule</p>
+                <ul class="support-points" id="support-points">
+                    <li>Mémoire sémantique</li>
+                    <li>Repères concrets</li>
+                    <li>Routine du quotidien</li>
+                </ul>
+            </div>
+
+            <button class="btn-soft-skip" id="btn-skip-round" type="button">Passer cette étape</button>
+        </aside>
+    </section>
+
+    <section class="choices-section">
+        <div class="sequence-lane" id="sequence-lane" hidden>
+            <p class="sequence-lane__label">Ordre retenu</p>
+            <div class="sequence-lane__slots" id="sequence-slots"></div>
+        </div>
+
+        <section class="choices" id="choices-container" aria-label="Choisissez la proposition qui convient le mieux"></section>
+    </section>
+
+    <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+
+</main>
+
+<script src="game-a.js"></script>
+</body>
+</html>

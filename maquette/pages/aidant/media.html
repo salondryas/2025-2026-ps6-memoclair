@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Médias</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="media.css">
+    <script src="../../components/mc-navbar.js" defer></script>
+</head>
+<body class="aidant-body">
+
+<mc-navbar active="media" dir="aidant"></mc-navbar>
+
+<main class="media-container">
+
+    <header class="media-header">
+        <h1 class="media-title">Médias personnels</h1>
+        <p class="media-subtitle">
+            Ajoutez des photos ou de la musique pour personnaliser les jeux de <span id="patient-name">Marcel</span>.
+        </p>
+    </header>
+
+    <section class="media-guidance">
+        <h2 class="media-guidance__title">Quels souvenirs fonctionnent le mieux ?</h2>
+        <ul class="media-guidance__list">
+            <li>Des photos simples, connues et émotionnellement rassurantes.</li>
+            <li>Des musiques ou lieux qui ouvrent facilement une conversation.</li>
+            <li>Des souvenirs anciens, concrets, plus faciles à évoquer qu'à vérifier.</li>
+        </ul>
+        <p class="media-guidance__themes">
+            Thèmes porteurs enregistrés pour <span id="patient-theme-name">Marcel</span> :
+            <strong id="patient-themes">famille, quotidien</strong>
+        </p>
+    </section>
+
+    <!-- Zone de dépôt -->
+    <section class="dropzone" id="dropzone" aria-label="Zone de dépôt de fichiers">
+        <!-- Illustration -->
+        <svg class="dropzone__illustration" viewBox="0 0 160 130" aria-hidden="true">
+            <!-- Nuage -->
+            <circle cx="62"  cy="72" r="24" fill="#D5E9D7"/>
+            <circle cx="94"  cy="60" r="30" fill="#D5E9D7"/>
+            <circle cx="122" cy="74" r="20" fill="#D5E9D7"/>
+            <rect   x="40"   y="74" width="100" height="28" rx="4" fill="#D5E9D7"/>
+            <!-- Flèche montante -->
+            <line x1="82" y1="95"  x2="82" y2="52" stroke="#6B8F71" stroke-width="3.5" stroke-linecap="round"/>
+            <polyline points="68,64 82,50 96,64"  fill="none" stroke="#6B8F71" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Étoiles -->
+            <circle cx="30"  cy="52" r="5" fill="#FAD07A"/>
+            <circle cx="146" cy="44" r="4" fill="#FAD07A"/>
+            <circle cx="22"  cy="80" r="3" fill="#A8C4A2"/>
+        </svg>
+
+        <p class="dropzone__title">Glissez vos fichiers ici</p>
+        <p class="dropzone__sub">Photos (JPG, PNG) ou musique (MP3, M4A)</p>
+
+        <div class="dropzone__actions">
+            <label class="btn-browse" for="file-input">
+                Parcourir…
+            </label>
+            <input type="file" id="file-input" accept="image/*,audio/*" multiple hidden
+                   aria-label="Choisir des fichiers">
+        </div>
+
+        <!-- Indicateur de progression (caché au départ) -->
+        <div class="upload-progress" id="upload-progress" hidden>
+            <div class="upload-progress__bar">
+                <div class="upload-progress__fill" id="progress-fill"></div>
+            </div>
+            <p class="upload-progress__text" id="progress-text">Importation en cours…</p>
+        </div>
+    </section>
+
+    <!-- Galerie des médias existants -->
+    <section class="gallery" id="gallery" aria-label="Médias déjà ajoutés">
+        <h2 class="gallery__title">Médias ajoutés <span id="gallery-count">(4)</span></h2>
+
+        <div class="gallery__grid" id="gallery-grid">
+
+            <div class="thumb">
+                <div class="thumb__media" aria-label="Jardin 2019">🌻</div>
+                <p class="thumb__label">Jardin 2019</p>
+                <button class="thumb__remove" aria-label="Supprimer Jardin 2019" title="Supprimer">×</button>
+            </div>
+
+            <div class="thumb">
+                <div class="thumb__media" aria-label="Famille Noël">👨‍👩‍👧</div>
+                <p class="thumb__label">Famille Noël</p>
+                <button class="thumb__remove" aria-label="Supprimer Famille Noël" title="Supprimer">×</button>
+            </div>
+
+            <div class="thumb thumb--audio">
+                <div class="thumb__media" aria-label="Chanson préférée">🎵</div>
+                <p class="thumb__label">Chanson préférée</p>
+                <button class="thumb__remove" aria-label="Supprimer Chanson préférée" title="Supprimer">×</button>
+            </div>
+
+            <div class="thumb">
+                <div class="thumb__media" aria-label="Vacances Bretagne">🏖️</div>
+                <p class="thumb__label">Vacances Bretagne</p>
+                <button class="thumb__remove" aria-label="Supprimer Vacances Bretagne" title="Supprimer">×</button>
+            </div>
+
+        </div>
+
+        <!-- État vide (caché si galerie non vide) -->
+        <p class="gallery__empty" id="gallery-empty" hidden>
+            Ajoutez des photos ou de la musique pour personnaliser les jeux.
+        </p>
+    </section>
+
+    <!-- Conseil -->
+    <div class="tip-banner">
+        <span class="tip-banner__icon">💡</span>
+        <p>Privilégiez les souvenirs qui ouvrent une conversation, même s'ils ne sont pas reconnus immédiatement.</p>
+    </div>
+
+</main>
+
+<script src="media.js"></script>
+</body>
+</html>

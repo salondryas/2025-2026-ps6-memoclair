@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Accueil</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="home-body">
+
+<div class="home-orb home-orb--left"></div>
+<div class="home-orb home-orb--right"></div>
+
+<main class="home-container">
+    <header class="home-header">
+        <span class="home-kicker">MemoClair</span>
+        <h1 class="main-title">Stimuler la mémoire sans mettre en échec.</h1>
+        <p class="subtitle">
+            Une expérience pensée pour les personnes vivant avec Alzheimer ou des troubles cognitifs apparentés,
+            en centre de jour comme à domicile, avec des parcours distincts pour les aidants et les patients.
+        </p>
+        <div class="home-highlights">
+            <span class="home-highlight">Sessions courtes et apaisées</span>
+            <span class="home-highlight">Grand confort visuel</span>
+            <span class="home-highlight">Mode duo aidant / patient</span>
+        </div>
+    </header>
+
+    <section class="profile-cards">
+        <a href="../games/patient-selection.html" class="card card--senior" id="link-senior">
+            <div class="card__badge">Patient / Centre de jour</div>
+            <div class="card__icon">
+                <img src="../assets/pictuers/homme_page/chemin_jeux.png" alt="Espace Jeux">
+            </div>
+            <div class="card__content">
+                <h2 class="card__title">Lancer une séance</h2>
+                <p class="card__text">Des jeux sobres, guidés et non évaluatifs pour faire émerger des repères du quotidien et des souvenirs anciens.</p>
+                <ul class="card__list">
+                    <li>Associations du quotidien</li>
+                    <li>Réminiscence visuelle et sonore</li>
+                    <li>Parcours simple, centré patient</li>
+                </ul>
+                <span class="card__btn">Accéder aux jeux</span>
+            </div>
+        </a>
+
+        <a href="../aidant/role-selection.html" class="card card--aidant" id="link-aidant">
+            <div class="card__badge">Aidant / Famille</div>
+            <div class="card__icon">
+                <img src="../assets/pictuers/homme_page/chemin_admin.png" alt="Espace Aidant">
+            </div>
+            <div class="card__content">
+                <h2 class="card__title">Préparer et suivre</h2>
+                <p class="card__text">Un espace pour choisir les thèmes porteurs, ajouter des souvenirs utiles et relire des repères de séance sans logique de score.</p>
+                <ul class="card__list">
+                    <li>Profil patient en 5 repères</li>
+                    <li>Médias et thèmes porteurs</li>
+                    <li>Repères de séance pour la suite</li>
+                </ul>
+                <span class="card__btn">Ouvrir l'espace aidant</span>
+            </div>
+        </a>
+    </section>
+
+    <p class="home-note">
+        Aucun compte requis pour démarrer. L'objectif n'est pas d'évaluer, mais de soutenir l'engagement, l'identité et le lien.
+    </p>
+</main>
+
+<script src="index.js"></script>
+</body>
+</html>

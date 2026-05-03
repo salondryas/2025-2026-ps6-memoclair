@@ -1,0 +1,118 @@
+.navbar {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 9rem;
+  gap: 2rem;
+}
+
+/* ── Logo ── */
+.navbar__brand {
+  flex-shrink: 0;
+
+  ::ng-deep .brand-img {
+    height: 137px;
+  }
+}
+
+/* ── Liens de navigation ── */
+.navbar__links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.3rem 2.6rem;
+  text-decoration: none;
+  color: #1f2937;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border-radius: 999px;
+  min-width: 170px;
+  border: 2px solid transparent;
+  transition: all 0.18s ease;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(209, 213, 219, 0.6);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  &--active {
+    background: rgba(239, 246, 255, 0.9);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.35);
+    font-weight: 800;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+  }
+}
+
+/* ── Patient selector via ::ng-deep ── */
+::ng-deep mc-patient-selector .patient-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 310px;
+}
+
+::ng-deep mc-patient-selector .patient-selector__label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+::ng-deep mc-patient-selector .patient-selector__select {
+  padding: 0.8rem 1.25rem;
+  border: 2px solid rgba(209, 213, 219, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 72px;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+@media (max-width: 900px) {
+  .navbar__container {
+    padding: 0 1.25rem;
+    height: 5.5rem;
+  }
+
+  ::ng-deep .brand-img { height: 64px !important; }
+
+  .navbar__link {
+    font-size: 1.05rem;
+    padding: 0.8rem 1.25rem;
+    min-width: 100px;
+  }
+}

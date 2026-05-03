@@ -1,0 +1,34 @@
+<div class="role-topbar">
+  <img src="assets/UI/memo-brand.png" alt="MemoClair" class="role-logo" routerLink="/" />
+  <a routerLink="/" class="btn-back">← Accueil</a>
+</div>
+
+<main class="role-page">
+
+  <h1 class="role-title">Qui êtes-vous ?</h1>
+
+  <div class="role-cards">
+
+    <button type="button"
+            class="role-card card--medical"
+            (click)="chooseRole('professional')"
+            aria-label="Espace soignant — professionnel de santé">
+      <div class="role-card__visual">
+        <img src="assets/UI/Mascotte-professionnel.png" alt="Soignant" />
+      </div>
+      <h2 class="role-card__name">Soignant</h2>
+    </button>
+
+    <button type="button"
+            class="role-card card--family"
+            (click)="chooseRole('family')"
+            aria-label="Espace famille — proche aidant">
+      <div class="role-card__visual">
+        <img src="assets/images/generic/famille.png" alt="Famille" />
+      </div>
+      <h2 class="role-card__name">Famille</h2>
+    </button>
+
+  </div>
+
+</main>

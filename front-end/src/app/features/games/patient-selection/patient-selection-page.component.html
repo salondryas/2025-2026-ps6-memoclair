@@ -1,0 +1,68 @@
+<main class="selection">
+
+  <a (click)="goBack()" class="btn-back">{{ backButtonText }}</a>
+
+  <h1 class="selection-title">Pour qui ?</h1>
+
+  <button type="button" class="manage-profiles-btn" (click)="goToProfileManagement()">
+    Gérer les profils
+  </button>
+
+  <!-- Single neutral card with button to open patient list -->
+  <div class="patient-selector-card" [ngClass]="selectedPatient?.cardClass">
+    <div class="patient-selector-card__avatar" [ngClass]="selectedPatient ? '' : 'patient-selector-card__avatar--neutral'">
+      <img
+        *ngIf="selectedPatient?.patient?.avatarUrl; else selectedInitial"
+        class="patient-selector-card__avatar-image"
+        [src]="selectedPatient!.patient.avatarUrl"
+        alt="" />
+      <ng-template #selectedInitial>
+        {{ selectedPatient ? selectedPatient.patient.firstName[0] : '?' }}
+      </ng-template>
+    </div>
+    <h2 class="patient-selector-card__name">{{ selectedPatient ? selectedPatient.patient.firstName : 'Choisir un accueilli' }}</h2>
+    <p class="patient-selector-card__subtitle">{{ selectedPatient ? 'Profil sélectionné' : 'Sélectionnez un profil parmi la liste' }}</p>
+    <button type="button" class="patient-selector-card__btn" (click)="openPatientList()" *ngIf="!selectedPatient">
+      Voir les accueillis
+    </button>
+    <button type="button" class="patient-selector-card__btn patient-selector-card__btn--continue" (click)="continue()" *ngIf="selectedPatient">
+      Continuer
+    </button>
+  </div>
+
+  <!-- Popup modal with scrollable patient list -->
+  <div class="patient-modal" *ngIf="isModalOpen" (click)="closePatientList()">
+    <div class="patient-modal__content" (click)="$event.stopPropagation()">
+      <div class="patient-modal__header">
+        <h2>Choisir un accueilli</h2>
+        <button type="button" class="patient-modal__close" (click)="closePatientList()">✕</button>
+      </div>
+      <div class="patient-modal__list">
+        <button
+          *ngFor="let card of cards"
+          class="patient-list-item"
+          [ngClass]="[card.cardClass, selectedPatient?.patient?.id === card.patient.id ? 'patient-list-item--selected' : '']"
+          (click)="selectPatient(card.patient.id)"
+          type="button">
+          <div class="patient-list-item__avatar">
+            <img
+              *ngIf="card.patient.avatarUrl; else listInitial"
+              class="patient-list-item__avatar-image"
+              [src]="card.patient.avatarUrl"
+              alt="" />
+            <ng-template #listInitial>
+              {{ card.patient.firstName[0] }}
+            </ng-template>
+          </div>
+          <div class="patient-list-item__info">
+            <h3>{{ card.patient.firstName }}</h3>
+            <span>{{ card.patient.stageLabel }}</span>
+          </div>
+          <span class="patient-list-item__check" *ngIf="selectedPatient?.patient?.id === card.patient.id">✓</span>
+          <span class="patient-list-item__arrow" *ngIf="selectedPatient?.patient?.id !== card.patient.id">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>

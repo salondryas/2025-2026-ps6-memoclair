@@ -1,0 +1,111 @@
+<div class="app-container" [class.high-contrast]="profile.highContrastEnabled" [style.fontSize.em]="profile.textSize">
+  <app-game-header
+    [patientName]="(patientName$ | async)?.firstName ?? ''"
+    title="Mémoire & Réminiscence"
+    [canGoNext]="!finished"
+    (nextClicked)="onNext()"
+  ></app-game-header>
+
+  <div *ngIf="loading" class="gameb-loading">
+    <div class="gameb-spinner"></div>
+    <p>Préparation des souvenirs personnalisés…</p>
+  </div>
+
+  <section *ngIf="!loading && !finished" class="main-layout">
+    <main class="game-panel">
+      <div class="game-container main-game-area">
+
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="progressPercent"></div>
+          </div>
+          <p class="progress-value">{{ currentQuestionIndex + 1 }}/{{ totalQuestions }}</p>
+        </div>
+
+        <div class="media-section">
+          <div *ngIf="currentQuestion.mediaType === 'image' && currentQuestion.imageSrc" class="media-wrapper">
+            <img
+              [src]="currentQuestion.imageSrc"
+              alt="Souvenir personnel"
+              class="memory-image"
+            />
+            <div class="media-meta" *ngIf="currentQuestion.source || currentQuestion.caption">
+              <span class="meta-pill" *ngIf="currentQuestion.source">{{ currentQuestion.source }}</span>
+              <span class="meta-caption" *ngIf="currentQuestion.caption">{{ currentQuestion.caption }}</span>
+            </div>
+          </div>
+
+          <app-large-audio-controls
+            *ngIf="currentQuestion.mediaType === 'audio' && currentQuestion.audioSrc"
+            [src]="currentQuestion.audioSrc"
+            title="Souvenir musical">
+          </app-large-audio-controls>
+        </div>
+
+        <app-guide-mascot
+          [text]="currentQuestion.question"
+          mascotImage="assets/UI/mascotte-famme2.png">
+        </app-guide-mascot>
+
+        <app-hint-banner class="no-mascot-banner" [hint]="hintMessage" (hintRequested)="requestHint()"></app-hint-banner>
+
+        <div class="feedback-box" [class.is-empty]="!feedbackMessage">
+          {{ feedbackMessage || '\u00A0' }}
+        </div>
+
+        <div class="choices-grid">
+          <button
+            *ngFor="let c of currentQuestion.choices"
+            type="button"
+            class="choice-btn"
+            [class.correct]="isCorrectChoice(c.id)"
+            [class.wrong]="isWrongSelectedChoice(c.id)"
+            [class.auto-highlight]="isAutoHighlighted(c.id)"
+            [disabled]="locked"
+            (click)="onChoose(c.id)"
+          >
+            <span class="choice-label">{{ c.label }}</span>
+            <span class="check" *ngIf="isCorrectChoice(c.id)">✓</span>
+          </button>
+        </div>
+
+      </div>
+    </main>
+
+    <aside class="sidebar sidebar-right">
+      <div class="assist-actions">
+        <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="profile.audioReadingEnabled">
+          🔊 Lire la question
+        </button>
+        <button type="button" class="assist-btn hint-btn" (click)="requestHint()" [disabled]="locked">
+          💡 Indice
+        </button>
+        <button type="button" class="assist-btn skip-btn" (click)="skipQuestion()" [disabled]="locked">
+          ⏭️ Passer ce souvenir
+        </button>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<style>
+  .gameb-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 1.5rem;
+    color: #64748b;
+    font-size: 1.1rem;
+  }
+  .gameb-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin-b 0.8s linear infinite;
+  }
+  @keyframes spin-b { to { transform: rotate(360deg); } }
+</style>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Espace Famille</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="dashboard-familial.css">
+</head>
+<body class="familial-body">
+
+<nav class="navbar-familial">
+    <a href="../index/index.html" class="navbar-familial__logo">MemoClair <span>Famille</span></a>
+
+    <div class="navbar-familial__center">
+        <select id="persona-selector" class="persona-select">
+            <option value="Marcel">Marcel</option>
+            <option value="Jean">Jean</option>
+            <option value="Paul">Paul</option>
+        </select>
+    </div>
+
+    <div class="navbar-familial__links">
+        <a href="../index/index.html" class="nav-item btn-return">Accueil</a>
+    </div>
+</nav>
+
+<main class="dashboard-container">
+
+    <header class="dashboard-header">
+        <p class="dashboard-kicker">Espace famille</p>
+        <h1 class="dashboard-title">Préparer un moment simple avec <span class="patient-name-display">Marcel</span></h1>
+        <p class="dashboard-subtitle">
+            Ajoutez quelques souvenirs, retrouvez les thèmes qui lui parlent le plus et lancez une séance à deux sans transformer le moment en exercice.
+        </p>
+    </header>
+
+    <section class="dashboard-highlight">
+        <article class="highlight-card">
+            <p class="highlight-card__eyebrow">Suggestion du jour</p>
+            <h2 class="highlight-card__title" id="family-reco-title">Commencer par un souvenir connu</h2>
+            <p class="highlight-card__text" id="family-reco-text">
+                Une photo de famille très lisible ou une musique familière peut aider à entrer dans la séance sans pression.
+            </p>
+        </article>
+
+        <article class="highlight-card highlight-card--warm">
+            <p class="highlight-card__eyebrow">Thèmes porteurs</p>
+            <div class="family-theme-list" id="family-theme-list">
+                <span class="family-theme">famille</span>
+                <span class="family-theme">quotidien</span>
+            </div>
+            <p class="highlight-card__text" id="family-theme-copy">
+                Choisissez de préférence un souvenir simple qui ouvre la conversation sans demander de réponse exacte.
+            </p>
+        </article>
+    </section>
+
+    <section class="dashboard-grid">
+        <article class="action-card family-action">
+            <div class="action-card__content">
+                <div class="action-card__icon" aria-hidden="true">📸</div>
+                <h3 class="action-card__title">Album souvenir</h3>
+                <p class="action-card__text">
+                    Ajoutez des photos ou de la musique pour enrichir les séances de <strong><span class="patient-name-display">Marcel</span></strong>
+                    avec des repères personnels connus.
+                </p>
+            </div>
+            <a href="media.html" class="btn-family">Ajouter des souvenirs</a>
+        </article>
+
+        <article class="action-card family-action family-action--soft">
+            <div class="action-card__content">
+                <div class="action-card__icon" aria-hidden="true">🤝</div>
+                <h3 class="action-card__title">Jouer à deux</h3>
+                <p class="action-card__text">
+                    Lancez un moment guidé avec des suggestions discrètes pour accompagner le souvenir sans corriger.
+                </p>
+            </div>
+            <a href="../games/patient-selection.html" class="btn-family btn-family--ghost">Ouvrir les jeux</a>
+        </article>
+
+        <article class="action-card family-action family-action--wide">
+            <div class="action-card__content">
+                <div class="action-card__icon" aria-hidden="true">💬</div>
+                <h3 class="action-card__title">Petits repères pour bien accompagner</h3>
+                <ul class="family-guidance-list" id="family-guidance-list">
+                    <li>Laisser quelques secondes de silence avant de relancer.</li>
+                    <li>Privilégier les questions ouvertes ou les commentaires doux.</li>
+                    <li>Passer au souvenir suivant si une gêne apparaît.</li>
+                </ul>
+            </div>
+        </article>
+    </section>
+
+</main>
+
+<script src="dashboard-familial.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<header class="app-header header">
+  <div class="header-left">
+    <app-brand-logo></app-brand-logo>
+    <div class="patient-badge" *ngIf="patientName">👤 {{ patientName }}</div>
+  </div>
+
+  <div class="header-center">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="header-right">
+    <button type="button" class="next-btn header-next-btn" [disabled]="!canGoNext" (click)="onNext()">
+      Passer a la suite
+    </button>
+  </div>
+</header>

@@ -1,0 +1,186 @@
+.profile-container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.4rem 2rem 5rem;
+}
+
+.profile-header {
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 30px;
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    padding: 2rem;
+}
+
+.profile-title {
+    font-size: clamp(2.1rem, 3.8vw, 3.3rem);
+    margin-bottom: 0.55rem;
+    color: var(--color-text);
+}
+
+.profile-subtitle {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 700px;
+}
+
+.question-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 248, 244, 0.96) 100%);
+    border-radius: 28px;
+    padding: 1.8rem;
+    margin-bottom: 1.1rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-line);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.question-number {
+    width: 38px;
+    height: 38px;
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.question-label {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.question-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.15rem;
+}
+
+.block-label {
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.card-copy {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.65;
+}
+
+.chips-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.chip {
+    padding: 0.85rem 1.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: rgba(255, 255, 255, 0.94);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    box-shadow: 0 12px 24px rgba(70, 102, 84, 0.2);
+}
+
+.chip:hover:not(.active),
+.chip:focus-visible:not(.active) {
+    border-color: var(--color-primary-mid);
+    color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.summary-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: linear-gradient(180deg, #F3F7F3 0%, #FFFFFF 100%);
+    border-radius: 22px;
+    padding: 1.25rem;
+    border: 1px solid rgba(95, 138, 111, 0.18);
+    color: var(--color-primary-dark);
+    line-height: 1.6;
+}
+
+.settings-note {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.inline-link {
+    color: var(--color-primary-dark);
+    font-weight: 700;
+}
+
+.save-status {
+    margin-top: 1rem;
+    text-align: center;
+    color: var(--color-primary-dark);
+    font-weight: 600;
+}
+
+.btn-save {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin: 2rem auto 0;
+    padding: 1.2rem 1.4rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 16px 30px rgba(70, 102, 84, 0.22);
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-save:hover,
+.btn-save:focus {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+body.high-contrast .profile-header,
+body.high-contrast .question-card {
+    background: rgba(30, 37, 33, 0.98);
+    border-color: #44534c;
+}
+
+body.high-contrast .summary-box {
+    background: rgba(17, 22, 19, 0.98);
+    border-color: #44534c;
+    color: #fff;
+}
+
+@media (max-width: 760px) {
+    .profile-container {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .profile-header,
+    .question-card {
+        padding: 1.25rem;
+    }
+}

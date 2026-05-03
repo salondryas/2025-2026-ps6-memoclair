@@ -1,0 +1,70 @@
+<audio
+  #player
+  [src]="src"
+  (loadedmetadata)="onLoadedMetadata()"
+  (timeupdate)="onTimeUpdate()"
+  (ended)="onEnded()">
+</audio>
+
+<div class="player-wrap">
+
+  <!-- Disque vinyle + Play superposé -->
+  <div class="vinyl-zone">
+    <div class="vinyl" [class.vinyl--spinning]="isPlaying">
+      <div class="vinyl-label"></div>
+      <div class="vinyl-hole"></div>
+    </div>
+
+    <button class="btn-play" (click)="togglePlayPause()" type="button"
+            [attr.aria-label]="isPlaying ? 'Pause' : 'Lecture'">
+      <svg *ngIf="!isPlaying" width="36" height="36" viewBox="0 0 24 24" fill="white">
+        <polygon points="6,3 20,12 6,21"/>
+      </svg>
+      <svg *ngIf="isPlaying" width="30" height="30" viewBox="0 0 24 24" fill="white">
+        <rect x="5" y="4" width="4" height="16" rx="1"/>
+        <rect x="15" y="4" width="4" height="16" rx="1"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Boutons ±5s + waveform CSS -->
+  <div class="skip-row">
+    <button class="btn-skip" (click)="rewind5()" type="button" aria-label="Reculer 5 secondes">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+        <polyline points="9 18 3 12 9 6"/>
+      </svg>
+      <span>5s</span>
+    </button>
+
+    <div class="waveform" [class.waveform--active]="isPlaying">
+      <span *ngFor="let b of bars; let i = index"
+            class="wave-bar"
+            [style.animation-delay.s]="i * 0.06">
+      </span>
+    </div>
+
+    <button class="btn-skip" (click)="forward5()" type="button" aria-label="Avancer 5 secondes">
+      <span>5s</span>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+        <polyline points="15 18 21 12 15 6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Barre de progression -->
+  <div class="progress-zone">
+    <span class="time">{{ formatTime(currentTime) }}</span>
+    <div class="timeline-track">
+      <div class="timeline-fill" [style.width.%]="progress"></div>
+      <input class="timeline-input" type="range" min="0"
+             [max]="duration || 0" [value]="currentTime"
+             (input)="seek($event)" aria-label="Position audio" />
+    </div>
+    <span class="time">{{ formatTime(duration) }}</span>
+  </div>
+
+</div>

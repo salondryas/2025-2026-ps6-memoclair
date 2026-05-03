@@ -1,0 +1,353 @@
+/* ══════════════════════════════════════════
+   Host & fond
+══════════════════════════════════════════ */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+  padding: 2.5rem 2rem 4rem;
+  box-sizing: border-box;
+}
+
+.catalog {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ══════════════════════════════════════════
+   Header patient
+══════════════════════════════════════════ */
+.catalog-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 3.5rem 2rem 2.5rem;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 6px 32px rgba(30, 48, 40, 0.08);
+}
+
+.catalog-nav {
+  position: absolute;
+  top: 1.4rem;
+  left: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: #556360;
+  background: #f0f4f1;
+  border: 1px solid rgba(95, 138, 111, 0.18);
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: background 0.18s;
+
+  &:hover { background: #e3ede7; }
+}
+
+/* Prénom du patient — point d'attention immédiat */
+.catalog-patient {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 900;
+  color: #1e3028;
+  margin: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* Pills contextuelles — petites, informatives, pas intrusives */
+.catalog-context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.context-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: #eef4f0;
+  border: 1px solid rgba(95, 138, 111, 0.18);
+  color: #2d5040;
+  font-weight: 700;
+  font-size: 1rem;
+
+  &--warm {
+    background: #fff4e0;
+    color: #8b5200;
+    border-color: rgba(215, 168, 87, 0.3);
+  }
+}
+
+/* ══════════════════════════════════════════
+   Bandeau recommandation
+══════════════════════════════════════════ */
+.reco-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 1.2rem 1.8rem;
+  background: #fffbe8;
+  border: 1.5px solid rgba(215, 168, 87, 0.4);
+  border-radius: 20px;
+  font-size: 1.1rem;
+  color: #5a3a00;
+}
+
+.reco-star  { font-size: 1.4rem; }
+.reco-label { font-weight: 600; color: #7a5200; }
+.reco-title { font-weight: 900; }
+
+/* ══════════════════════════════════════════
+   Grille des jeux — gap 40px minimum
+══════════════════════════════════════════ */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem; /* 40 px */
+}
+
+/* ══════════════════════════════════════════
+   Carte de jeu
+══════════════════════════════════════════ */
+.game-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2.5rem 2.5rem 2rem;
+  background: #fff;
+  border-radius: 32px;
+  border: 2px solid transparent;
+  box-shadow: 0 6px 32px rgba(30, 48, 40, 0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 56px rgba(30, 48, 40, 0.13);
+  }
+
+  /* Mise en évidence de la carte recommandée */
+  &.is-recommended {
+    border-color: #5f8a6f;
+    box-shadow:
+      0 0 0 4px rgba(95, 138, 111, 0.12),
+      0 6px 32px rgba(30, 48, 40, 0.08);
+  }
+}
+
+/* ── Icône + Titre ── */
+.game-card__header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.game-card__icon {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef4f0;
+  border-radius: 20px;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+/* Titre du jeu — minimum 1.5rem, ici 2rem */
+.game-card__title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1e3028;
+  margin: 0;
+  line-height: 1.15;
+}
+
+/* ── Tags visuels ── */
+.game-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(95, 138, 111, 0.2);
+  background: #eef4f0;
+  color: #1e3028;
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+
+  &--duo {
+    background: #f0ecfb;
+    border-color: rgba(130, 100, 200, 0.25);
+    color: #4a2e90;
+  }
+}
+
+/* ── Toggle duo ── */
+.duo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: #eef4f0;
+  border-radius: 18px;
+  flex-wrap: wrap;
+}
+
+.duo-toggle__label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e3028;
+  flex: 1;
+}
+
+.duo-active {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #4a2e90;
+  background: #f0ecfb;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(130, 100, 200, 0.25);
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #bfc9c4;
+  border-radius: 999px;
+  transition: background 0.22s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    transition: transform 0.22s;
+  }
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: #7a5cc0;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(30px);
+}
+
+/* ══════════════════════════════════════════
+   Bouton Jouer — impossible à rater
+══════════════════════════════════════════ */
+.btn-jouer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 88px;
+  border-radius: 22px;
+  background: #3a7554;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  margin-top: auto;
+  transition: background 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 10px 28px rgba(40, 90, 65, 0.22);
+
+  &:hover {
+    background: #2e5e42;
+    transform: translateY(-2px);
+  }
+
+  /* Variante recommandé : vert plus vif */
+  &--recommended {
+    background: #2a6644;
+    box-shadow: 0 12px 32px rgba(40, 90, 65, 0.28);
+  }
+
+  /* Variante duo : violet */
+  &--duo {
+    background: #6a46b8;
+    box-shadow: 0 12px 32px rgba(90, 50, 160, 0.24);
+
+    &:hover { background: #543797; }
+  }
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+══════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .catalog-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  :host { padding: 1.5rem 1rem 3rem; }
+
+  .catalog-header { padding: 4rem 1.5rem 2rem; }
+
+  .catalog-patient { font-size: 2.2rem; }
+
+  .game-card {
+    padding: 2rem 1.5rem 1.75rem;
+    gap: 1.75rem;
+  }
+
+  .game-card__title { font-size: 1.7rem; }
+
+  .btn-jouer {
+    min-height: 80px;
+    font-size: 1.7rem;
+  }
+
+  .btn-back { font-size: 0.9rem; }
+}

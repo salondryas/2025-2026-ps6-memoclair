@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Jeu de Mémoire</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="game-memory.css">
+</head>
+<body>
+
+<main class="game-container">
+
+    <header class="game-header">
+        <a href="../games/games.html" class="btn-back">
+            <span aria-hidden="true">⬅️</span>
+            Quitter le jeu
+        </a>
+        <h1 class="main-title">Trouvez les paires</h1>
+    </header>
+
+    <section class="memory-board">
+
+        <button class="memory-card memory-card--hidden" aria-label="Carte cachée">
+            <span class="card-pattern">❓</span>
+        </button>
+
+        <button class="memory-card memory-card--revealed" aria-label="Carte retournée : Un chien">
+            <img src="../../assets/pictuers/memory/photo_chien.png" alt="Un chien" class="card-image">
+        </button>
+
+        <button class="memory-card memory-card--hidden" aria-label="Carte cachée">
+            <span class="card-pattern">❓</span>
+        </button>
+
+        <div class="memory-card memory-card--matched" aria-label="Paire trouvée : Une pomme">
+            <img src="../../assets/pictuers/memory/pomme.png" alt="Une pomme" class="card-image">
+            <div class="match-badge">✅ Bravo !</div>
+        </div>
+        <div class="memory-card memory-card--matched" aria-label="Paire trouvée : Une pomme">
+            <img src="../../assets/pictuers/memory/pomme.png" alt="Une pomme" class="card-image">
+            <div class="match-badge">✅ Bravo !</div>
+        </div>
+
+        <button class="memory-card memory-card--hidden" aria-label="Carte cachée">
+            <span class="card-pattern">❓</span>
+        </button>
+
+    </section>
+
+</main>
+
+</body>
+</html>

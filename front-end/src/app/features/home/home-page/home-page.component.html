@@ -1,0 +1,25 @@
+<div class="home-container">
+
+  <div class="logo-wrapper">
+    <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="brand-logo" />
+  </div>
+
+  <div class="main-content">
+    <p class="tagline">Bienvenue ! Choisissez votre espace pour commencer.</p>
+
+    <div class="portals-wrapper">
+      <a [routerLink]="['/games/patient-selection']" [queryParams]="{ from: 'games' }" class="portal-card patient-card">
+        <img src="assets/UI/Mascotte-famme-bienveneu.png" alt="Espace Jeu" />
+        <h2>Espace Jeu</h2>
+        <p>Démarrer une session de stimulation</p>
+      </a>
+
+      <a routerLink="/caregiver" class="portal-card caregiver-card">
+        <img src="assets/UI/Mascotte-aidant.png" alt="Espace Aidant" />
+        <h2>Espace Aidant</h2>
+        <p>Suivi, statistiques et configuration</p>
+      </a>
+    </div>
+  </div>
+
+</div>

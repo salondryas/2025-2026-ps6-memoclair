@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="choice-card"
+  [class.correct]="isCorrect"
+  [class.success]="isCorrect"
+  [class.wrong]="isWrong"
+  [class.auto-highlight]="isAutoHighlighted"
+  [disabled]="isDisabled"
+  (click)="onCardClick()"
+>
+  <img [src]="choice.image" [alt]="choice.label" class="choice-image" />
+  <span class="choice-label">{{ choice.label }}</span>
+  <span class="check" *ngIf="isCorrect">✓</span>
+</button>

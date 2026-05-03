@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoClair - Statistiques</title>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="statistics.css">
+    <script src="../../components/mc-navbar.js" defer></script>
+</head>
+<body class="stats-body">
+
+<mc-navbar active="statistics" dir="statistics"></mc-navbar>
+
+<main class="stats-page">
+
+    <!-- Sélecteur patient -->
+    <div class="patient-bar">
+        <label for="patient-select">Dossier patient :</label>
+        <select id="patient-select">
+            <option value="marcel">Marcel D. — Stade Avancé</option>
+            <option value="jean">Jean M. — Stade Modéré</option>
+            <option value="paul">Paul R. — Stade Léger</option>
+        </select>
+    </div>
+
+    <div class="warning-card">
+        Ces repères servent à préparer la prochaine séance. Ils ne remplacent ni une évaluation clinique, ni le MMSE, ni l'ADL.
+    </div>
+
+    <!-- ── SECTION 1 : DONUTS GLOBAUX ── -->
+    <section class="global-section">
+        <h2 class="section-title">Repères de séance</h2>
+
+        <div class="donuts-row">
+
+            <!-- Donut 1 : Séances menées à terme -->
+            <div class="donut-card">
+                <div class="donut-wrap">
+                    <svg viewBox="0 0 120 120" class="donut-svg">
+                        <circle class="donut-bg"    cx="60" cy="60" r="50"/>
+                        <circle class="donut-fill"  cx="60" cy="60" r="50" id="donut-success-fill"/>
+                    </svg>
+                    <div class="donut-center">
+                        <span class="donut-pct" id="donut-success-pct">--</span>
+                        <span class="donut-unit">%</span>
+                    </div>
+                </div>
+                <p class="donut-label">Séances menées jusqu'au bout</p>
+                <p class="donut-sub" id="donut-success-sub">-- séances sur --</p>
+            </div>
+
+            <!-- Donut 2 : Besoin d'accompagnement -->
+            <div class="donut-card">
+                <div class="donut-wrap donut-multi">
+                    <svg viewBox="0 0 120 120" class="donut-svg">
+                        <circle class="donut-bg"          cx="60" cy="60" r="50"/>
+                        <circle class="donut-seg seg-faces"    cx="60" cy="60" r="50" id="donut-err-faces"/>
+                        <circle class="donut-seg seg-objects"  cx="60" cy="60" r="50" id="donut-err-objects"/>
+                        <circle class="donut-seg seg-souvenirs" cx="60" cy="60" r="50" id="donut-err-souvenirs"/>
+                    </svg>
+                    <div class="donut-center">
+                        <span class="donut-pct" id="donut-err-total">--</span>
+                        <span class="donut-unit">signaux</span>
+                    </div>
+                </div>
+                <p class="donut-label">Besoin d'accompagnement</p>
+                <div class="donut-legend">
+                    <span class="legend-dot dot-faces"></span><span id="leg-faces">Indices -- %</span>
+                    <span class="legend-dot dot-objects"></span><span id="leg-objects">Guidage verbal -- %</span>
+                    <span class="legend-dot dot-souvenirs"></span><span id="leg-souvenirs">Arrêts précoces -- %</span>
+                </div>
+            </div>
+
+            <!-- Donut 3 : Répartition par jeu -->
+            <div class="donut-card">
+                <div class="donut-wrap donut-multi">
+                    <svg viewBox="0 0 120 120" class="donut-svg">
+                        <circle class="donut-bg"         cx="60" cy="60" r="50"/>
+                        <circle class="donut-seg seg-gameA" cx="60" cy="60" r="50" id="donut-game-a"/>
+                        <circle class="donut-seg seg-gameB" cx="60" cy="60" r="50" id="donut-game-b"/>
+                    </svg>
+                    <div class="donut-center">
+                        <span class="donut-pct" id="donut-sessions-total">--</span>
+                        <span class="donut-unit">sessions</span>
+                    </div>
+                </div>
+                <p class="donut-label">Répartition par jeu</p>
+                <div class="donut-legend">
+                    <span class="legend-dot dot-gameA"></span><span id="leg-gameA">Associations -- %</span>
+                    <span class="legend-dot dot-gameB"></span><span id="leg-gameB">Réminiscence -- %</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── SECTION 2 : SESSIONS ── -->
+    <section class="sessions-section">
+        <h2 class="section-title">Sessions <span class="sessions-count" id="sessions-count"></span></h2>
+        <div id="sessions-list" class="sessions-list"></div>
+    </section>
+
+</main>
+
+<script src="statistics.js"></script>
+</body>
+</html>

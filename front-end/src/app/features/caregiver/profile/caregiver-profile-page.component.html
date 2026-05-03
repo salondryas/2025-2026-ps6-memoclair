@@ -1,0 +1,131 @@
+<mc-caregiver-shell>
+  <main class="profile-page">
+  <header class="profile-page__hero">
+    <p class="profile-page__kicker">Espace aidant</p>
+    <h1>Profil accueilli aidant</h1>
+    <p class="profile-page__subtitle">
+      Préparez une séance courte et adaptée en répondant à cinq repères simples.
+      Les réglages sont sauvegardés séparément pour chaque accueilli.
+    </p>
+  </header>
+
+  <section class="profile-page__patient-card">
+    <div>
+      <p class="profile-page__section-label">Accueilli actif</p>
+      <h2>{{ currentPatient.displayName }}</h2>
+      <p class="profile-page__patient-meta">{{ currentPatient.stageLabel }}</p>
+    </div>
+    <button type="button" class="btn-new-patient" (click)="openCreateForm()">
+      + Nouveau profil
+    </button>
+  </section>
+
+  <!-- Formulaire de création -->
+  <section *ngIf="showCreateForm" class="create-patient-card">
+    <h3>Créer un nouveau profil</h3>
+    <div class="create-patient-form">
+      <input
+        type="text"
+        class="create-patient-input"
+        placeholder="Prénom de l'accueilli"
+        [(ngModel)]="newFirstName"
+        (keydown.enter)="createPatient()"
+        autofocus />
+      <div class="create-patient-actions">
+        <button type="button" class="btn-create-confirm" (click)="createPatient()">Créer</button>
+        <button type="button" class="btn-create-cancel" (click)="cancelCreate()">Annuler</button>
+      </div>
+      <p *ngIf="createError" class="create-patient-error">{{ createError }}</p>
+    </div>
+  </section>
+
+  <section class="profile-card">
+    <div class="profile-card__header">
+      <span class="profile-card__index">1</span>
+      <div>
+        <h3>Difficulté du jeu</h3>
+        <p>Adaptez la complexité de la séance selon les capacités actuelles de l'accueilli.</p>
+      </div>
+    </div>
+
+    <div class="chip-group">
+      <button
+        *ngFor="let option of difficultyOptions"
+        type="button"
+        class="chip"
+        [class.chip--active]="isSelected(profile.difficulty, option.value)"
+        (click)="selectDifficulty(option.value)">
+        {{ option.label }}
+      </button>
+    </div>
+
+    <div class="difficulty-details" *ngIf="profile.difficulty !== 'personnalise'">
+      <p class="difficulty-details__title">Configuration {{ profile.difficulty }} :</p>
+      <ul class="difficulty-details__list">
+        <li>Nombre de questions : <strong>{{ profile.questionCount }}</strong></li>
+        <li>Nombre de réponses : <strong>{{ profile.answerCount }}</strong></li>
+        <li>Délai avant indice : <strong>{{ profile.hintDelaySeconds }}s</strong></li>
+      </ul>
+    </div>
+
+    <div class="custom-settings" *ngIf="profile.difficulty === 'personnalise'">
+      <div class="profile-card__block">
+        <p class="profile-card__label">Nombre de questions</p>
+        <input type="number" class="custom-settings__input" min="1" max="13" [(ngModel)]="profile.questionCount" (ngModelChange)="clearMessages()">
+      </div>
+      <div class="profile-card__block">
+        <p class="profile-card__label">Nombre de réponses (2 à 4)</p>
+        <input type="range" min="2" max="4" class="custom-settings__range" [(ngModel)]="profile.answerCount" (ngModelChange)="clearMessages()">
+        <span class="custom-settings__value">{{ profile.answerCount }}</span>
+      </div>
+      <div class="profile-card__block">
+        <p class="profile-card__label">Délai avant l'indice (secondes)</p>
+        <input type="number" class="custom-settings__input" min="1" max="30" [(ngModel)]="profile.hintDelaySeconds" (ngModelChange)="clearMessages()">
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-card">
+    <div class="profile-card__header">
+      <span class="profile-card__index">2</span>
+      <div>
+        <h3>Aides visuelles et auditives</h3>
+        <p>Améliorez le confort d'utilisation en activant des assistances spécifiques.</p>
+      </div>
+    </div>
+
+    <div class="profile-card__block">
+      <label class="toggle-control">
+        <span class="profile-card__label">Lecture audio de la question</span>
+        <input type="checkbox" class="toggle-control__checkbox" [ngModel]="profile.audioReadingEnabled" (ngModelChange)="toggleAudio($event)">
+      </label>
+    </div>
+
+    <div class="profile-card__block">
+      <label class="toggle-control">
+        <span class="profile-card__label">Option de contraste élevé</span>
+        <input type="checkbox" class="toggle-control__checkbox" [ngModel]="profile.highContrastEnabled" (ngModelChange)="toggleHighContrast($event)">
+      </label>
+    </div>
+
+    <div class="profile-card__block">
+      <p class="profile-card__label">Taille du texte</p>
+      <input type="range" min="1" max="2" step="0.1" class="custom-settings__range" [ngModel]="profile.textSize" (ngModelChange)="updateTextSize($event)">
+      <div class="text-sample" [style.fontSize.em]="profile.textSize" [class.high-contrast]="profile.highContrastEnabled">
+        Échantillon de texte : Comment allez-vous aujourd'hui ?
+      </div>
+    </div>
+  </section>
+
+  <div class="profile-page__actions">
+    <button type="button" class="profile-page__save" (click)="saveProfile()">
+      Enregistrer ce profil
+    </button>
+
+    <p *ngIf="saveStatus" class="profile-card__message profile-card__message--success">
+      {{ saveStatus }}
+    </p>
+  </div>
+
+  </main>
+</mc-caregiver-shell>
