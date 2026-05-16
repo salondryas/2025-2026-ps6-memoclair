@@ -6,6 +6,8 @@
 2) install the dependencies `npm install`. If you see any vunerabilities after the installation, like `5 moderate, 1 high`, you don't need to fix them. The project will build correctly.
 3) Run the application `npm run dev`
 
+Set `GEMINI_API_KEY` in your shell before using Game B or Duo generation. The API key is only read by the backend.
+
 ## Test your back
 
 To test if your backend is running correctly, you first shouldn't see any error in the console, and you can then open postman (https://www.postman.com/downloads/) and launch the following request:
@@ -17,14 +19,14 @@ To test if your backend is running correctly, you first shouldn't see any error 
 ``` . is not recognized as an internal command```
 
 To fix it, two options:
-- Updating the `dev` command in the package.json as follow: `"dev": "%INIT_CWD%/node_modules/.bin/nodemon app/index.js",`
+- Updating the `dev` command in the package.json as follow: `"dev": "%INIT_CWD%/node_modules/.bin/nodemon src/app.js",`
 - In case it doesn't work: 
 1) Install nodemon: `npm install -g nodemon`
-2) Run from git bash command line the nodemon command directly to start the server: `nodemon app/index.js` 
+2) Run from git bash command line the nodemon command directly to start the server: `nodemon src/app.js` 
 
 ## Development
 
-During the development process, you should use `npm run dev` to have livereload each time you modify a file in `app` folder.
+During the development process, you should use `npm run dev` to have livereload each time you modify a file in `src` folder.
 
 ## Run the end to end tests
 

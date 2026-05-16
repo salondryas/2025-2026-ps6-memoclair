@@ -6,12 +6,11 @@ import { RouterLink } from '@angular/router';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { PatientId, PatientProfile, PatientSummary } from '../../../models/patient.model';
 import { CaregiverProfileService } from '../services/caregiver-profile.service';
-import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-family-dashboard-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SharedModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './family-dashboard-page.component.html',
   styleUrl: './family-dashboard-page.component.scss',
 })

@@ -30,3 +30,69 @@ export interface DashboardMetric {
   value: string;
   helper: string;
 }
+
+export interface SessionChoiceDto {
+  id: string;
+  label: string;
+  isCorrect: boolean;
+}
+
+export interface GameBQuestionDto {
+  id: string;
+  mediaType: 'image' | 'audio';
+  imageSrc?: string;
+  audioSrc?: string;
+  question: string;
+  source: string;
+  caption: string;
+  hint: string;
+  choices: SessionChoiceDto[];
+}
+
+export interface GameBGenerateRequestDto {
+  patientName: string;
+}
+
+export interface GameBGenerateResponseDto {
+  questions: GameBQuestionDto[];
+  fromCache?: boolean;
+}
+
+export interface GameBGenerateErrorDto {
+  error: string;
+  questions?: GameBQuestionDto[];
+}
+
+export interface DuoRoundDto {
+  mediaType: 'image' | 'audio';
+  mediaSrc: string;
+  mediaAlt: string;
+  mediaCaption: string;
+  question: string;
+  helper: string;
+  choicesAidant: string[];
+  choicesAccueilli: string[];
+  correctIndex: number;
+  feedbackCorrect: string;
+}
+
+export interface DuoGenerateRequestDto {
+  patientName: string;
+}
+
+export interface DuoGenerateResponseDto {
+  rounds: DuoRoundDto[];
+  fromCache?: boolean;
+}
+
+export interface DuoNotEnoughMediaErrorDto {
+  error: 'not_enough_media';
+  message: string;
+  count: number;
+}
+
+export interface DuoGenerateErrorDto {
+  error: string;
+  message?: string;
+  count?: number;
+}

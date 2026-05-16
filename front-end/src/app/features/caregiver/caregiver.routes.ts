@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { FamilyDashboardPageComponent } from './family-dashboard/family-dashboard-page.component';
+import { FamilySouvenirsPageComponent } from './family-souvenirs/family-souvenirs-page.component';
 import { CaregiverMediaPageComponent } from './media/caregiver-media-page.component';
 import { CaregiverProfilePageComponent } from './profile/caregiver-profile-page.component';
 import { ProfileManagementPageComponent } from './profile-management/profile-management-page.component';
@@ -37,6 +38,11 @@ export const CAREGIVER_ROUTES: Routes = [
     path: 'family-dashboard',
     component: FamilyDashboardPageComponent,
     title: 'MemoClair - Dashboard familial',
+  },
+  {
+    path: 'family-souvenirs',
+    component: FamilySouvenirsPageComponent,
+    title: 'MemoClair - Souvenirs',
   },
   {
     path: 'statistics',

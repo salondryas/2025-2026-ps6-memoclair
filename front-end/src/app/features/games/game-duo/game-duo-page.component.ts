@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from '../../../../environments/environment';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { StatisticsService } from '../../caregiver/services/statistics.service';
 import { DuoFacilitationService, DuoRound, DuoState } from '../services/duo-facilitation.service';
-import { SupportLevel, EmotionalState } from '../../../models/session.model';
+import { DuoGenerateErrorDto, DuoGenerateRequestDto, DuoGenerateResponseDto, DuoNotEnoughMediaErrorDto, EmotionalState, SupportLevel } from '../../../models/session.model';
 import { SessionSummaryService } from '../services/session-summary.service';
 import { GameHeaderComponent } from '../../../shared/components/game-header/game-header.component';
 import { LargeAudioControlsComponent } from '../../../shared/components/games/large-audio-controls/large-audio-controls.component';
@@ -96,9 +96,10 @@ export class GameDuoPageComponent implements OnInit {
   }
 
   private generateQuestions(patientId: string, patientName: string): void {
-    this.http.post<{ rounds: DuoRound[] }>(
+    const payload: DuoGenerateRequestDto = { patientName };
+    this.http.post<DuoGenerateResponseDto>(
       `${environment.backendUrl}/api/duo/generate/${patientId}`,
-      { patientName },
+      payload,
     ).pipe(timeout(150000)).subscribe({
       next: ({ rounds }) => {
         this.state = {
@@ -107,8 +108,8 @@ export class GameDuoPageComponent implements OnInit {
         };
         this.pageState = 'ready';
       },
-      error: (err) => {
-        const body = err?.error;
+      error: (error: HttpErrorResponse) => {
+        const body = error.error as DuoGenerateErrorDto | DuoNotEnoughMediaErrorDto | null;
         if (body?.error === 'not_enough_media') {
           this.mediaCount = body.count ?? 0;
           this.pageState = 'not-enough-media';

@@ -14,6 +14,7 @@
   <section *ngIf="!loading && !finished" class="main-layout">
     <main class="game-panel">
       <div class="game-container main-game-area">
+        <app-mascot-decorator mascotUrl="assets/UI/mascotte-famme2.png" positionClass="game-mascot"></app-mascot-decorator>
 
         <div class="progress-wrap">
           <div class="progress-bar">
@@ -42,12 +43,10 @@
           </app-large-audio-controls>
         </div>
 
-        <app-guide-mascot
-          [text]="currentQuestion.question"
-          mascotImage="assets/UI/mascotte-famme2.png">
-        </app-guide-mascot>
-
-        <app-hint-banner class="no-mascot-banner" [hint]="hintMessage" (hintRequested)="requestHint()"></app-hint-banner>
+        <div class="hint-box">
+          <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
+          <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
+        </div>
 
         <div class="feedback-box" [class.is-empty]="!feedbackMessage">
           {{ feedbackMessage || '\u00A0' }}
@@ -77,7 +76,7 @@
         <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="profile.audioReadingEnabled">
           🔊 Lire la question
         </button>
-        <button type="button" class="assist-btn hint-btn" (click)="requestHint()" [disabled]="locked">
+        <button type="button" class="assist-btn hint-btn" (click)="onHint()" [disabled]="locked">
           💡 Indice
         </button>
         <button type="button" class="assist-btn skip-btn" (click)="skipQuestion()" [disabled]="locked">

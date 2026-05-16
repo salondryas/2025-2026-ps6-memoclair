@@ -7,12 +7,12 @@ import { Subscription, filter } from 'rxjs';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { PatientId, PatientSummary } from '../../../models/patient.model';
 import { StatisticsService, SessionDonutStats, SessionHistoryItem } from '../services/statistics.service';
-import { SharedModule } from '../../../shared/shared.module';
+import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
 
 @Component({
   selector: 'app-caregiver-statistics-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SharedModule],
+  imports: [CommonModule, FormsModule, RouterLink, CaregiverShellComponent],
   templateUrl: './caregiver-statistics-page.component.html',
   styleUrls: ['./caregiver-statistics-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

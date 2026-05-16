@@ -1,0 +1,190 @@
+// =============================
+// MemoClair Design Tokens
+// =============================
+
+// Color palette - neutrals
+$color-neutral-0: #ffffff;
+$color-black: #000000;
+$color-neutral-50: #f8fafc;
+$color-neutral-100: #f1f5f9;
+$color-neutral-150: #f3f4f6;
+$color-neutral-200: #e2e8f0;
+$color-neutral-300: #d1d5db;
+$color-neutral-400: #cbd5e1;
+$color-neutral-500: #94a3b8;
+$color-neutral-600: #64748b;
+$color-neutral-700: #475569;
+$color-neutral-800: #334155;
+$color-neutral-900: #1e293b;
+$color-neutral-950: #0f172a;
+$color-neutral-975: #1f2937;
+
+// Brand / primary
+$color-primary-50: #eff6ff;
+$color-primary-100: #dbeafe;
+$color-primary-200: #d6e4ff;
+$color-primary-300: #93c5fd;
+$color-primary-500: #3b82f6;
+$color-primary-600: #2563eb;
+$color-primary-700: #1d4ed8;
+$color-primary-800: #1e40af;
+
+// Clinical semantic colors
+$color-clinical-success-50: #f0fdf4;
+$color-clinical-success-75: #ecfdf3;
+$color-clinical-success-100: #dcfce7;
+$color-clinical-success-200: #d1fae5;
+$color-clinical-success-300: #bbf7d0;
+$color-clinical-success-400: #86efac;
+$color-clinical-success-450: #7ccf8f;
+$color-clinical-success-500: #4ade80;
+$color-clinical-success-80: #e9f8ee;
+$color-clinical-success-600: #22c55e;
+$color-clinical-success-700: #34a853;
+$color-clinical-success-900: #065f46;
+
+$color-clinical-warning-50: #fffbeb;
+$color-clinical-warning-75: #fffbf3;
+$color-clinical-warning-100: #fef3c7;
+$color-clinical-warning-300: #fcd34d;
+$color-clinical-warning-400: #fbbf24;
+$color-clinical-warning-500: #f59e0b;
+$color-clinical-warning-600: #d97706;
+$color-clinical-warning-900: #78350f;
+
+$color-clinical-error-100: #fecdd3;
+$color-clinical-error-300: #fca5a5;
+
+// Accent colors used in app
+$color-accent-cyan-600: #0284c7;
+$color-accent-moss-700: #3f6b52;
+$color-accent-moss-900: #22302a;
+$color-accent-slate-500: #888888;
+$color-accent-slate-400: #777777;
+$color-accent-gray-400: #aaaaaa;
+$color-accent-gray-500: #666666;
+$color-accent-emerald-700: #2f855a;
+
+// Typography scale (relative)
+$font-size-2xs: 0.72rem;
+$font-size-xs: 0.78rem;
+$font-size-sm: 0.85rem;
+$font-size-md: 0.9rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.1rem;
+$font-size-xl: 1.2rem;
+$font-size-2xl: 1.35rem;
+$font-size-3xl: 1.4rem;
+$font-size-4xl: 1.5rem;
+$font-size-5xl: 1.8rem;
+$font-size-6xl: 1.9rem;
+$font-size-7xl: 2rem;
+
+// Spacing scale
+$space-0: 0;
+$space-0-25: 0.0625rem; // 1px
+$space-0-5: 0.125rem; // 2px
+$space-0-75: 0.1875rem; // 3px
+$space-1: 0.25rem; // 4px
+$space-1-25: 0.3125rem; // 5px
+$space-1-5: 0.375rem; // 6px
+$space-2: 0.5rem; // 8px
+$space-2-5: 0.625rem; // 10px
+$space-3: 0.75rem; // 12px
+$space-3-75: 0.9375rem; // 15px
+$space-3-5: 0.875rem; // 14px
+$space-4: 1rem; // 16px
+$space-4-5: 1.125rem; // 18px
+$space-5: 1.25rem; // 20px
+$space-5-5: 1.375rem; // 22px
+$space-6-25: 1.5625rem; // 25px
+$space-6: 1.5rem; // 24px
+$space-7: 1.75rem; // 28px
+$space-7-5: 1.875rem; // 30px
+$space-8: 2rem; // 32px
+$space-8-75: 2.1875rem; // 35px
+$space-9: 2.25rem; // 36px
+$space-10: 2.5rem; // 40px
+$space-11: 2.75rem; // 44px
+$space-12: 3rem; // 48px
+$space-13: 3.25rem; // 52px
+$space-14: 3.5rem; // 56px
+$space-15: 3.75rem; // 60px
+$space-16: 4rem; // 64px
+$space-17-5: 4.375rem; // 70px
+$space-20: 5rem; // 80px
+$space-24: 6rem; // 96px
+$space-25: 6.25rem; // 100px
+$space-28: 7rem; // 112px
+$space-32: 8rem; // 128px
+$space-40: 10rem; // 160px
+
+// Border widths
+$border-width-1: 0.0625rem;
+$border-width-2: 0.125rem;
+$border-width-3: 0.1875rem;
+$border-width-4: 0.25rem;
+
+// Radius
+$radius-sm: 0.625rem;
+$radius-md: 0.75rem;
+$radius-lg: 1rem;
+$radius-xl: 1.5rem;
+$radius-pill: 999px;
+
+// Layout sizing
+$layout-header-height: 5rem; // 80px
+$layout-sidebar-width: 12.5rem; // 200px
+$layout-sidebar-width-sm: 11.25rem; // 180px
+$size-progress-height: 1.5rem; // 24px
+$size-progress-height-thin: 0.375rem; // 6px
+$size-spinner: 2.5rem; // 40px
+$offset-mascot-left: 55rem; // 880px
+$size-content-max-md: 55rem; // 880px
+$size-content-max-lg: 68.75rem; // 1100px
+
+// Breakpoints
+$breakpoint-lg: 56.25rem; // 900px
+$breakpoint-xl: 75rem; // 1200px
+
+// Shadows and overlays
+$shadow-soft: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.03);
+$shadow-card: 0 0.625rem 1.5rem rgba(15, 23, 42, 0.08);
+$shadow-card-strong: 0 1rem 3rem rgba(15, 23, 42, 0.1);
+$shadow-elevated: 0 2rem 5rem rgba(15, 23, 42, 0.18);
+
+$overlay-white-10: rgba(255, 255, 255, 0.1);
+$overlay-white-55: rgba(255, 255, 255, 0.55);
+$overlay-white-60: rgba(255, 255, 255, 0.6);
+$overlay-white-70: rgba(255, 255, 255, 0.7);
+$overlay-white-80: rgba(255, 255, 255, 0.8);
+$overlay-white-82: rgba(255, 255, 255, 0.82);
+$overlay-white-85: rgba(255, 255, 255, 0.85);
+$overlay-white-90: rgba(255, 255, 255, 0.9);
+$overlay-white-93: rgba(255, 255, 255, 0.93);
+$overlay-white-95: rgba(255, 255, 255, 0.95);
+
+$overlay-dark-4: rgba(0, 0, 0, 0.04);
+$overlay-dark-5: rgba(0, 0, 0, 0.05);
+$overlay-dark-8: rgba(0, 0, 0, 0.08);
+$overlay-dark-10: rgba(15, 23, 42, 0.1);
+$overlay-dark-14: rgba(15, 23, 42, 0.14);
+$overlay-dark-15: rgba(0, 0, 0, 0.15);
+$overlay-dark-18: rgba(15, 23, 42, 0.18);
+
+$overlay-primary-10: rgba(59, 130, 246, 0.1);
+$overlay-primary-15: rgba(59, 130, 246, 0.15);
+$overlay-primary-18: rgba(59, 130, 246, 0.18);
+$overlay-primary-20: rgba(59, 130, 246, 0.2);
+$overlay-primary-22: rgba(59, 130, 246, 0.22);
+$overlay-primary-30: rgba(37, 99, 235, 0.3);
+$overlay-primary-40: rgba(37, 99, 235, 0.4);
+
+$overlay-success-10: rgba(34, 197, 94, 0.1);
+$overlay-success-16: rgba(16, 185, 129, 0.16);
+$overlay-success-20: rgba(16, 185, 129, 0.2);
+$overlay-success-45: rgba(34, 197, 94, 0.45);
+
+$overlay-warning-15: rgba(245, 158, 11, 0.15);
+$overlay-warning-18: rgba(245, 158, 11, 0.18);
+$overlay-warning-20: rgba(245, 158, 11, 0.2);

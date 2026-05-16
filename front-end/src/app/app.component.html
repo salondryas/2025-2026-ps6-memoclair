@@ -1,1 +1,22 @@
 <router-outlet></router-outlet>
+<div class="floating-audio-panel">
+  <button
+    class="bgm-toggle-btn"
+    (click)="soundEffects.toggleBgMusic()"
+    [attr.aria-label]="soundEffects.isBgMusicPlaying ? 'Couper la musique' : 'Mettre la musique'"
+  >
+    {{ soundEffects.isBgMusicPlaying ? '🎵' : '🔇' }}
+  </button>
+  <div class="volume-control" *ngIf="soundEffects.isBgMusicPlaying">
+    <span class="vol-icon">🔉</span>
+    <input
+      type="range"
+      class="vol-slider"
+      min="0"
+      max="1"
+      step="0.05"
+      [value]="soundEffects.bgVolume"
+      (input)="soundEffects.setBgVolume($event)"
+    />
+  </div>
+</div>

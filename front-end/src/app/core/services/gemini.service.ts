@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, of, timeout } from 'rxjs';
+import { Observable, map, timeout } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { MediaItem } from '../../models/media.model';
@@ -26,7 +26,7 @@ export class GeminiService {
 
     console.group('[Gemini] Génération de questions duo');
     console.log('Patient :', patientName);
-    console.log('Médias envoyés :', mediaItems.map(i => ({ titre: i.title, type: i.kind, description: i.description })));
+    console.log('Médias envoyés :', mediaItems.map(i => ({ titre: i.title, type: i.kind, description: i.clinicalNote })));
     console.log('Prompt complet :', prompt);
     console.groupEnd();
 
@@ -39,10 +39,6 @@ export class GeminiService {
         const rounds = this.parseRounds(response, mediaItems);
         console.log('[Gemini] Réponse reçue :', rounds);
         return rounds;
-      }),
-      catchError((err) => {
-        console.error('[Gemini] Erreur :', err);
-        return of([]);
       }),
     );
   }
@@ -110,7 +106,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide de ${items.length} objets dans l
         feedbackAgree: round.feedbackAgree,
       }));
     } catch {
-      return [];
+      throw new Error('Réponse Gemini invalide: JSON non conforme pour les rounds duo.');
     }
   }
 

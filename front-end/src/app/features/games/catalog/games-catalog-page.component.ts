@@ -1,76 +1,46 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { GameCatalogService } from '../services/game-catalog.service';
 import { Game } from 'src/app/models/game.model';
 
+type CatalogGameId = 'game-a' | 'game-b';
+type CatalogGame = Game & { id: CatalogGameId };
+
 @Component({
   selector: 'app-games-catalog-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './games-catalog-page.component.html',
   styleUrls: ['./games-catalog-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamesCatalogPageComponent {
-  patientName$ = this.patientContext.activePatient$;
+  private readonly patientContext = inject(PatientContextService);
+  private readonly catalog = inject(GameCatalogService);
 
-  games: Game[] = this.catalog.getGames();
+  readonly activePatient = toSignal(this.patientContext.activePatient$, {
+    initialValue: this.patientContext.getActivePatientSnapshot(),
+  });
+  readonly patientFirstName = computed(() => this.activePatient()?.firstName ?? '...');
+  readonly patientAvatarUrl = computed(
+    () => this.activePatient()?.avatarUrl ?? 'assets/patients/Marcel.png',
+  );
 
-  // valeurs affichées
-  stageLabel = '...';
-  attentionMinutes = 5;
-  themeLabel = '...';
+  readonly games: CatalogGame[] = this.catalog.getGames().filter((game): game is CatalogGame => {
+    return game.id === 'game-a' || game.id === 'game-b';
+  });
 
-  recoTitle = '';
-  recoText = '';
-  recommendedGameId: Game['id'] | null = null;
-
-  constructor(
-    private readonly patientContext: PatientContextService,
-    private readonly catalog: GameCatalogService
-  ) {
-    const patient = this.patientContext.getActivePatientSnapshot(); // PatientSummary
-    const profile = this.catalog.getDefaultProfileForPatient(patient.firstName);
-
-    this.stageLabel = this.catalog.getStageLabel(profile.stage);
-    this.attentionMinutes = profile.attentionMinutes;
-    this.themeLabel = profile.themes.join(', ');
-
-    const reco = this.catalog.getRecommendation(profile);
-    this.recoTitle = reco.title;
-    this.recoText = reco.text;
-    this.recommendedGameId = reco.recommendedGameId;
-  }
-
-  duoMode = false;
-
-  isRecommended(game: Game): boolean {
-    return this.recommendedGameId === game.id;
-  }
-
-  isDuoEnabledFor(game: Game): boolean {
-    return game.id === 'game-b' && this.duoMode;
-  }
-
-  getIcon(id: Game['id']): string {
-    switch (id) {
-      case 'game-a':   return '🏠';
-      case 'game-b':   return '💭';
-      case 'game-duo': return '🤝';
+  getThumbnail(gameId: string): string {
+    if (gameId === 'game-a') {
+      return 'assets/games/game-a/thumbnails/cover.png';
     }
-  }
-
-  getGameRoute(game: Game): string {
-    if (this.isDuoEnabledFor(game)) return '/games/game-duo';
-    return game.route;
-  }
-
-  getPrimaryActionLabel(game: Game): string {
-    if (this.isDuoEnabledFor(game)) return '👥 Jouer en duo';
-    if (this.isRecommended(game)) return '⭐ Lancer';
-    return 'Lancer';
+    if (gameId === 'game-b') {
+      return 'assets/games/game-b/thumbnails/cover.png';
+    }
+    return '';
   }
 }

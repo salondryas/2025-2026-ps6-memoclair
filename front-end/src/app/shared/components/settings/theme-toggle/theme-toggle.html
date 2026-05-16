@@ -1,1 +1,14 @@
-<p>theme-toggle works!</p>
+<div class="toggle-row" (click)="toggle()">
+  <div class="toggle-row__text">
+    <span class="toggle-row__label">{{ label }}</span>
+    <span class="toggle-row__desc">{{ description }}</span>
+  </div>
+  <button
+    type="button"
+    class="toggle-switch"
+    [class.toggle-switch--on]="enabled"
+    [attr.aria-pressed]="enabled"
+    [attr.aria-label]="label">
+    <span class="toggle-switch__thumb"></span>
+  </button>
+</div>

@@ -1,0 +1,13 @@
+@use '../../../../styles/tokens' as *;
+
+:host {
+  display: contents;
+}
+
+.mascot-base {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  max-height: 40vh;
+  object-fit: contain;
+}

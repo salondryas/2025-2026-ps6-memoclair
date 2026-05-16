@@ -1,8 +1,8 @@
-import { Question } from './game-b-page.component';
+import { GameBQuestionDto } from '../../../models/session.model';
 
 const BASE = 'assets/games/game-b/questions';
 
-export const GAME_B_QUESTIONS: Question[] = [
+export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q1',
     mediaType: 'image',

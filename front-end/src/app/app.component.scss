@@ -1,5 +1,62 @@
+@use '../styles/tokens' as *;
+
 :host {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.floating-audio-panel {
+  position: fixed;
+  bottom: $space-8;
+  right: $space-8;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  background: $overlay-white-95;
+  border: $border-width-2 solid $color-neutral-200;
+  border-radius: $radius-pill;
+  padding: $space-2;
+  padding-right: $space-6;
+  box-shadow: 0 $space-1 $space-3-75 $overlay-dark-10;
+  z-index: 9999;
+}
+
+.bgm-toggle-btn {
+  width: $space-12;
+  height: $space-12;
+  border-radius: 50%;
+  border: none;
+  background: $color-neutral-100;
+  font-size: $font-size-5xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.bgm-toggle-btn:hover {
+  background: $color-neutral-200;
+  transform: scale(1.05);
+}
+
+.bgm-toggle-btn:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-1;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.vol-icon {
+  font-size: $font-size-2xl;
+}
+
+.vol-slider {
+  width: $space-20;
+  accent-color: $color-primary-500;
 }

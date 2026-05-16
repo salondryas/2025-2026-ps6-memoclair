@@ -1,1 +1,11 @@
-<p>font-size-slider works!</p>
+<div class="size-options">
+  <button
+    *ngFor="let opt of options"
+    type="button"
+    class="size-option"
+    [class.size-option--active]="value === opt.value"
+    (click)="select(opt.value)">
+    <span class="size-option__preview" [style.fontSize.rem]="opt.value">{{ opt.preview }}</span>
+    <span class="size-option__label">{{ opt.label }}</span>
+  </button>
+</div>

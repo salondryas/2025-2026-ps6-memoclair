@@ -21,6 +21,11 @@ export const GAMES_ROUTES: Routes = [
         loadComponent: () =>
           import('./game-b/game-b-page.component').then((m) => m.GameBPageComponent),
       },
+      {
+        path: 'game-duo',
+        loadComponent: () =>
+          import('./game-duo/game-duo-page.component').then((m) => m.GameDuoPageComponent),
+      },
 
       {
         path: 'patient-selection',

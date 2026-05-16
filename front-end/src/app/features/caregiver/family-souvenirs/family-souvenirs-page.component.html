@@ -1,0 +1,120 @@
+<!-- Navbar famille -->
+<nav class="fam-nav">
+  <div class="fam-nav__left">
+    <a routerLink="/" class="fam-nav__logo">
+      <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="fam-nav__logo-img" />
+    </a>
+    <button type="button" class="fam-nav__back" (click)="goBack()">← Retour</button>
+  </div>
+</nav>
+
+<main class="souvenirs-page">
+
+  <!-- En-tête -->
+  <header class="souvenirs-page__header">
+    <h1>Souvenirs de {{ currentPatient.firstName }}</h1>
+    <p class="souvenirs-page__subtitle">
+      Ajoutez des photos et des musiques qui rappellent de bons moments.
+    </p>
+  </header>
+
+  <!-- Progression duo -->
+  <div class="duo-banner" [class.duo-banner--ready]="duoReady">
+    <span class="duo-banner__icon">{{ duoReady ? '✓' : '🎮' }}</span>
+    <span>{{ duoProgress }}</span>
+  </div>
+
+  <!-- Formulaire ajout -->
+  <section class="souvenir-card">
+    <h2 class="souvenir-card__title">
+      <span aria-hidden="true">📸</span> Ajouter un souvenir
+    </h2>
+
+    <form class="souvenir-form" (ngSubmit)="addSouvenir()">
+
+      <!-- Description -->
+      <div class="form-field">
+        <label for="description">Décrivez ce souvenir</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="form.description"
+          rows="3"
+          [disabled]="uploading"
+          placeholder="Ex : Anniversaire de Paul en 2018 avec ses enfants à la mer…"></textarea>
+      </div>
+
+      <!-- Type de fichier + Ce souvenir parle de -->
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="kind">Type de fichier</label>
+          <select id="kind" name="kind" [(ngModel)]="form.kind" [disabled]="uploading">
+            <option *ngFor="let opt of kindOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="cueType">Ce souvenir parle de…</label>
+          <select id="cueType" name="cueType" [(ngModel)]="form.cueType" [disabled]="uploading">
+            <option *ngFor="let opt of cueOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fichier -->
+      <div class="form-field">
+        <label>Fichier (photo ou musique)</label>
+        <label class="file-picker">
+          <input type="file" accept="image/*,audio/*"
+                 (change)="onFileSelected($event)" [disabled]="uploading"
+                 aria-label="Choisir un fichier">
+          <span class="file-picker__btn">Choisir un fichier</span>
+          <span class="file-picker__name">{{ fileInputLabel }}</span>
+        </label>
+      </div>
+
+      <p *ngIf="validationMessage" class="form-message form-message--error">
+        {{ validationMessage }}
+      </p>
+
+      <button type="submit" class="btn-submit" [disabled]="uploading">
+        {{ uploading ? 'Enregistrement…' : 'Ajouter ce souvenir' }}
+      </button>
+
+      <p *ngIf="saveStatus" class="form-message form-message--success">{{ saveStatus }}</p>
+    </form>
+  </section>
+
+  <!-- Liste des souvenirs -->
+  <section class="souvenir-card">
+    <h2 class="souvenir-card__title">
+      <span aria-hidden="true">🗂️</span>
+      Souvenirs enregistrés
+      <span class="souvenir-count">{{ mediaItems.length }}</span>
+    </h2>
+
+    <p *ngIf="emptyState" class="souvenir-empty">
+      Aucun souvenir enregistré pour l'instant.
+    </p>
+
+    <div *ngIf="!emptyState" class="souvenir-list">
+      <article *ngFor="let item of mediaItems; trackBy: trackById" class="souvenir-item">
+        <div class="souvenir-item__icon" [class.souvenir-item__icon--audio]="item.kind === 'audio'">
+          {{ item.kind === 'audio' ? '🎵' : '📷' }}
+        </div>
+        <div class="souvenir-item__content">
+          <h3>{{ item.title }}</h3>
+          <p *ngIf="item.clinicalNote" class="souvenir-item__note">{{ item.clinicalNote }}</p>
+        </div>
+        <button
+          type="button"
+          class="souvenir-item__delete"
+          (click)="deleteSouvenir(item.id)"
+          [attr.aria-label]="'Supprimer ' + item.title">
+          ✕
+        </button>
+      </article>
+    </div>
+  </section>
+
+</main>

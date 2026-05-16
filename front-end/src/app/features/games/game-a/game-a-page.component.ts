@@ -8,13 +8,14 @@ import { GameASessionService, GameAState, GameAQuestion, GameAChoice, GameAStep 
 import { SupportLevel, EmotionalState } from '../../../models/session.model';
 import { SessionSummaryService } from '../services/session-summary.service';
 import { GameHeaderComponent } from '../../../shared/components/game-header/game-header.component';
-import { HintBannerComponent } from '../../../shared/components/hint-banner/hint-banner.component';
+import { MascotDecoratorComponent } from '../../../shared/components/mascot-decorator/mascot-decorator.component';
 import { ChoiceCardComponent } from '../../../shared/components/choice-card/choice-card.component';
+import { SoundEffectsService } from '../../../core/services/sound-effects.service';
 
 @Component({
   selector: 'app-game-a-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GameHeaderComponent, HintBannerComponent, ChoiceCardComponent],
+  imports: [CommonModule, RouterModule, GameHeaderComponent, MascotDecoratorComponent, ChoiceCardComponent],
   templateUrl: './game-a-page.component.html',
   styleUrls: ['./game-a-page.component.scss']
 })
@@ -36,6 +37,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   private hintTimeoutId: number | null = null;
   private autoRevealTimeoutId: number | null = null;
   private autoNextTimeoutId: number | null = null;
+  private autoNextQuestionTimeoutId: number | null = null;
   private transitionTimeoutId: number | null = null;
 
   private readonly startedAt = new Date().toISOString();
@@ -51,7 +53,8 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     private readonly statistics: StatisticsService,
     private readonly sessionSummary: SessionSummaryService,
     private readonly session: GameASessionService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly soundEffects: SoundEffectsService
   ) {}
 
   ngOnInit(): void {
@@ -105,18 +108,30 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.clearAssistFlow();
     const q = this.question;
     if (q?.correctChoiceId && choiceId !== q.correctChoiceId) this.wrongAnswers++;
+    this.soundEffects.play(q?.correctChoiceId === choiceId ? 'success' : 'gentleError');
     this.state = this.session.choose(this.state, choiceId);
+    if (this.state.locked) {
+      if (this.autoNextQuestionTimeoutId) {
+        window.clearTimeout(this.autoNextQuestionTimeoutId);
+      }
+      this.autoNextQuestionTimeoutId = window.setTimeout(() => {
+        this.onNext();
+      }, 5000);
+    }
   }
 
   onChronoStepClick(step: GameAStep, fromPlaced: boolean = false): void {
     if (this.state.locked || this.state.finished) return;
+    this.soundEffects.play('select');
+    let hasChanged = false;
 
     if (fromPlaced) {
       const index = this.placedSteps.indexOf(step);
       if (index !== -1) {
         this.placedSteps[index] = null;
         this.availableSteps.push(step);
-        this.availableSteps = this.shuffleArray(this.availableSteps.map(s => ({ ...s, isHinted: false })));
+        this.availableSteps = this.shuffleArray(this.availableSteps);
+        hasChanged = true;
       }
     } else {
       const index = this.availableSteps.indexOf(step);
@@ -125,11 +140,21 @@ export class GameAPageComponent implements OnInit, OnDestroy {
         const emptyIndex = this.placedSteps.findIndex(s => s === null);
         if (emptyIndex !== -1) {
           this.placedSteps[emptyIndex] = step;
-          if (this.placedSteps.every(s => s !== null)) {
-            this.validateChronoOrder();
-          }
+          hasChanged = true;
         }
       }
+    }
+
+    if (!hasChanged) return;
+
+    for (const availableStep of this.availableSteps) {
+      availableStep.isHinted = false;
+    }
+    this.state = { ...this.state, hint: null, feedback: null };
+    this.startAssistFlow();
+
+    if (this.placedSteps.every(s => s !== null)) {
+      this.validateChronoOrder();
     }
   }
 
@@ -138,11 +163,20 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.recordLatency();
     this.clearAssistFlow();
     this.state = this.session.validateChronoOrder(this.state, placedOrder);
+    if (this.state.locked) {
+      if (this.autoNextQuestionTimeoutId) {
+        window.clearTimeout(this.autoNextQuestionTimeoutId);
+      }
+      this.autoNextQuestionTimeoutId = window.setTimeout(() => {
+        this.onNext();
+      }, 5000);
+    }
   }
 
   onHint(): void {
     if (this.state.locked || this.state.finished) return;
     this.hintCount++;
+    this.soundEffects.play('hint');
 
     if (this.question.type === 'chrono-order' && this.question.correctOrder) {
       const placedIds = this.placedSteps.filter(s => s !== null).map(s => s!.id);
@@ -171,6 +205,9 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   onNext(): void {
     if (this.isTransitioning) return;
+    this.soundEffects.play('transition');
+    if (this.autoNextQuestionTimeoutId) window.clearTimeout(this.autoNextQuestionTimeoutId);
+    this.autoNextQuestionTimeoutId = null;
     this.clearAssistFlow();
     this.isAutoRevealed = false;
     this.isTransitioning = true;
@@ -337,8 +374,10 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     if (this.hintTimeoutId) window.clearTimeout(this.hintTimeoutId);
     if (this.autoRevealTimeoutId) window.clearTimeout(this.autoRevealTimeoutId);
     if (this.autoNextTimeoutId) window.clearTimeout(this.autoNextTimeoutId);
+    if (this.autoNextQuestionTimeoutId) window.clearTimeout(this.autoNextQuestionTimeoutId);
     this.hintTimeoutId = null;
     this.autoRevealTimeoutId = null;
     this.autoNextTimeoutId = null;
+    this.autoNextQuestionTimeoutId = null;
   }
 }

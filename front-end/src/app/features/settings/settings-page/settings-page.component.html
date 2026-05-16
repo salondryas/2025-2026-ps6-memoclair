@@ -1,1 +1,78 @@
-<!-- -->
+<main class="settings-page" *ngIf="prefs">
+
+  <header class="settings-page__header">
+    <a routerLink="/" class="btn-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Accueil
+    </a>
+    <h1>Paramètres</h1>
+  </header>
+
+  <div class="settings-page__sections">
+
+    <!-- Taille du texte -->
+    <section class="settings-section">
+      <div class="settings-section__title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="4 7 4 4 20 4 20 7"/>
+          <line x1="9" y1="20" x2="15" y2="20"/>
+          <line x1="12" y1="4" x2="12" y2="20"/>
+        </svg>
+        Taille du texte
+      </div>
+      <app-font-size-slider
+        [value]="prefs.textSize"
+        (valueChange)="onTextSizeChange($event)">
+      </app-font-size-slider>
+    </section>
+
+    <!-- Accessibilité visuelle -->
+    <section class="settings-section">
+      <div class="settings-section__title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+        </svg>
+        Visuel
+      </div>
+      <app-theme-toggle
+        label="Contraste élevé"
+        description="Renforce les contrastes pour une meilleure lisibilité."
+        [enabled]="prefs.highContrastEnabled"
+        (enabledChange)="onHighContrastChange($event)">
+      </app-theme-toggle>
+    </section>
+
+    <!-- Audio -->
+    <section class="settings-section">
+      <div class="settings-section__title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        Audio
+      </div>
+      <app-theme-toggle
+        label="Lecture audio"
+        description="Les questions sont lues à voix haute pendant les jeux."
+        [enabled]="prefs.audioReadingEnabled"
+        (enabledChange)="onAudioReadingChange($event)">
+      </app-theme-toggle>
+    </section>
+
+  </div>
+
+  <div class="settings-page__footer">
+    <button type="button" class="btn-reset" (click)="reset()">
+      Réinitialiser les paramètres
+    </button>
+  </div>
+
+</main>

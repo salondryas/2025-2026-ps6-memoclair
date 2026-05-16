@@ -8,7 +8,8 @@ import { MediaItem, MediaKind, MemoryCueType } from '../../../models/media.model
 import { PatientId, PatientSummary } from '../../../models/patient.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { MediaLibraryService } from '../services/media-library.service';
-import { SharedModule } from '../../../shared/shared.module';
+import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
+import { environment } from '../../../../environments/environment';
 
 const DUO_REQUIRED = 9;
 
@@ -21,7 +22,7 @@ interface MediaFormValue {
 @Component({
   selector: 'app-caregiver-media-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SharedModule],
+  imports: [CommonModule, FormsModule, RouterLink, CaregiverShellComponent],
   templateUrl: './caregiver-media-page.component.html',
   styleUrls: ['./caregiver-media-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +49,13 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     { value: 'event', label: 'Événement' },
     { value: 'music', label: 'Musique' },
   ];
+  private readonly cueLabels: Record<MemoryCueType, string> = {
+    location: 'Lieu',
+    person: 'Famille',
+    event: 'Événement',
+    music: 'Musique',
+    object: 'Objet',
+  };
 
   form: MediaFormValue = this.createEmptyForm();
   private selectedFile: File | null = null;
@@ -139,6 +147,14 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
 
   trackByMediaId(_: number, item: MediaItem): string {
     return item.id;
+  }
+
+  getMediaPreviewUrl(item: MediaItem): string {
+    return `${environment.backendUrl}/uploads/${encodeURIComponent(item.fileName)}`;
+  }
+
+  getCueLabel(cueType: MemoryCueType): string {
+    return this.cueLabels[cueType];
   }
 
   get currentPatient(): PatientSummary {

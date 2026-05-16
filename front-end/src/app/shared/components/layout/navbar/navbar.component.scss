@@ -20,12 +20,34 @@
   gap: 2rem;
 }
 
-/* ── Logo ── */
+/* ── Logo + retour ── */
 .navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   flex-shrink: 0;
 
   ::ng-deep .brand-img {
     height: 137px;
+  }
+}
+
+.navbar__back {
+  padding: 0.65rem 1.25rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #1e3028;
   }
 }
 

@@ -1,41 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
-import { SessionResult } from '../../../models/session.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
-import { StatisticsService } from '../../caregiver/services/statistics.service';
+import { SoundEffectsService } from '../../../core/services/sound-effects.service';
+import { PatientSummary } from '../../../models/patient.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-game-end-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule],
   templateUrl: './game-end-page.component.html',
   styleUrls: ['./game-end-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameEndPageComponent implements OnInit {
-  latestSession: SessionResult | null = null;
+  readonly patientName$: Observable<PatientSummary> = this.patientContext.activePatient$;
 
   constructor(
     private readonly patientContext: PatientContextService,
-    private readonly statisticsService: StatisticsService,
+    private readonly router: Router,
+    private readonly soundEffects: SoundEffectsService,
   ) {}
 
   ngOnInit(): void {
-    const patientId = this.patientContext.getActivePatientSnapshot().id;
-    this.latestSession = this.statisticsService.getSessionsForPatient(patientId)[0] ?? null;
+    this.soundEffects.play('sessionEnd');
   }
 
-  get gameLabel(): string {
-    switch (this.latestSession?.gameType) {
-      case 'game-a':
-        return 'Associations du quotidien';
-      case 'game-b':
-        return 'Mémoire & Réminiscence';
-      case 'game-duo':
-        return 'Mode Duo';
-      default:
-        return 'Jeu';
-    }
+  goHome(): void {
+    void this.router.navigate(['/games']);
   }
 }

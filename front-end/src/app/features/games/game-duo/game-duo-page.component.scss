@@ -1,10 +1,12 @@
+@use '../../../../styles/tokens' as *;
+
 :host {
   display: block;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   font-family: Arial, Roboto, 'Open Sans', sans-serif;
-  color: #0f172a;
+  color: $color-neutral-950;
   margin: 0;
   padding: 0;
 }
@@ -20,17 +22,17 @@
   justify-content: center;
   background: transparent;
 
-  &--warn { background: #fffbf3; }
+  &--warn { background: $color-clinical-warning-75; }
 }
 
 .state-box {
-  width: min(100%, 500px);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 24px;
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.1);
+  width: min(100%, 31.25rem);
+  background: $overlay-white-85;
+  backdrop-filter: blur($space-3-5);
+  -webkit-backdrop-filter: blur($space-3-5);
+  border: $border-width-1 solid $overlay-white-90;
+  border-radius: $radius-xl;
+  box-shadow: 0 $space-4 $space-12 $overlay-dark-10;
   padding: 2.5rem 2rem;
   text-align: center;
   display: flex;
@@ -38,8 +40,8 @@
   align-items: center;
   gap: 1rem;
 
-  h1 { font-size: 1.8rem; margin: 0; color: #0f172a; }
-  p  { color: #64748b; line-height: 1.6; margin: 0; }
+  h1 { font-size: $font-size-5xl; margin: 0; color: $color-neutral-950; }
+  p  { color: $color-neutral-600; line-height: 1.6; margin: 0; }
 }
 
 .state-icon { font-size: 3rem; line-height: 1; }
@@ -53,10 +55,10 @@
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e2e8f0;
-  border-top-color: #3b82f6;
+  width: $size-spinner;
+  height: $size-spinner;
+  border: $space-1 solid $color-neutral-200;
+  border-top-color: $color-primary-500;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -70,21 +72,21 @@
   height: 100vh;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 6px 80px 32px 1fr;
+  grid-template-rows: $size-progress-height-thin $layout-header-height $space-8 1fr;
   margin: 0;
   padding: 0;
 }
 
-/* ── Barre de progression bleue 6px ── */
+/* ── Barre de progression bleue 6 px ── */
 .top-progress {
   width: 100%;
-  height: 6px;
-  background: #e2e8f0;
+  height: $size-progress-height-thin;
+  background: $color-neutral-200;
   overflow: hidden;
 
   &__fill {
     height: 100%;
-    background: #3b82f6;
+    background: $color-primary-500;
     transition: width 0.5s ease;
   }
 
@@ -96,24 +98,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: #fff;
-  border-bottom: 1px solid #e2e8f0;
+  gap: $space-2;
+  background: $color-neutral-0;
+  border-bottom: $border-width-1 solid $color-neutral-200;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: $space-2-5;
+  height: $space-2-5;
   border-radius: 50%;
-  background: #d1d5db;
+  background: $color-neutral-300;
   transition: background 0.3s, transform 0.3s;
 
   &--done {
-    background: #86efac;
+    background: $color-clinical-success-400;
   }
 
   &--active {
-    background: #3b82f6;
+    background: $color-primary-500;
     transform: scale(1.35);
   }
 }
@@ -130,40 +132,40 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(10px, 1.5vh, 18px);
-  padding: clamp(8px, 1.2vh, 16px) 1.5rem clamp(6px, 1vh, 12px);
+  gap: clamp($space-2-5, 1.5vh, $space-4-5);
+  padding: clamp($space-2, 1.2vh, $space-4) $space-6 clamp($space-1-5, 1vh, $space-3);
 }
 
 /* Zone basse : les deux moitiés occupent TOUT l'espace restant */
 .split-zone {
   display: grid;
-  grid-template-columns: 1fr 3px 1fr;
+  grid-template-columns: 1fr $space-0-75 1fr;
   min-height: 0;
   overflow: hidden;
 }
 
 .divider-vert {
   background: rgba(30, 41, 59, 0.25);
-  border-radius: 999px;
-  margin: 16px 0;
+  border-radius: $radius-pill;
+  margin: $space-4 0;
 }
 
 .half {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: clamp(10px, 1.5vh, 18px);
-  padding: clamp(14px, 2vh, 24px) clamp(16px, 2.5vw, 40px);
+  gap: clamp($space-2-5, 1.5vh, $space-4-5);
+  padding: clamp($space-3-5, 2vh, $space-6) clamp($space-4, 2.5vw, $space-10);
   overflow: hidden;
 
   &--aidant {
     background: rgba(255, 251, 235, 0.55);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur($space-1);
   }
 
   &--patient {
     background: rgba(240, 253, 244, 0.55);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur($space-1);
   }
 }
 
@@ -176,10 +178,10 @@
 }
 
 .media-img {
-  width: min(92vw, 1000px);
-  height: clamp(280px, 45vh, 520px);
+  width: min(92vw, 62.5rem);
+  height: clamp(17.5rem, 45vh, 32.5rem);
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   display: block;
 }
 
@@ -187,51 +189,51 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
+  background: $overlay-white-82;
+  backdrop-filter: blur($space-2-5);
+  -webkit-backdrop-filter: blur($space-2-5);
+  border: $border-width-1 solid $overlay-white-90;
+  border-radius: $radius-lg;
   padding: 1.25rem 2.5rem;
-  width: min(92vw, 1000px);
+  width: min(92vw, 62.5rem);
   justify-content: center;
 }
 
 .audio-icon { font-size: 2rem; line-height: 1; }
-.audio-title { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin: 0; }
-.audio-player { height: 32px; width: min(100%, 240px); }
+.audio-title { font-size: 0.95rem; font-weight: 700; color: $color-neutral-950; margin: 0; }
+.audio-player { height: $space-8; width: min(100%, 15rem); }
 
 /* Question */
 .question-block {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: $space-1;
 }
 
 .question {
   font-size: clamp(1.6rem, 2.8vw, 2.2rem);
   font-weight: 800;
-  color: #0f172a;
+  color: $color-neutral-950;
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  max-width: min(88vw, 820px);
+  max-width: min(88vw, 51.25rem);
   text-align: center;
 }
 
 .helper {
   font-size: 0.85rem;
-  color: #888;
+  color: $color-accent-slate-500;
   font-style: italic;
   margin: 0;
 }
 
 /* Colonnes de pills */
 .pills-grid {
-  width: min(96vw, 1100px);
+  width: min(96vw, 68.75rem);
   display: grid;
-  grid-template-columns: 1fr 2px 1fr;
+  grid-template-columns: 1fr $space-0-5 1fr;
   gap: 0;
   align-items: stretch;
   align-self: stretch;
@@ -239,10 +241,10 @@
 }
 
 .vertical-divider {
-  width: 2px;
+  width: $space-0-5;
   background: rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-  margin: 0 clamp(16px, 2.5vw, 36px);
+  border-radius: $radius-pill;
+  margin: 0 clamp($space-4, 2.5vw, $space-9);
   align-self: stretch;
 }
 
@@ -251,7 +253,7 @@
   flex-direction: column;
   gap: 0;
   align-items: stretch;
-  padding: 0 clamp(12px, 2vw, 28px);
+  padding: 0 clamp($space-3, 2vw, $space-7);
   justify-content: center;
 }
 
@@ -259,13 +261,13 @@
   font-size: clamp(1.1rem, 1.9vw, 1.5rem);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #1e293b;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(6px);
-  padding: 8px 18px;
-  border-radius: 999px;
-  margin: 0 0 16px 0;
+  letter-spacing: $space-0-5;
+  color: $color-neutral-900;
+  background: $overlay-white-70;
+  backdrop-filter: blur($space-1-5);
+  padding: $space-2 $space-4-5;
+  border-radius: $radius-pill;
+  margin: 0 0 $space-4 0;
   text-align: center;
   align-self: center;
 }
@@ -275,7 +277,7 @@
 .pills-row {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.8vh, 20px);
+  gap: clamp($space-3, 1.8vh, $space-5);
   align-items: stretch;
   width: 100%;
   flex: 1;
@@ -288,41 +290,41 @@
   justify-content: center;
   flex: 1;
   width: 100%;
-  padding: 0 clamp(20px, 2vw, 32px);
-  border-radius: 999px;
-  min-height: clamp(64px, 9vh, 96px);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+   padding: 0 clamp($space-5, 2vw, $space-8);
+  border-radius: $radius-pill;
+   min-height: clamp($space-16, 9vh, $space-24);
+   background: $overlay-white-82;
+   backdrop-filter: blur($space-2-5);
+   -webkit-backdrop-filter: blur($space-2-5);
+   border: $border-width-1 solid $overlay-white-90;
+   box-shadow: 0 $space-1 $space-4 $overlay-dark-8;
   font-weight: 700;
   font-size: clamp(1.1rem, 2vw, 1.45rem);
-  color: #1e293b;
+   color: $color-neutral-900;
   cursor: pointer;
   font-family: inherit;
   transition: box-shadow 0.15s, transform 0.1s, background 0.15s;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.18);
-    transform: translateY(-1px);
+     box-shadow: 0 $space-1 $space-4 $overlay-primary-18;
+    transform: translateY(-$space-0-25);
   }
 
   &--active {
-    background: #dbeafe;
-    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.22);
-    color: #1e40af;
+     background: $color-primary-100;
+     box-shadow: 0 $space-0-5 $space-3 $overlay-primary-22;
+     color: $color-primary-800;
     font-weight: 700;
   }
 
   &--patient:hover:not(:disabled) {
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.16);
+     box-shadow: 0 $space-1 $space-4 $overlay-success-16;
   }
 
   &--patient#{&}--active {
-    background: #d1fae5;
-    box-shadow: 0 2px 12px rgba(16, 185, 129, 0.2);
-    color: #065f46;
+     background: $color-clinical-success-200;
+     box-shadow: 0 $space-0-5 $space-3 $overlay-success-20;
+     color: $color-clinical-success-900;
   }
 
   &:disabled { opacity: 0.45; cursor: default; transform: none; }
@@ -331,32 +333,32 @@
 .link-btn {
   background: none;
   border: none;
-  color: #3b82f6;
+   color: $color-primary-500;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   padding: 0.15rem 0;
-  margin-top: 6px;
+   margin-top: $space-1-5;
   transition: color 0.15s;
 
-  &:hover:not(:disabled) { color: #2563eb; text-decoration: underline; }
+   &:hover:not(:disabled) { color: $color-primary-600; text-decoration: underline; }
   &:disabled { opacity: 0.4; cursor: default; }
 }
 
 .subtle-note {
   font-size: 0.72rem;
-  color: #aaa;
+   color: $color-accent-gray-400;
   font-style: italic;
   margin: 0;
-  margin-top: 6px;
+   margin-top: $space-1-5;
 }
 
 /* Indicateur bas */
 .bottom-progress {
   font-size: clamp(0.95rem, 1.3vw, 1.1rem);
   font-weight: 700;
-  color: #777;
+   color: $color-accent-slate-400;
   text-align: center;
   margin: 0;
   letter-spacing: 0.05em;
@@ -368,8 +370,8 @@
 .feedback-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(240, 244, 248, 0.85);
-  backdrop-filter: blur(8px);
+   background: rgba(240, 244, 248, 0.85);
+   backdrop-filter: blur($space-2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -378,13 +380,13 @@
 }
 
 .feedback-card {
-  width: min(92vw, 780px);
-  background: rgba(255, 255, 255, 0.93);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 32px;
-  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.18);
+   width: min(92vw, 48.75rem);
+   background: $overlay-white-93;
+   backdrop-filter: blur($space-5);
+   -webkit-backdrop-filter: blur($space-5);
+   border: $border-width-1 solid $overlay-white-95;
+   border-radius: $space-8;
+   box-shadow: $shadow-elevated;
   padding: clamp(2rem, 5vh, 3.5rem) clamp(2rem, 5vw, 4rem);
   text-align: center;
   display: flex;
@@ -392,21 +394,21 @@
   align-items: center;
   gap: 1.25rem;
 
-  h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; color: #0f172a; margin: 0; }
-  p  { color: #475569; line-height: 1.7; margin: 0; font-size: clamp(1rem, 1.8vw, 1.2rem); }
+   h2 { font-size: clamp($font-size-5xl, 3.5vw, 2.6rem); font-weight: 900; color: $color-neutral-950; margin: 0; }
+   p  { color: $color-neutral-700; line-height: 1.7; margin: 0; font-size: clamp($font-size-base, 1.8vw, $font-size-xl); }
 }
 
 .fb-icon { font-size: clamp(3rem, 6vw, 4.5rem); line-height: 1; }
 
 .fb-reveal {
   font-size: clamp(1rem, 1.8vw, 1.2rem);
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 14px;
-  padding: 0.85rem 1.75rem;
-  color: #065f46;
+   background: $color-clinical-success-50;
+   border: $border-width-1 solid $color-clinical-success-300;
+   border-radius: $space-3-5;
+   padding: 0.85rem $space-7;
+   color: $color-clinical-success-900;
 
-  strong { color: #0f172a; font-size: 1.1em; }
+   strong { color: $color-neutral-950; font-size: 1.1em; }
 }
 
 .fb-actions {
@@ -421,51 +423,51 @@
    Boutons partagés
 ══════════════════════════ */
 .btn-primary {
-  min-height: 58px;
-  padding: 16px 40px;
-  border-radius: 999px;
+  min-height: 3.625rem;
+  padding: $space-4 $space-10;
+  border-radius: $radius-pill;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   font-family: inherit;
   border: none;
-  background: #3b82f6;
-  color: #fff;
+  background: $color-primary-500;
+  color: $color-neutral-0;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  min-width: 160px;
+  min-width: $space-40;
   justify-content: center;
   transition: background 0.15s;
 
-  &:hover { background: #2563eb; }
+  &:hover { background: $color-primary-600; }
 }
 
 .btn-ghost {
-  min-height: 58px;
-  padding: 16px 40px;
-  border-radius: 999px;
+  min-height: 3.625rem;
+  padding: $space-4 $space-10;
+  border-radius: $radius-pill;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   font-family: inherit;
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  background: $color-neutral-100;
+  color: $color-neutral-700;
+  border: $border-width-1 solid $color-neutral-200;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  min-width: 160px;
+  min-width: $space-40;
   justify-content: center;
   transition: background 0.15s;
 
-  &:hover { background: #e2e8f0; }
+  &:hover { background: $color-neutral-200; }
 }
 
 /* ══════════════════════════
    Responsive
 ══════════════════════════ */
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .pills-grid { grid-template-columns: 1fr; }
-  .media-img { width: 100%; height: 200px; }
+  .media-img { width: 100%; height: 12.5rem; }
 }

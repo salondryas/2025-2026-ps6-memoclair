@@ -10,88 +10,116 @@
     <h1>Gérer les profils</h1>
   </header>
 
-    <div class="profile-management-page__content">
-      <div class="profile-list">
-        <div *ngFor="let patient of patients" class="profile-card">
-          <div class="profile-card__avatar">
-            <img
-              *ngIf="patient.avatarUrl; else fallbackInitial"
-              class="profile-card__avatar-image"
-              [src]="patient.avatarUrl"
-              alt="" />
-            <ng-template #fallbackInitial>
-              {{ patient.firstName[0] }}
-            </ng-template>
-          </div>
-          <div class="profile-card__info">
-            <h2>{{ patient.firstName }}</h2>
-          </div>
-          <button 
-            type="button" 
-            class="profile-card__delete"
-            (click)="deletePatient(patient.id)"
-            [disabled]="!canDelete()"
-            [attr.aria-label]="'Supprimer ' + patient.firstName">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
+  <div class="profile-management-page__content">
+    <div class="profile-list">
+      <div *ngFor="let patient of patients" class="profile-card">
+        <div class="profile-card__avatar">
+          <img
+            *ngIf="patient.avatarUrl; else fallbackInitial"
+            class="profile-card__avatar-image"
+            [src]="patient.avatarUrl"
+            alt="" />
+          <ng-template #fallbackInitial>
+            {{ patient.firstName[0] }}
+          </ng-template>
         </div>
-      </div>
-
-      <button type="button" class="btn-add-profile" (click)="openAddModal()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="16"></line>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-        </svg>
-        Ajouter un profil
-      </button>
-    </div>
-
-    <!-- Modal pour ajouter un profil -->
-    <div class="add-profile-modal" *ngIf="isAddModalOpen" (click)="closeAddModal()">
-      <div class="add-profile-modal__content" (click)="$event.stopPropagation()">
-        <div class="add-profile-modal__header">
-          <h2>Nouveau profil</h2>
-          <button type="button" class="add-profile-modal__close" (click)="closeAddModal()">✕</button>
+        <div class="profile-card__info">
+          <h2>{{ patient.firstName }}</h2>
+          <p>{{ patient.stageLabel }}</p>
         </div>
-        <form class="add-profile-form" (ngSubmit)="submitAddProfile()">
-          <div class="form-field">
-            <label for="lastName">Nom</label>
-            <input 
-              type="text" 
-              id="lastName" 
-              [(ngModel)]="newProfile.lastName" 
-              required
-              placeholder="Ex: Dupont">
-          </div>
-          <div class="form-field">
-            <label for="firstName">Prénom</label>
-            <input 
-              type="text" 
-              id="firstName" 
-              [(ngModel)]="newProfile.firstName" 
-              required
-              placeholder="Ex: Marie">
-          </div>
-          <div class="form-field">
-            <label for="stage">Stade de la maladie</label>
-            <select id="stage" [(ngModel)]="newProfile.stage" required>
-              <option value="">Sélectionner...</option>
-              <option value="leger">Léger</option>
-              <option value="modere">Modéré</option>
-              <option value="avance">Avancé</option>
-            </select>
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn-cancel" (click)="closeAddModal()">Annuler</button>
-            <button type="submit" class="btn-submit" [disabled]="!isFormValid">Créer</button>
-          </div>
-        </form>
+        <button
+          type="button"
+          class="profile-card__delete"
+          (click)="deletePatient(patient.id)"
+          [disabled]="!canDelete(patient.id)"
+          [attr.aria-label]="'Supprimer ' + patient.firstName">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
       </div>
     </div>
-  </main>
+
+    <button type="button" class="btn-add-profile" (click)="openAddModal()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="16"></line>
+        <line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+      Ajouter un profil
+    </button>
+  </div>
+
+  <!-- Modal pour ajouter un profil -->
+  <div class="add-profile-modal" *ngIf="isAddModalOpen" (click)="closeAddModal()">
+    <div class="add-profile-modal__content" (click)="$event.stopPropagation()">
+      <div class="add-profile-modal__header">
+        <h2>Nouveau profil</h2>
+        <button type="button" class="add-profile-modal__close" (click)="closeAddModal()">✕</button>
+      </div>
+
+      <form class="add-profile-form" (ngSubmit)="submitAddProfile()">
+
+        <!-- Photo optionnelle -->
+        <div class="form-field form-field--photo">
+          <label>Photo (optionnel)</label>
+          <div class="photo-picker" (click)="triggerPhotoInput()" role="button" tabindex="0"
+               (keydown.enter)="triggerPhotoInput()">
+            <div class="photo-picker__preview">
+              <img *ngIf="newProfile.avatarUrl" [src]="newProfile.avatarUrl"
+                   alt="Aperçu" class="photo-picker__img" />
+              <span *ngIf="!newProfile.avatarUrl" class="photo-picker__placeholder">
+                {{ newProfile.firstName ? newProfile.firstName[0].toUpperCase() : '+' }}
+              </span>
+            </div>
+            <span class="photo-picker__label">
+              {{ newProfile.avatarUrl ? 'Changer la photo' : 'Ajouter une photo' }}
+            </span>
+          </div>
+          <input #photoInput type="file" accept="image/*"
+                 class="photo-picker__input" (change)="onPhotoSelected($event)" />
+        </div>
+
+        <div class="form-field">
+          <label for="lastName">Nom</label>
+          <input
+            type="text"
+            id="lastName"
+            [(ngModel)]="newProfile.lastName"
+            name="lastName"
+            required
+            placeholder="Ex: Dupont">
+        </div>
+
+        <div class="form-field">
+          <label for="firstName">Prénom</label>
+          <input
+            type="text"
+            id="firstName"
+            [(ngModel)]="newProfile.firstName"
+            name="firstName"
+            required
+            placeholder="Ex: Marie">
+        </div>
+
+        <div class="form-field">
+          <label for="stage">Stade de la maladie</label>
+          <select id="stage" [(ngModel)]="newProfile.stage" name="stage" required>
+            <option value="">Sélectionner...</option>
+            <option value="leger">Léger</option>
+            <option value="modere">Modéré</option>
+            <option value="avance">Avancé</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()">Annuler</button>
+          <button type="submit" class="btn-submit" [disabled]="!isFormValid">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>

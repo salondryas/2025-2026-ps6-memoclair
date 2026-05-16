@@ -1,3 +1,5 @@
+@use './styles/tokens' as *;
+
 :root {
   color-scheme: light;
 }
@@ -23,8 +25,8 @@ app-root {
 body {
   margin: 0;
   font-family: Inter, "Segoe UI", Roboto, sans-serif;
-  color: #22302a;
-  background-color: #f8fafc;
+  color: $color-accent-moss-900;
+  background-color: $color-neutral-50;
   background-image: url('/assets/UI/global-bg.png');
   background-size: cover;
   background-position: center;
@@ -46,6 +48,6 @@ textarea {
 }
 
 .caregiver-role-switch a {
-  color: #3f6b52;
+  color: $color-accent-moss-700;
   font-weight: 750;
 }

@@ -1,353 +1,194 @@
-/* ══════════════════════════════════════════
-   Host & fond
-══════════════════════════════════════════ */
+@use '../../../../styles/tokens' as *;
+
 :host {
   display: block;
   min-height: 100vh;
   background: transparent;
-  padding: 2.5rem 2rem 4rem;
+  padding: $space-10 $space-8 $space-16;
   box-sizing: border-box;
 }
 
 .catalog {
-  max-width: 1100px;
+  max-width: $size-content-max-lg;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: $space-10;
 }
 
-/* ══════════════════════════════════════════
-   Header patient
-══════════════════════════════════════════ */
 .catalog-header {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 1.25rem;
-  padding: 3.5rem 2rem 2.5rem;
-  background: #fff;
-  border-radius: 32px;
-  box-shadow: 0 6px 32px rgba(30, 48, 40, 0.08);
-}
-
-.catalog-nav {
-  position: absolute;
-  top: 1.4rem;
-  left: 1.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  gap: $space-5;
+  padding: $space-8;
+  background: $color-neutral-0;
+  border-radius: $radius-xl;
+  border: $border-width-1 solid $color-neutral-200;
+  box-shadow: $shadow-soft;
 }
 
 .btn-back {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-self: start;
+  gap: $space-2;
   text-decoration: none;
-  color: #556360;
-  background: #f0f4f1;
-  border: 1px solid rgba(95, 138, 111, 0.18);
-  padding: 0.75rem 1.1rem;
-  border-radius: 999px;
+  color: $color-neutral-700;
+  background: $color-neutral-100;
+  border: $border-width-1 solid $color-neutral-300;
+  padding: $space-3 $space-5;
+  border-radius: $radius-pill;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: $font-size-base;
+  min-height: $space-11;
   transition: background 0.18s;
 
-  &:hover { background: #e3ede7; }
+  &:hover {
+    background: $color-neutral-150;
+  }
 }
 
-/* Prénom du patient — point d'attention immédiat */
 .catalog-patient {
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  justify-self: center;
+  font-size: $font-size-7xl;
   font-weight: 900;
-  color: #1e3028;
+  color: $color-accent-moss-900;
   margin: 0;
   line-height: 1.1;
   text-align: center;
 }
 
-/* Pills contextuelles — petites, informatives, pas intrusives */
-.catalog-context {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
+.patient-photo-circle {
+  justify-self: end;
+  width: $space-15;
+  height: $space-15;
+  border-radius: $radius-pill;
+  object-fit: cover;
+  border: $border-width-2 solid $color-neutral-200;
+  background: $color-neutral-100;
 }
 
-.context-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.6rem 1.1rem;
-  border-radius: 999px;
-  background: #eef4f0;
-  border: 1px solid rgba(95, 138, 111, 0.18);
-  color: #2d5040;
-  font-weight: 700;
-  font-size: 1rem;
-
-  &--warm {
-    background: #fff4e0;
-    color: #8b5200;
-    border-color: rgba(215, 168, 87, 0.3);
-  }
-}
-
-/* ══════════════════════════════════════════
-   Bandeau recommandation
-══════════════════════════════════════════ */
-.reco-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  padding: 1.2rem 1.8rem;
-  background: #fffbe8;
-  border: 1.5px solid rgba(215, 168, 87, 0.4);
-  border-radius: 20px;
-  font-size: 1.1rem;
-  color: #5a3a00;
-}
-
-.reco-star  { font-size: 1.4rem; }
-.reco-label { font-weight: 600; color: #7a5200; }
-.reco-title { font-weight: 900; }
-
-/* ══════════════════════════════════════════
-   Grille des jeux — gap 40px minimum
-══════════════════════════════════════════ */
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2.5rem; /* 40 px */
+  gap: $space-10;
 }
 
-/* ══════════════════════════════════════════
-   Carte de jeu
-══════════════════════════════════════════ */
 .game-card {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2.5rem 2.5rem 2rem;
-  background: #fff;
-  border-radius: 32px;
-  border: 2px solid transparent;
-  box-shadow: 0 6px 32px rgba(30, 48, 40, 0.08);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  align-items: stretch;
+  gap: $space-6;
+  padding: $space-8;
+  background: $color-neutral-0;
+  border-radius: $radius-xl;
+  border: $border-width-1 solid $color-neutral-200;
+  box-shadow: none;
+  opacity: 0;
+  transform: translateY($space-2);
+  animation: game-card-fade-up 0.45s ease-out forwards;
+  transition: border-color 0.22s ease;
+
+  @for $index from 1 through 8 {
+    &:nth-child(#{$index}) {
+      animation-delay: #{($index - 1) * 0.06}s;
+    }
+  }
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 56px rgba(30, 48, 40, 0.13);
-  }
-
-  /* Mise en évidence de la carte recommandée */
-  &.is-recommended {
-    border-color: #5f8a6f;
-    box-shadow:
-      0 0 0 4px rgba(95, 138, 111, 0.12),
-      0 6px 32px rgba(30, 48, 40, 0.08);
+    border-color: $color-neutral-300;
   }
 }
 
-/* ── Icône + Titre ── */
-.game-card__header {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
+.game-card__image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-top-left-radius: $radius-xl;
+  border-top-right-radius: $radius-xl;
+  border-bottom-left-radius: $space-0;
+  border-bottom-right-radius: $space-0;
+  border: $border-width-1 solid $color-neutral-200;
+  background: $color-neutral-100;
 }
 
-.game-card__icon {
-  width: 72px;
-  height: 72px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #eef4f0;
-  border-radius: 20px;
-  font-size: 2.6rem;
-  line-height: 1;
-}
-
-/* Titre du jeu — minimum 1.5rem, ici 2rem */
 .game-card__title {
-  font-size: 2rem;
+  font-size: $font-size-7xl;
   font-weight: 900;
-  color: #1e3028;
+  color: $color-accent-moss-900;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
-/* ── Tags visuels ── */
-.game-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.65rem 1.1rem;
-  border-radius: 999px;
-  border: 1.5px solid rgba(95, 138, 111, 0.2);
-  background: #eef4f0;
-  color: #1e3028;
-  font-weight: 700;
-  font-size: 1rem;
-  white-space: nowrap;
-
-  &--duo {
-    background: #f0ecfb;
-    border-color: rgba(130, 100, 200, 0.25);
-    color: #4a2e90;
-  }
-}
-
-/* ── Toggle duo ── */
-.duo-toggle {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.2rem 1.5rem;
-  background: #eef4f0;
-  border-radius: 18px;
-  flex-wrap: wrap;
-}
-
-.duo-toggle__label {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #1e3028;
-  flex: 1;
-}
-
-.duo-active {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #4a2e90;
-  background: #f0ecfb;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(130, 100, 200, 0.25);
-}
-
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 64px;
-  height: 34px;
-  cursor: pointer;
-  flex-shrink: 0;
-
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-  }
-}
-
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: #bfc9c4;
-  border-radius: 999px;
-  transition: background 0.22s;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 4px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-    transition: transform 0.22s;
-  }
-}
-
-.toggle-switch input:checked + .toggle-slider {
-  background: #7a5cc0;
-}
-
-.toggle-switch input:checked + .toggle-slider::before {
-  transform: translateX(30px);
-}
-
-/* ══════════════════════════════════════════
-   Bouton Jouer — impossible à rater
-══════════════════════════════════════════ */
 .btn-jouer {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 88px;
-  border-radius: 22px;
-  background: #3a7554;
-  color: #fff;
+  min-height: calc($space-20 + $space-2);
+  border-radius: $radius-xl;
+  background: $color-accent-emerald-700;
+  color: $color-neutral-0;
   text-decoration: none;
   font-weight: 900;
-  font-size: 2rem;
+  font-size: $font-size-7xl;
   letter-spacing: 0.02em;
   margin-top: auto;
-  transition: background 0.18s ease, transform 0.18s ease;
-  box-shadow: 0 10px 28px rgba(40, 90, 65, 0.22);
+  transition: background 0.18s ease;
 
   &:hover {
-    background: #2e5e42;
-    transform: translateY(-2px);
-  }
-
-  /* Variante recommandé : vert plus vif */
-  &--recommended {
-    background: #2a6644;
-    box-shadow: 0 12px 32px rgba(40, 90, 65, 0.28);
-  }
-
-  /* Variante duo : violet */
-  &--duo {
-    background: #6a46b8;
-    box-shadow: 0 12px 32px rgba(90, 50, 160, 0.24);
-
-    &:hover { background: #543797; }
+    background: $color-accent-moss-700;
   }
 }
 
-/* ══════════════════════════════════════════
-   Responsive
-══════════════════════════════════════════ */
-@media (max-width: 860px) {
+@keyframes game-card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY($space-2);
+  }
+  to {
+    opacity: 1;
+    transform: translateY($space-0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-card {
+    animation: none;
+    opacity: 1;
+    transform: translateY($space-0);
+    transition: border-color 0.01s linear;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
   .catalog-grid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-}
-
-@media (max-width: 600px) {
-  :host { padding: 1.5rem 1rem 3rem; }
-
-  .catalog-header { padding: 4rem 1.5rem 2rem; }
-
-  .catalog-patient { font-size: 2.2rem; }
-
-  .game-card {
-    padding: 2rem 1.5rem 1.75rem;
-    gap: 1.75rem;
+    gap: $space-8;
   }
 
-  .game-card__title { font-size: 1.7rem; }
+  :host {
+    padding: $space-6 $space-4 $space-12;
+  }
+
+  .catalog-header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: $space-4;
+  }
 
   .btn-jouer {
-    min-height: 80px;
-    font-size: 1.7rem;
+    min-height: $space-20;
+    font-size: $font-size-5xl;
   }
 
-  .btn-back { font-size: 0.9rem; }
+  .btn-back {
+    justify-self: center;
+    font-size: $font-size-md;
+  }
+
+  .patient-photo-circle {
+    justify-self: center;
+  }
 }

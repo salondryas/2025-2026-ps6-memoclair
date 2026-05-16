@@ -9,6 +9,11 @@
   <section *ngIf="!state.finished" class="main-layout">
     <main class="game-panel">
       <div class="game-container main-game-area" [class.transitioning]="isTransitioning">
+        <app-mascot-decorator
+          mascotUrl="assets/UI/Mascotte-homme-indice.png"
+          [positionClass]="question.type === 'chrono-order' ? 'game-mascot game-mascot--hidden' : 'game-mascot'">
+        </app-mascot-decorator>
+
         <div class="progress-wrap">
           <div class="progress-bar">
             <div class="progress-fill" [style.width.%]="progressPercent"></div>
@@ -24,15 +29,20 @@
           {{ question.prompt }}
         </h2>
 
-        <app-hint-banner
-          [hint]="state.hint"
-          (hintRequested)="onHint()"
-          [class.chrono-mode-banner]="question.type === 'chrono-order'">
-        </app-hint-banner>
+        <div class="hint-box">
+          <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
+          <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
+        </div>
 
         <div class="feedback-box" [class.is-empty]="!state.feedback">
           {{ state.feedback || '&nbsp;' }}
         </div>
+
+        @if (state.locked && !state.finished) {
+          <button type="button" class="btn-next-question" (click)="onNext()">
+            Question suivante ➔
+          </button>
+        }
 
         <!-- MODE CHOIX MULTIPLE -->
         <ng-container *ngIf="question.type === 'multiple-choice'">

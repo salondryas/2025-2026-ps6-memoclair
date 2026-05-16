@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { SoundEffectsService } from '../../../../core/services/sound-effects.service';
 
 @Component({
   selector: 'app-large-audio-controls',
@@ -19,9 +20,15 @@ export class LargeAudioControlsComponent implements OnDestroy {
 
   readonly bars = Array.from({ length: 20 });
 
+  constructor(private readonly soundEffects: SoundEffectsService) {}
+
   ngOnDestroy(): void {
     const audio = this.playerRef?.nativeElement;
-    if (audio) { audio.pause(); audio.src = ''; }
+    if (audio) {
+      audio.pause();
+      audio.src = '';
+    }
+    this.soundEffects.resumeBgMusic();
   }
 
   onLoadedMetadata(): void {
@@ -34,6 +41,7 @@ export class LargeAudioControlsComponent implements OnDestroy {
 
   onEnded(): void {
     this.isPlaying = false;
+    this.soundEffects.resumeBgMusic();
   }
 
   togglePlayPause(): void {
@@ -41,9 +49,11 @@ export class LargeAudioControlsComponent implements OnDestroy {
     if (this.isPlaying) {
       audio.pause();
       this.isPlaying = false;
+      this.soundEffects.resumeBgMusic();
     } else {
       void audio.play();
       this.isPlaying = true;
+      this.soundEffects.suspendBgMusic();
     }
   }
 

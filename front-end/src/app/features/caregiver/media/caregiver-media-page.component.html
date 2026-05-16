@@ -8,7 +8,7 @@
     </header>
 
     <!-- Progression duo -->
-    <section class="media-card" [class.media-card--success]="duoReady" [class.media-card--progress]="!duoReady">
+    <section class="media-panel" [class.media-panel--success]="duoReady" [class.media-panel--progress]="!duoReady">
       <p class="duo-progress-label">{{ duoProgress }}</p>
       <div class="duo-progress-bar">
         <div class="duo-progress-bar__fill" [style.width.%]="(mediaItems.length / duoRequired) * 100"></div>
@@ -16,9 +16,9 @@
     </section>
 
     <!-- Formulaire d'ajout -->
-    <section class="media-card">
-      <h3 class="media-card__title">
-        <span class="media-card__icon">➕</span> Ajouter un média
+    <section class="media-panel">
+      <h3 class="media-panel__title">
+        <span class="media-panel__icon">➕</span> Ajouter un média
       </h3>
 
       <form class="media-form" (ngSubmit)="addMediaItem()">
@@ -34,7 +34,7 @@
             placeholder="Décrivez ce souvenir : qui, quoi, où, quand… (ex : Anniversaire de Paul en 2018 avec ses enfants)"></textarea>
         </label>
 
-        <div class="media-grid">
+        <div class="media-form-grid">
           <label class="media-field">
             <span>Type de média</span>
             <select name="kind" [(ngModel)]="form.kind" [disabled]="uploading">
@@ -71,41 +71,50 @@
     </section>
 
     <!-- Liste des médias -->
-    <section class="media-card">
-      <h3 class="media-card__title">
-        <span class="media-card__icon">🗂️</span>
+    <section class="media-panel">
+      <h3 class="media-panel__title">
+        <span class="media-panel__icon">🗂️</span>
         Médias de {{ currentPatient.firstName }}
         <span class="media-count">{{ mediaItems.length }}</span>
       </h3>
 
-      <p *ngIf="emptyState" class="media-empty">
-        Aucun média enregistré pour cet accueilli.
-      </p>
+      @if (emptyState) {
+        <div class="media-empty-state" role="status">
+          <div class="media-empty-state__icon" aria-hidden="true">🫶</div>
+          <p class="media-empty-state__text">Aucun souvenir ajouté pour le moment</p>
+        </div>
+      } @else {
+        <section class="media-grid" aria-label="Galerie de souvenirs">
+          @for (item of mediaItems; track item.id) {
+            <article class="media-card">
+              <div class="media-card__preview">
+                @if (item.kind === 'image') {
+                  <img
+                    class="media-card__image"
+                    [src]="getMediaPreviewUrl(item)"
+                    [alt]="item.title">
+                } @else {
+                  <div class="media-card__audio-icon" aria-hidden="true">♫</div>
+                }
+              </div>
 
-      <div *ngIf="!emptyState" class="media-library">
-        <article *ngFor="let item of mediaItems; trackBy: trackByMediaId" class="media-item">
-          <div class="media-item__icon" [class.media-item__icon--audio]="item.kind === 'audio'">
-            {{ item.kind === 'audio' ? '🎵' : '📷' }}
-          </div>
-
-          <div class="media-item__content">
-            <div class="media-item__meta">
-              <h4>{{ item.title }}</h4>
-              <span class="media-tag">{{ item.cueType }}</span>
-              <span class="media-tag media-tag--soft">{{ item.kind }}</span>
-            </div>
-            <p class="media-item__note">{{ item.clinicalNote }}</p>
-          </div>
-
-          <button
-            type="button"
-            class="media-item__delete"
-            (click)="deleteMediaItem(item.id)"
-            [attr.aria-label]="'Supprimer ' + item.title">
-            Supprimer
-          </button>
-        </article>
-      </div>
+              <div class="media-card__info">
+                <div class="media-card__meta">
+                  <h4 class="media-card__title">{{ item.title }}</h4>
+                  <span class="media-tag">{{ getCueLabel(item.cueType) }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="media-card__delete"
+                  (click)="deleteMediaItem(item.id)"
+                  [attr.aria-label]="'Supprimer ' + item.title">
+                  <span aria-hidden="true">🗑️</span>
+                </button>
+              </div>
+            </article>
+          }
+        </section>
+      }
     </section>
 
   </main>

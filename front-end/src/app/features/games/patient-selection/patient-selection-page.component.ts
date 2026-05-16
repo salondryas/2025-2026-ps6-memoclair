@@ -96,7 +96,14 @@ export class PatientSelectionPageComponent {
 
   private buildCards(): PatientCardData[] {
     const patients = this.patientContext.getPatients();
-    const meta: Record<PatientId, { cardClass: string; description: string; tags: string[] }> = {
+
+    const stageToCardClass: Record<string, string> = {
+      'Stade avancé': 'card--advance',
+      'Stade modéré': 'card--moderate',
+      'Stade léger':  'card--light',
+    };
+
+    const builtInMeta: Record<string, { cardClass: string; description: string; tags: string[] }> = {
       marcel: {
         cardClass: 'card--advance',
         description: 'Sessions très courtes, peu de choix, objets familiers et relances douces.',
@@ -113,6 +120,17 @@ export class PatientSelectionPageComponent {
         tags: ['4 choix possibles', 'Séquences complètes', 'Thèmes porteurs'],
       },
     };
-    return patients.map((p) => ({ patient: p, ...meta[p.id] }));
+
+    return patients.map((p) => {
+      const known = builtInMeta[p.id];
+      if (known) return { patient: p, ...known };
+      const cardClass = stageToCardClass[p.stageLabel] ?? 'card--light';
+      return {
+        patient: p,
+        cardClass,
+        description: `Profil personnalisé — ${p.stageLabel}`,
+        tags: [p.stageLabel],
+      };
+    });
   }
 }

@@ -1,12 +1,13 @@
-<section class="end-layout" aria-live="polite">
-  <img src="assets/UI/Mascotte-bravo.png" class="bg-mascot" />
-  <div class="end-card">
-    <h1>🏆 Félicitations !</h1>
-    <p>Merci pour votre participation avec MemoClair 🌿</p>
-    <p *ngIf="latestSession">
-      Dernière séance : {{ gameLabel }} · {{ latestSession.durationMinutes }} min<br />
-      {{ latestSession.summary }}
-    </p>
-    <a routerLink="/games" class="cta-btn">Revenir au catalogue</a>
-  </div>
-</section>
+<div class="end-screen-layout" aria-live="polite">
+  <img
+    src="assets/UI/Mascotte-bravo.png"
+    alt=""
+    aria-hidden="true"
+    class="celebration-img"
+  />
+  <h1 class="congrats-title">Bravo {{ (patientName$ | async)?.firstName || '!' }} !</h1>
+  <p class="congrats-subtitle">
+    Vous avez terminé cette séance avec succès. Reposez-vous bien.
+  </p>
+  <button type="button" class="btn-return" (click)="goHome()">Retour à l'accueil</button>
+</div>

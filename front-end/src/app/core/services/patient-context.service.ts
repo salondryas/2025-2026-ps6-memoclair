@@ -43,7 +43,14 @@ export class PatientContextService {
   addPatient(summary: PatientSummary, profile: PatientProfile): void {
     this.patientRepository.addPatient(summary, profile);
     this.patients = this.patientRepository.getPatients();
-    this.setActivePatient(summary.id);
+  }
+
+  removePatient(patientId: PatientId): void {
+    this.patientRepository.removePatient(patientId);
+    this.patients = this.patientRepository.getPatients();
+    if (this.getActivePatientSnapshot().id === patientId) {
+      this.activePatientSubject.next(this.patients[0]);
+    }
   }
 
   private resolveInitialPatient(): PatientSummary {

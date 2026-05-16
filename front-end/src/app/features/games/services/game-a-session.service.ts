@@ -6,7 +6,7 @@ import { PatientProfile } from '../../../models/patient.model';
 export type GameAQuestionType = 'multiple-choice' | 'chrono-order';
 
 export interface GameAChoice {
-  id: 'a' | 'b' | 'c' | 'd';
+  id: string;
   label: string;
   image: string;
 }
@@ -23,7 +23,7 @@ export interface GameAQuestion {
   prompt: string;
   promptImage?: string;
   choices?: GameAChoice[];
-  correctChoiceId?: 'a' | 'b' | 'c' | 'd';
+  correctChoiceId?: string;
   steps?: GameAStep[];
   correctOrder?: string[];
   hint: string;
@@ -38,7 +38,7 @@ export interface GameAState {
   hint: string | null;
   locked: boolean;
   finished: boolean;
-  selectedChoiceId: 'a' | 'b' | 'c' | 'd' | null;
+  selectedChoiceId: string | null;
   profile: PatientProfile;
 }
 
@@ -54,7 +54,7 @@ export class GameASessionService {
   createInitialState(): GameAState {
     const patientId = this.patientContext.getActivePatientSnapshot().id;
     const profile = this.caregiverProfile.getProfile(patientId);
-    
+
     return {
       index: 0,
       questions: this.buildQuestionSequence(profile),
@@ -63,7 +63,7 @@ export class GameASessionService {
       locked: false,
       finished: false,
       selectedChoiceId: null,
-      profile: profile
+      profile,
     };
   }
 
@@ -81,7 +81,7 @@ export class GameASessionService {
     this.hintTimer = null;
   }
 
-  choose(state: GameAState, choiceId: 'a' | 'b' | 'c' | 'd'): GameAState {
+  choose(state: GameAState, choiceId: string): GameAState {
     if (state.locked || state.finished) return state;
     this.stopHintTimer();
     const q = this.getQuestion(state);
@@ -101,9 +101,10 @@ export class GameASessionService {
     this.stopHintTimer();
     const q = this.getQuestion(state);
     if (q.type !== 'chrono-order' || !q.correctOrder?.length) return state;
+    const correctOrder = q.correctOrder;
     const isCorrect =
-      placedOrder.length === q.correctOrder.length &&
-      placedOrder.every((stepId, index) => stepId === q.correctOrder![index]);
+      placedOrder.length === correctOrder.length &&
+      placedOrder.every((stepId, index) => stepId === correctOrder[index]);
     return {
       ...state,
       selectedChoiceId: null,
@@ -158,29 +159,87 @@ export class GameASessionService {
   }
 
   private buildQuestionSequence(profile: PatientProfile): GameAQuestion[] {
-    const qCount = Number(profile.questionCount || 5);
-    const aCount = Number(profile.answerCount || 3);
+    const qCount = Math.max(1, Number(profile.questionCount || 5));
+    const requestedChoiceCount = Math.max(2, Number(profile.answerCount || 3));
 
-    let multipleChoice = this.shuffle([...MULTIPLE_CHOICE_QUESTIONS]);
+    const multipleChoice = this.shuffle([...MULTIPLE_CHOICE_QUESTIONS]).map((question) =>
+      this.prepareMultipleChoiceQuestion(question, requestedChoiceCount),
+    );
     const chronoOrder = this.shuffle([...CHRONO_ORDER_QUESTIONS]);
-
-    // Limit answerCount for multiple choice
-    multipleChoice = multipleChoice.map(q => {
-      if (!q.choices || !q.correctChoiceId) return q;
-      const correctChoice = q.choices.find(c => c.id === q.correctChoiceId)!;
-      const others = q.choices.filter(c => c.id !== q.correctChoiceId).sort(() => Math.random() - 0.5);
-      
-      // Dynamic choice pool management
-      const availableOthers = [...others];
-      // If we need more others than available in the question (shouldn't happen with updated mocks but let's be safe)
-      const limitedOthers = availableOthers.slice(0, Math.min(aCount - 1, availableOthers.length));
-      
-      const finalChoices = this.shuffle([correctChoice, ...limitedOthers]);
-      return { ...q, choices: finalChoices as GameAChoice[] };
-    });
 
     const combined = this.shuffle([...multipleChoice, ...chronoOrder]);
     return combined.slice(0, qCount);
+  }
+
+  private prepareMultipleChoiceQuestion(question: GameAQuestion, requestedChoiceCount: number): GameAQuestion {
+    if (question.type !== 'multiple-choice' || !question.choices?.length || !question.correctChoiceId) {
+      return question;
+    }
+
+    const correctChoice = question.choices.find((choice) => choice.id === question.correctChoiceId);
+    if (!correctChoice) return question;
+
+    const targetDistractorsCount = requestedChoiceCount - 1;
+    const localDistractors = this.shuffle(
+      question.choices.filter((choice) => choice.id !== question.correctChoiceId),
+    );
+
+    const allDistractors: GameAChoice[] = [...localDistractors];
+    if (localDistractors.length < targetDistractorsCount) {
+      const importedDistractors = this.shuffle(this.getImportedDistractors(question.id));
+      const usedImages = new Set<string>([
+        ...allDistractors.map((choice) => choice.image),
+        correctChoice.image,
+      ]);
+
+      for (const choice of importedDistractors) {
+        if (allDistractors.length >= targetDistractorsCount) break;
+        if (usedImages.has(choice.image)) continue;
+        usedImages.add(choice.image);
+        allDistractors.push({ ...choice });
+      }
+    }
+
+    const selectedDistractors = allDistractors.slice(0, targetDistractorsCount);
+    const shuffledChoices = this.shuffle([correctChoice, ...selectedDistractors]);
+    const normalizedChoices = shuffledChoices.map((choice, index) => ({
+      ...choice,
+      id: this.getChoiceId(index),
+    }));
+
+    const normalizedCorrectChoice = normalizedChoices.find(
+      (choice) => choice.image === correctChoice.image,
+    );
+    if (!normalizedCorrectChoice) return question;
+
+    return {
+      ...question,
+      choices: normalizedChoices,
+      correctChoiceId: normalizedCorrectChoice.id,
+    };
+  }
+
+  private getImportedDistractors(currentQuestionId: string): GameAChoice[] {
+    const imported: GameAChoice[] = [];
+
+    for (const question of MULTIPLE_CHOICE_QUESTIONS) {
+      if (question.id === currentQuestionId || !question.choices?.length || !question.correctChoiceId) {
+        continue;
+      }
+
+      const distractors = question.choices.filter((choice) => choice.id !== question.correctChoiceId);
+      imported.push(...distractors.map((choice) => ({ ...choice })));
+    }
+
+    return imported;
+  }
+
+  private getChoiceId(index: number): string {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    if (index < alphabet.length) {
+      return alphabet[index];
+    }
+    return `choice-${index + 1}`;
   }
 
   private shuffle<T>(items: T[]): T[] {
@@ -203,7 +262,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Soucoupe', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/soucoupe.png' },
       { id: 'b', label: 'Sous-plat', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/sous-plat.png' },
       { id: 'c', label: 'Petite assiette', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/petite-assiette.png' },
-      { id: 'd' as any, label: 'Verre', image: 'assets/game-daily/choix_verre.png' },
     ],
     correctChoiceId: 'a',
     hint: 'on la place souvent sous une tasse.',
@@ -216,10 +274,9 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
     prompt: 'Pour l\'hygiène dentaire, quel objet accompagne cette brosse à dents ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q02/prompt-dentifrice.png',
     choices: [
-      { id: 'a', label: 'Dentifrice', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/choix-a.png' },
+      { id: 'a', label: 'Dentifrice', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/dentifrice.png' },
       { id: 'b', label: 'Brosse à cheveux', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/brosse-a-cheveux.png' },
       { id: 'c', label: 'Savon', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/Savon.png' },
-      { id: 'd' as any, label: 'Peigne', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/peigne.png' },
     ],
     correctChoiceId: 'a',
     hint: 'c\'est un tube utilisé avec la brosse.',
@@ -235,7 +292,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Une porte', image: 'assets/games/game-a/questions/questions-choix-multiple/q03/porte.png' },
       { id: 'b', label: 'Une fenêtre', image: 'assets/games/game-a/questions/questions-choix-multiple/q03/fenetre.png' },
       { id: 'c', label: 'Un coffre-fort', image: 'assets/games/game-a/questions/questions-choix-multiple/q03/coffre-fort.png' },
-      { id: 'd' as any, label: 'Une boîte', image: 'assets/games/game-a/questions/questions-choix-multiple/q03/boite.png' },
     ],
     correctChoiceId: 'a',
     hint: 'on l\'utilise pour entrer chez soi.',
@@ -251,7 +307,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Étui à lunettes', image: 'assets/games/game-a/questions/questions-choix-multiple/q04/etui-a-lunettes.png' },
       { id: 'b', label: 'Portefeuille', image: 'assets/games/game-a/questions/questions-choix-multiple/q04/portefeuille.png' },
       { id: 'c', label: 'Coque de téléphone', image: 'assets/games/game-a/questions/questions-choix-multiple/q04/Coque-de-telephone.png' },
-      { id: 'd' as any, label: 'Sac', image: 'assets/games/game-a/questions/questions-choix-multiple/q04/sac.png' },
     ],
     correctChoiceId: 'a',
     hint: 'cet objet protège les lunettes.',
@@ -267,7 +322,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Télévision', image: 'assets/games/game-a/questions/questions-choix-multiple/q05/Television.png' },
       { id: 'b', label: 'Radio', image: 'assets/games/game-a/questions/questions-choix-multiple/q05/radio.png' },
       { id: 'c', label: 'Lampe', image: 'assets/games/game-a/questions/questions-choix-multiple/q05/lampe.png' },
-      { id: 'd' as any, label: 'Ventilateur', image: 'assets/games/game-a/questions/questions-choix-multiple/q05/ventilateur.png' },
     ],
     correctChoiceId: 'a',
     hint: 'elle sert à changer de chaîne.',
@@ -283,7 +337,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Arroser une plante', image: 'assets/games/game-a/questions/questions-choix-multiple/q06/arroser-une-plante.png' },
       { id: 'b', label: 'Remplir un vase', image: 'assets/games/game-a/questions/questions-choix-multiple/q06/remplire-une-vase.png' },
       { id: 'c', label: 'Nettoyer un seau', image: 'assets/games/game-a/questions/questions-choix-multiple/q06/Nettoyer-un-seau.png' },
-      { id: 'd' as any, label: 'Laver la voiture', image: 'assets/games/game-a/questions/questions-choix-multiple/q06/laver-la-voiture.png' },
     ],
     correctChoiceId: 'a',
     hint: 'on l\'utilise pour les plantes.',
@@ -299,7 +352,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'De la pluie', image: 'assets/games/game-a/questions/questions-choix-multiple/q07/de-la-peluie.png' },
       { id: 'b', label: 'Du soleil', image: 'assets/games/game-a/questions/questions-choix-multiple/q07/du-soleil.png' },
       { id: 'c', label: 'De la neige', image: 'assets/games/game-a/questions/questions-choix-multiple/q07/de-la-niege.png' },
-      { id: 'd' as any, label: 'Du vent', image: 'assets/games/game-a/questions/questions-choix-multiple/q07/du-vent.png' },
     ],
     correctChoiceId: 'a',
     hint: 'il protège de l\'eau qui tombe du ciel.',
@@ -315,7 +367,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Un verre d\'eau', image: 'assets/games/game-a/questions/questions-choix-multiple/q08/eau.png' },
       { id: 'b', label: 'Un café', image: 'assets/games/game-a/questions/questions-choix-multiple/q08/cafe.png' },
       { id: 'c', label: 'Un jus', image: 'assets/games/game-a/questions/questions-choix-multiple/q08/jus.png' },
-      { id: 'd' as any, label: 'Une soupe', image: 'assets/games/game-a/questions/questions-choix-multiple/q08/soupe.png' },
     ],
     correctChoiceId: 'a',
     hint: 'la boisson neutre est préférable.',
@@ -331,7 +382,6 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'a', label: 'Lampe de lecture', image: 'assets/games/game-a/questions/questions-choix-multiple/q09/lampe-de-lecteur.png' },
       { id: 'b', label: 'Bougie', image: 'assets/games/game-a/questions/questions-choix-multiple/q09/bougie.png' },
       { id: 'c', label: 'Lampe torche', image: 'assets/games/game-a/questions/questions-choix-multiple/q09/lampe-torche.png' },
-      { id: 'd' as any, label: 'Lustre', image: 'assets/games/game-a/questions/questions-choix-multiple/q09/lustre.png' },
     ],
     correctChoiceId: 'a',
     hint: 'elle éclaire de façon confortable pour lire.',

@@ -13,11 +13,16 @@
 .fam-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 1rem 2rem;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
   min-height: 72px;
+}
+
+.fam-nav__left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .fam-nav__logo {

@@ -18,12 +18,12 @@ import {
 } from '../../../models/patient.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { CaregiverProfileService } from '../services/caregiver-profile.service';
-import { SharedModule } from '../../../shared/shared.module';
+import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
 
 @Component({
   selector: 'app-caregiver-profile-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SharedModule],
+  imports: [CommonModule, FormsModule, RouterLink, CaregiverShellComponent],
   templateUrl: './caregiver-profile-page.component.html',
   styleUrl: './caregiver-profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

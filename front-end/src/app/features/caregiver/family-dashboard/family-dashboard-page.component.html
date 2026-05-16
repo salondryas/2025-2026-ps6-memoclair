@@ -1,18 +1,11 @@
 <!-- Navbar famille -->
 <nav class="fam-nav">
-  <a routerLink="/" class="fam-nav__logo">
-    <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="fam-nav__logo-img" />
-  </a>
-
-  <button type="button" class="fam-nav__back" (click)="goBack()">← Retour</button>
-
-  <select class="fam-nav__select"
-          [ngModel]="selectedPatientId"
-          (ngModelChange)="onPatientChange($event)"
-          aria-label="Choisir le patient">
-    <option *ngFor="let p of patients" [value]="p.id">{{ p.displayName }}</option>
-  </select>
-
+  <div class="fam-nav__left">
+    <a routerLink="/" class="fam-nav__logo">
+      <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="fam-nav__logo-img" />
+    </a>
+    <button type="button" class="fam-nav__back" (click)="goBack()">← Retour</button>
+  </div>
 </nav>
 
 <main class="dashboard">
@@ -57,7 +50,7 @@
   <!-- Deux actions massives -->
   <div class="action-row">
 
-    <a routerLink="/caregiver/media" class="action-btn action-btn--amber">
+    <a routerLink="/caregiver/family-souvenirs" class="action-btn action-btn--amber">
       <span class="action-btn__icon" aria-hidden="true">📸</span>
       <span class="action-btn__label">Ajouter des souvenirs</span>
     </a>

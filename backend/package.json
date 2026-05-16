@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app/index.js",
-    "dev": "nodemon app/index.js",
-    "lint": "eslint -c .eslintrc.js app/",
-    "lint:fix": "eslint -c .eslintrc.js app/ --fix",
-    "start:e2e": "rimraf ./database/e2e && copyfiles -f ./database/e2e-starter/* ./database/e2e ./database/e2e && cross-env DB_FOLDER=e2e/ node app/index.js"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "lint": "eslint -c .eslintrc.js src/",
+    "lint:fix": "eslint -c .eslintrc.js src/ --fix",
+    "start:e2e": "rimraf ./database/e2e && copyfiles -f ./database/e2e-starter/* ./database/e2e ./database/e2e && cross-env DB_FOLDER=e2e/ node src/app.js"
   },
   "precommit": [
     "lint"

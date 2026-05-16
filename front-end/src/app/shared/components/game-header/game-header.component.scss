@@ -1,14 +1,16 @@
+@use '../../../../styles/tokens' as *;
+
 .app-header {
   display: flex;
-  height: 80px;
+  height: $layout-header-height;
   align-items: center;
-  gap: 12px;
-  padding: 0 32px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+  gap: $space-3;
+  padding: 0 $space-8;
+  background: $overlay-white-70;
+  backdrop-filter: blur($space-4);
+  -webkit-backdrop-filter: blur($space-4);
+  border-bottom: $border-width-1 solid $overlay-white-80;
+  box-shadow: 0 $space-1 $space-7-5 $overlay-dark-4;
 }
 
 .header-left,
@@ -20,7 +22,7 @@
 
 .header-left {
   justify-content: flex-start;
-  gap: 24px;
+  gap: $space-6;
 }
 
 .header-center {
@@ -43,59 +45,59 @@ h1 {
 }
 
 .header-center h1 {
-  color: #0f172a;
+  color: $color-neutral-950;
   letter-spacing: -0.02em;
 }
 
 .patient-badge {
-  background: #ffffff;
+  background: $color-neutral-0;
   border: none;
-  border-radius: 50px;
-  padding: 10px 12px;
+  border-radius: $radius-pill;
+  padding: $space-2-5 $space-3;
   font-size: 1.8rem;
   font-weight: 800;
-  color: #0284c7;
+  color: $color-accent-cyan-600;
   white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
+  box-shadow: 0 $space-1 $space-3-75 rgba(2, 132, 199, 0.1);
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: $space-2-5;
   text-decoration: none;
   font-weight: 700;
   font-size: 1.5rem;
-  color: #1f2937;
-  background: #ffffff;
-  border: 3px solid #94a3b8;
-  border-radius: 14px;
-  padding: 12px 18px;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
+  color: $color-neutral-975;
+  background: $color-neutral-0;
+  border: $border-width-3 solid $color-neutral-500;
+  border-radius: $space-3-5;
+  padding: $space-3 $space-4-5;
+  box-shadow: 0 $space-2-5 $space-5 $overlay-dark-14;
 }
 
 .next-btn {
-  border-radius: 12px;
-  padding: 12px 18px;
+  border-radius: $radius-md;
+  padding: $space-3 $space-4-5;
   font-size: 1.2rem;
   font-weight: 800;
   cursor: pointer;
-  background: #e2e8f0;
-  border: 2px solid #cbd5e1;
-  color: #1e293b;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  background: $color-neutral-200;
+  border: $border-width-2 solid $color-neutral-400;
+  color: $color-neutral-900;
+  box-shadow: 0 $space-2 $space-4-5 $overlay-dark-14;
 }
 
 /* --- BOUTON PASSER A LA SUITE --- */
 .header-next-btn {
-  background: #2563eb;
-  color: #ffffff;
+  background: $color-primary-600;
+  color: $color-neutral-0;
   border: none;
-  border-radius: 50px;
-  padding: 14px 32px;
+  border-radius: $radius-pill;
+  padding: $space-3-5 $space-8;
   font-size: 1.2rem;
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 $space-2 $space-5 $overlay-primary-30;
   transition: all 0.2s ease;
   cursor: pointer;
   display: flex;
@@ -104,35 +106,35 @@ h1 {
 
 /* Lévitation au survol */
 .header-next-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
-  background: #1d4ed8;
+  transform: translateY(-$space-0-75);
+  box-shadow: 0 $space-3 $space-6-25 $overlay-primary-40;
+  background: $color-primary-700;
 }
 
 /* Enfoncement au clic */
 .header-next-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  transform: translateY($space-0-5);
+  box-shadow: 0 $space-1 $space-2-5 $overlay-primary-20;
 }
 
 /* Accessibilité pour la navigation au clavier (Tab) */
 .header-next-btn:focus-visible {
-  outline: 3px solid #1d4ed8;
-  outline-offset: 4px;
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-1;
 }
 
 .back-link:focus-visible,
 .next-btn:focus-visible {
-  outline: 3px solid #1d4ed8;
-  outline-offset: 2px;
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 @keyframes pulseNext {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.18);
+    box-shadow: 0 0 0 0 $overlay-primary-18;
   }
   50% {
-    box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 $space-3 rgba(37, 99, 235, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);

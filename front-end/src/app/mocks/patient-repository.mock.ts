@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
 
 import { PatientId, PatientProfile, PatientSummary } from '../models/patient.model';
+import { StorageService } from '../core/services/storage.service';
+
+const CUSTOM_PATIENTS_KEY = 'mc_custom_patients';
+const CUSTOM_PROFILES_KEY = 'mc_custom_profiles';
+
+const BUILT_IN_IDS = ['marcel', 'jean', 'paul'];
 
 @Injectable({
   providedIn: 'root',
 })
 export class PatientRepositoryMock {
-  private readonly patients: PatientSummary[] = [
+  private readonly builtInPatients: PatientSummary[] = [
     {
       id: 'marcel',
       firstName: 'Marcel',
@@ -30,7 +36,7 @@ export class PatientRepositoryMock {
     },
   ];
 
-  private readonly defaultProfiles: Record<PatientId, PatientProfile> = {
+  private readonly builtInProfiles: Record<PatientId, PatientProfile> = {
     marcel: {
       patientId: 'marcel',
       stage: 'avance',
@@ -81,45 +87,56 @@ export class PatientRepositoryMock {
     },
   };
 
+  private customPatients: PatientSummary[] = [];
+  private customProfiles: Record<PatientId, PatientProfile> = {};
+
+  constructor(private readonly storage: StorageService) {
+    this.loadFromStorage();
+  }
+
   getPatients(): PatientSummary[] {
-    return this.patients.map((patient) => ({ ...patient }));
+    return [...this.builtInPatients, ...this.customPatients].map((p) => ({ ...p }));
   }
 
   getPatientById(patientId: PatientId): PatientSummary {
-    const patient = this.patients.find((entry) => entry.id === patientId);
-
-    if (!patient) {
-      return this.patients[0];
-    }
-
-    return { ...patient };
+    const all = [...this.builtInPatients, ...this.customPatients];
+    return { ...(all.find((p) => p.id === patientId) ?? all[0]) };
   }
 
   addPatient(summary: PatientSummary, profile: PatientProfile): void {
-    const existingIndex = this.patients.findIndex((entry) => entry.id === summary.id);
-    const nextSummary = { ...summary };
-    const nextProfile: PatientProfile = {
-      ...profile,
-      patientId: summary.id,
-      themes: [...profile.themes],
-    };
-
-    if (existingIndex >= 0) {
-      this.patients[existingIndex] = nextSummary;
+    const idx = this.customPatients.findIndex((p) => p.id === summary.id);
+    if (idx >= 0) {
+      this.customPatients[idx] = { ...summary };
     } else {
-      this.patients.push(nextSummary);
+      this.customPatients.push({ ...summary });
     }
+    this.customProfiles[summary.id] = { ...profile, themes: [...profile.themes] };
+    this.saveToStorage();
+  }
 
-    this.defaultProfiles[summary.id] = nextProfile;
+  removePatient(patientId: PatientId): void {
+    if (BUILT_IN_IDS.includes(patientId)) return;
+    this.customPatients = this.customPatients.filter((p) => p.id !== patientId);
+    delete this.customProfiles[patientId];
+    this.saveToStorage();
   }
 
   getDefaultProfile(patientId: PatientId): PatientProfile {
-    const fallback = this.defaultProfiles['marcel'];
-    const profile = this.defaultProfiles[patientId] ?? fallback;
+    const builtIn = this.builtInProfiles[patientId];
+    if (builtIn) return { ...builtIn, themes: [...builtIn.themes] };
+    const custom = this.customProfiles[patientId];
+    if (custom) return { ...custom, themes: [...custom.themes] };
+    const fallback = this.builtInProfiles['marcel'];
+    return { ...fallback, patientId, themes: [...fallback.themes] };
+  }
 
-    return {
-      ...profile,
-      themes: [...profile.themes],
-    };
+  private loadFromStorage(): void {
+    this.customPatients = this.storage.getLocalItem<PatientSummary[]>(CUSTOM_PATIENTS_KEY) ?? [];
+    this.customProfiles = this.storage.getLocalItem<Record<PatientId, PatientProfile>>(CUSTOM_PROFILES_KEY) ?? {};
+  }
+
+  private saveToStorage(): void {
+    this.storage.setLocalItem(CUSTOM_PATIENTS_KEY, this.customPatients);
+    this.storage.setLocalItem(CUSTOM_PROFILES_KEY, this.customProfiles);
   }
 }

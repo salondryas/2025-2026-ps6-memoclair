@@ -1,7 +1,7 @@
 import { PatientId } from './patient.model';
 
 export type MediaKind = 'image' | 'audio';
-export type MemoryCueType = 'location' | 'person' | 'event' | 'music';
+export type MemoryCueType = 'location' | 'person' | 'event' | 'music' | 'object';
 
 export interface MediaItem {
   id: string;
@@ -24,4 +24,12 @@ export interface CreateMediaItemPayload {
   fileName: string;
   cueType: MemoryCueType;
   clinicalNote: string;
+}
+
+export interface DeleteMediaResponseDto {
+  success: boolean;
+}
+
+export interface MediaApiErrorDto {
+  error: string;
 }

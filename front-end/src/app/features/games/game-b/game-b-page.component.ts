@@ -1,41 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LargeAudioControlsComponent } from '../../../shared/components/games/large-audio-controls/large-audio-controls.component';
 import { GameHeaderComponent } from '../../../shared/components/game-header/game-header.component';
-import { HintBannerComponent } from '../../../shared/components/hint-banner/hint-banner.component';
+import { MascotDecoratorComponent } from '../../../shared/components/mascot-decorator/mascot-decorator.component';
 import { ChoiceCardComponent } from '../../../shared/components/choice-card/choice-card.component';
-// 1. IMPORT DE LA NOUVELLE MASCOTTE
 import { GuideMascotComponent } from '../../../shared/components/guide-mascot/guide-mascot.component';
 
 import { environment } from '../../../../environments/environment';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { StatisticsService } from '../../caregiver/services/statistics.service';
-import { SupportLevel, EmotionalState } from '../../../models/session.model';
+import { EmotionalState, GameBGenerateErrorDto, GameBGenerateRequestDto, GameBGenerateResponseDto, GameBQuestionDto, SupportLevel } from '../../../models/session.model';
 import { SessionSummaryService } from '../services/session-summary.service';
+import { SoundEffectsService } from '../../../core/services/sound-effects.service';
 
 import { CaregiverProfileService } from '../../caregiver/services/caregiver-profile.service';
 import { PatientProfile } from '../../../models/patient.model';
 import { GAME_B_QUESTIONS } from './game-b-questions';
-
-export interface Choice {
-  id: string;
-  label: string;
-  isCorrect: boolean;
-}
-
-export interface Question {
-  id: string;
-  mediaType: 'image' | 'audio';
-  imageSrc?: string;
-  audioSrc?: string;
-  question: string;
-  source: string;
-  caption: string;
-  hint: string;
-  choices: Choice[];
-}
 
 @Component({
   selector: 'app-game-b-page',
@@ -45,9 +27,8 @@ export interface Question {
     RouterModule,
     LargeAudioControlsComponent,
     GameHeaderComponent,
-    HintBannerComponent,
+    MascotDecoratorComponent,
     ChoiceCardComponent,
-    // 2. AJOUT DE LA MASCOTTE AUX IMPORTS DU COMPOSANT
     GuideMascotComponent
   ],
   templateUrl: './game-b-page.component.html',
@@ -57,7 +38,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   patientName$ = this.patientContext.activePatient$;
   profile!: PatientProfile;
 
-  questions: Question[] = [...GAME_B_QUESTIONS];
+  questions: GameBQuestionDto[] = [...GAME_B_QUESTIONS];
 
   currentQuestionIndex = 0;
   totalQuestions = 0;
@@ -91,15 +72,17 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     private readonly caregiverProfile: CaregiverProfileService,
     private readonly router: Router,
     private readonly http: HttpClient,
+    private readonly soundEffects: SoundEffectsService,
   ) {}
 
   ngOnInit(): void {
     const patient = this.patientContext.getActivePatientSnapshot();
     this.profile = this.caregiverProfile.getProfile(patient.id);
 
-    this.http.post<{ questions: Question[] }>(
+    const payload: GameBGenerateRequestDto = { patientName: patient.firstName };
+    this.http.post<GameBGenerateResponseDto>(
       `${environment.backendUrl}/api/game-b/generate/${patient.id}`,
-      { patientName: patient.firstName },
+      payload,
     ).subscribe({
       next: ({ questions: geminiQuestions }) => {
         this.initializeGame();
@@ -110,7 +93,9 @@ export class GameBPageComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.startAssistFlow();
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
+        const apiError = error.error as GameBGenerateErrorDto | null;
+        console.error('[GameB] Erreur API generate:', apiError?.error ?? error.message);
         this.initializeGame();
         this.loading = false;
         this.startAssistFlow();
@@ -147,12 +132,16 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  get currentQuestion(): Question {
+  get currentQuestion(): GameBQuestionDto {
     return this.questions[this.currentQuestionIndex];
   }
 
   get progressPercent(): number {
     return Math.round(((this.currentQuestionIndex + 1) / this.totalQuestions) * 100);
+  }
+
+  get state(): { hint: string | null } {
+    return { hint: this.hintMessage };
   }
 
   onChoose(choiceId: string): void {
@@ -165,6 +154,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
     const choice = this.currentQuestion.choices.find((c) => c.id === choiceId);
     if (choice && !choice.isCorrect) this.wrongAnswers++;
+    this.soundEffects.play(choice?.isCorrect ? 'success' : 'gentleError');
     this.feedbackMessage = choice?.isCorrect
       ? 'Très bien 🌿'
       : "D'accord, regardons ensemble la bonne réponse 🌿";
@@ -173,12 +163,18 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   requestHint(): void {
     if (this.locked || this.finished) return;
     this.hintCount++;
+    this.soundEffects.play('hint');
     this.hintMessage = this.currentQuestion.hint;
     this.feedbackMessage = 'Prenez votre temps, un repère peut aider.';
   }
 
+  onHint(): void {
+    this.requestHint();
+  }
+
   skipQuestion(): void {
     if (this.finished) return;
+    this.soundEffects.play('transition');
     this.skippedCount++;
     this.recordLatency();
     this.clearAssistFlow();
@@ -198,6 +194,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   }
 
   onNext(): void {
+    this.soundEffects.play('transition');
     this.clearAssistFlow();
     this.isAutoRevealed = false;
 

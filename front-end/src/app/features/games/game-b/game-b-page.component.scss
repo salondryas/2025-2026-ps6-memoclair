@@ -1,3 +1,5 @@
+@use '../../../../styles/tokens' as *;
+
 :host {
   display: block;
   width: 100vw;
@@ -6,7 +8,7 @@
   box-sizing: border-box;
   background: transparent;
   font-family: Arial, Roboto, "Open Sans", sans-serif;
-  color: #1f2937;
+  color: $color-neutral-975;
 }
 
 .app-container {
@@ -14,16 +16,16 @@
   height: 100vh;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 80px minmax(0, 1fr);
+  grid-template-rows: $layout-header-height minmax(0, 1fr);
 }
 
 .main-layout {
   display: grid;
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 1fr $layout-sidebar-width;
   height: 100%;
   overflow: hidden;
-  gap: 12px;
-  padding: 12px;
+  gap: $space-3;
+  padding: $space-3;
 }
 
 .sidebar {
@@ -31,12 +33,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
+  gap: $space-4-5;
+  padding: $space-4;
+  background: $overlay-white-60;
+  backdrop-filter: blur($space-3);
+  border: $border-width-1 solid $overlay-white-80;
+  border-radius: $radius-lg;
 }
 
 .sidebar-right {
@@ -46,22 +48,22 @@
 .progress-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: $space-2-5;
   width: 100%;
-  max-width: 880px;
+  max-width: $size-content-max-md;
 }
 
 .progress-bar {
   flex-grow: 1;
-  height: 24px;
-  background: #e2e8f0;
-  border-radius: 20px;
+  height: $size-progress-height;
+  background: $color-neutral-200;
+  border-radius: $space-5;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #3b82f6;
+  background: $color-primary-500;
   transition: width 0.5s ease;
 }
 
@@ -69,7 +71,7 @@
   font-size: 1.4rem;
   font-weight: bold;
   margin: 0;
-  color: #64748b;
+  color: $color-neutral-600;
 }
 
 .game-panel {
@@ -84,10 +86,11 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
+  position: relative;
+  background: $overlay-white-60;
+  backdrop-filter: blur($space-3);
+  border: $border-width-1 solid $overlay-white-80;
+  border-radius: $radius-xl;
   overflow: hidden;
 }
 
@@ -96,18 +99,18 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px 40px;
-  gap: 18px;
+  padding: $space-5 $space-10;
+  gap: $space-4-5;
   height: 100%;
 }
 
 .question-text {
   margin: 0;
   text-align: center;
-  font-size: clamp(36px, 3vw, 44px);
+  font-size: clamp($space-9, 3vw, $space-11);
   line-height: 1.2;
   font-weight: 900;
-  color: #0f172a;
+  color: $color-neutral-950;
   letter-spacing: -0.02em;
 }
 
@@ -116,7 +119,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 700px;
+  max-width: 43.75rem;
 }
 
 .media-wrapper {
@@ -124,24 +127,24 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 12px;
+  gap: $space-3;
 }
 
 .memory-image {
   width: 100%;
-  max-height: 25vh;
+  max-height: 45vh;
   object-fit: contain;
-  border-radius: 16px;
-  background: #ffffff;
-  padding: 12px;
-  border: 2px solid #e2e8f0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: $radius-lg;
+  background: $color-neutral-0;
+  padding: $space-3;
+  border: $border-width-2 solid $color-neutral-200;
+  box-shadow: 0 $space-2-5 $space-6-25 $overlay-dark-8;
 }
 
 .media-meta {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: $space-2-5;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -149,11 +152,11 @@
 .meta-pill {
   display: inline-flex;
   padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid #d6e4ff;
-  background: #ffffff;
+  border-radius: $radius-pill;
+  border: $border-width-1 solid $color-primary-200;
+  background: $color-neutral-0;
   font-weight: 700;
-  color: #1e3a8a;
+  color: $color-primary-800;
   font-size: 0.9rem;
 }
 
@@ -161,8 +164,65 @@
   display: inline-flex;
   align-items: center;
   font-weight: 700;
-  color: #4b5563;
+  color: $color-neutral-700;
   font-size: 0.9rem;
+}
+
+::ng-deep .game-mascot {
+  position: absolute !important; /* Force la sortie du flux flexbox central */
+  z-index: 0; /* S'assure qu'elle reste derrière le contenu */
+  height: 1000px;
+  width: auto;
+  left: 2rem; /* Valeur à ajuster selon le besoin visuel */
+  bottom: 7rem;
+  opacity: 0.95;
+  filter: drop-shadow(0 $space-3-75 $space-6-25 $overlay-dark-15);
+  pointer-events: none;
+}
+
+::ng-deep .game-mascot--hidden {
+  display: none !important;
+}
+
+.hint-box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 57.5rem;
+  margin: $space-1-5 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3-5;
+  padding: $space-5 $space-7-5 $space-5 $space-40;
+  background: linear-gradient(135deg, $color-clinical-warning-50 0%, $color-clinical-warning-100 100%);
+  border-radius: $radius-xl;
+  box-shadow: 0 $space-2-5 $space-6-25 $overlay-warning-15;
+  color: $color-clinical-warning-900;
+}
+
+.hint-text {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.hint-action-btn {
+  min-height: $space-14;
+  border-radius: $radius-pill;
+  border: none;
+  background: $color-neutral-0;
+  color: $color-clinical-warning-600;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: $space-2-5 $space-4;
+  cursor: pointer;
+  box-shadow: 0 $space-2 $space-4-5 $overlay-warning-18;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hint-action-btn:hover {
+  transform: translateY(-$space-0-5);
+  box-shadow: 0 $space-2-5 $space-5-5 $overlay-warning-20;
 }
 
 .choices-grid {
@@ -171,9 +231,9 @@
   justify-content: center;    /* On centre les choix */
   align-items: stretch;       /* Ils auront tous la même hauteur */
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto 16px auto;
-  gap: 30px;                  /* L'espacement parfait (tu peux ajuster cette valeur) */
+  max-width: $size-content-max-lg;
+  margin: 0 auto $space-4 auto;
+  gap: $space-7-5;                  /* L'espacement parfait (tu peux ajuster cette valeur) */
 }
 
 /* On s'assure que les cartes se partagent bien l'espace */
@@ -184,25 +244,25 @@
 
 .choice-btn {
   position: relative;
-  min-height: 100px;
-  border: 2px solid #d1d5db;
-  border-radius: 16px;
-  background: #ffffff;
-  padding: 16px;
+  min-height: 6.25rem;
+  border: $border-width-2 solid $color-neutral-300;
+  border-radius: $radius-lg;
+  background: $color-neutral-0;
+  padding: $space-4;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 $space-1 $space-3 $overlay-dark-5;
   font-size: 1.1rem;
   font-weight: 700;
   transition: all 0.25s ease;
 }
 
 .choice-btn:hover:not(:disabled) {
-  border-color: #3b82f6;
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.15);
+  border-color: $color-primary-500;
+  box-shadow: 0 $space-1-5 $space-4 $overlay-primary-15;
 }
 
 .choice-btn:disabled {
@@ -215,66 +275,66 @@
 }
 
 .choice-btn.correct {
-  border: 3px solid #34a853;
-  background: #f1fbf3;
+  border: $border-width-3 solid $color-clinical-success-700;
+  background: $color-clinical-success-50;
 }
 
 .choice-btn.wrong {
-  border: 2px solid #cbd5e1;
-  background: #f3f4f6;
+  border: $border-width-2 solid $color-neutral-400;
+  background: $color-neutral-150;
   opacity: 0.6;
 }
 
 .choice-btn.auto-highlight {
-  border: 3px solid #22c55e !important;
-  background: #ecfdf3 !important;
+  border: $border-width-3 solid $color-clinical-success-600 !important;
+  background: $color-clinical-success-75 !important;
   animation: autoPulse 0.9s ease-in-out infinite;
   opacity: 1 !important;
 }
 
 .check {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: $space-2-5;
+  right: $space-3-5;
   font-size: 1.6rem;
-  color: #2f855a;
+  color: $color-accent-emerald-700;
   font-weight: 800;
 }
 
 @keyframes autoPulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
-  50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.1); }
+  0% { box-shadow: 0 0 0 0 $overlay-success-45; }
+  50% { box-shadow: 0 0 0 $space-2-5 $overlay-success-10; }
   100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 .assist-actions {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: $space-3-5;
   width: 100%;
 }
 
 .assist-btn {
   width: 100%;
-  min-height: 64px;
-  border-radius: 12px;
-  padding: 14px 16px;
+  min-height: $space-16;
+  border-radius: $radius-md;
+  padding: $space-3-5 $space-4;
   font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
   text-align: left;
-  background: #eef2f7;
-  border: 2px solid #d4dde9;
-  color: #1e293b;
+  background: $color-neutral-100;
+  border: $border-width-2 solid $color-neutral-300;
+  color: $color-neutral-900;
   transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
 }
 
 .assist-btn:hover:not(:disabled) {
-  background: #e2e8f0;
+  background: $color-neutral-200;
 }
 
 .assist-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY($space-0-25);
 }
 
 .assist-btn:disabled {
@@ -283,28 +343,28 @@
 }
 
 .read-btn {
-  background: #e8f0fe;
-  border-color: #93c5fd;
+  background: $color-primary-50;
+  border-color: $color-primary-300;
 }
 
 .hint-btn {
-  background: #fef3c7;
-  border-color: #fcd34d;
+  background: $color-clinical-warning-100;
+  border-color: $color-clinical-warning-300;
 }
 
 .skip-btn {
-  background: #fecdd3;
-  border-color: #fca5a5;
+  background: $color-clinical-error-100;
+  border-color: $color-clinical-error-300;
 }
 
 .feedback-box {
   margin: 0;
   width: 100%;
-  min-height: 60px;
-  border: 1px solid #d6e4ff;
-  background: #f3f8ff;
-  border-radius: 12px;
-  padding: 10px 12px;
+  min-height: $space-15;
+  border: $border-width-1 solid $color-primary-200;
+  background: $color-primary-50;
+  border-radius: $radius-md;
+  padding: $space-2-5 $space-3;
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
@@ -319,15 +379,15 @@
 }
 
 .assist-btn:focus-visible {
-  outline: 3px solid #1d4ed8;
-  outline-offset: 2px;
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: $breakpoint-xl) {
   .main-layout {
-    grid-template-columns: minmax(0, 1fr) 180px;
-    gap: 12px;
-    padding: 12px;
+    grid-template-columns: minmax(0, 1fr) $layout-sidebar-width-sm;
+    gap: $space-3;
+    padding: $space-3;
   }
 
   .choices-grid {
@@ -335,7 +395,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: $breakpoint-lg) {
   .main-layout {
     grid-template-columns: 1fr;
   }
@@ -347,14 +407,4 @@
   .choices-grid {
     grid-template-columns: 1fr;
   }
-}
-/* --- CACHER LA MASCOTTE DE L'INDICE DANS LE JEU B --- */
-::ng-deep .no-mascot-banner .mascot-img {
-  display: none !important; /* Cache l'image de la mascotte */
-}
-
-::ng-deep .no-mascot-banner .hint-container {
-  padding: 12px 24px !important; /* Réduit l'espace vide laissé par l'image */
-  margin: 0 auto 16px auto !important;
-  max-width: 600px;
 }

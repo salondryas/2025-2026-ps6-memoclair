@@ -14,6 +14,8 @@ export interface PatientSummary {
   avatarUrl?: string;
 }
 
+export type PatientSummaryDto = PatientSummary;
+
 export interface PatientProfile {
   patientId: PatientId;
   stage: ClinicalStage;
@@ -33,6 +35,8 @@ export interface PatientProfile {
 
   updatedAt: string | null;
 }
+
+export type PatientProfileDto = PatientProfile;
 
 export interface SelectOption<TValue extends string | number> {
   value: TValue;

@@ -1,12 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AsyncPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { PatientContextService } from '../../../../core/services/patient-context.service';
 import { PatientSummary, PatientId } from '../../../../models/patient.model';
 
 @Component({
   selector: 'mc-patient-selector',
+  standalone: true,
+  imports: [AsyncPipe, FormsModule],
   templateUrl: './patient-selector.component.html',
   styleUrls: ['./patient-selector.component.scss'],
 })
