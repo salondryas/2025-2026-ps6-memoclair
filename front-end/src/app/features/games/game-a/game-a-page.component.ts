@@ -4,13 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { StatisticsService } from '../../caregiver/services/statistics.service';
-import {
-  GameASessionService,
-  GameAState,
-  GameAQuestion,
-  GameAChoice,
-  GameAStep,
-} from '../services/game-a-session.service';
+import { GameASessionService, GameAState, GameAQuestion, GameAChoice, GameAStep } from '../services/game-a-session.service';
 import { SupportLevel, EmotionalState } from '../../../models/session.model';
 import { SessionSummaryService } from '../services/session-summary.service';
 import { GameHeaderComponent } from '../../../shared/components/game-header/game-header.component';
@@ -21,15 +15,9 @@ import { SoundEffectsService } from '../../../core/services/sound-effects.servic
 @Component({
   selector: 'app-game-a-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    GameHeaderComponent,
-    MascotDecoratorComponent,
-    ChoiceCardComponent,
-  ],
+  imports: [CommonModule, RouterModule, GameHeaderComponent, MascotDecoratorComponent, ChoiceCardComponent],
   templateUrl: './game-a-page.component.html',
-  styleUrls: ['./game-a-page.component.scss'],
+  styleUrls: ['./game-a-page.component.scss']
 })
 export class GameAPageComponent implements OnInit, OnDestroy {
   readonly HINT_DELAY = 10000;
@@ -44,17 +32,17 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   shuffledChoices: GameAChoice[] = [];
   placedSteps: (GameAStep | null)[] = [null, null, null, null];
   availableSteps: GameAStep[] = [];
+  readingChoiceId: string | null = null;
 
   isAutoRevealed = false;
-  readingChoiceId: GameAChoice['id'] | null = null;
-  recentlyPlacedZoneIndex: number | null = null;
-
+  isEntering = true;
+  private ttsSessionId = 0;
+  private navigating = false;
+  private enterTimeoutId: number | null = null;
   private hintTimeoutId: number | null = null;
   private autoRevealTimeoutId: number | null = null;
   private autoNextTimeoutId: number | null = null;
   private autoNextQuestionTimeoutId: number | null = null;
-  private transitionTimeoutId: number | null = null;
-  private placedAnimationTimeoutId: number | null = null;
 
   private readonly startedAt = new Date().toISOString();
   private hintCount = 0;
@@ -70,7 +58,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     private readonly sessionSummary: SessionSummaryService,
     private readonly session: GameASessionService,
     private readonly router: Router,
-    private readonly soundEffects: SoundEffectsService,
+    private readonly soundEffects: SoundEffectsService
   ) {}
 
   ngOnInit(): void {
@@ -79,13 +67,22 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.startAssistFlow();
   }
 
+  private triggerEnterAnimation(): void {
+    if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
+    this.isEntering = false;
+    window.setTimeout(() => {
+      this.isEntering = true;
+      this.enterTimeoutId = window.setTimeout(() => { this.isEntering = false; }, 350);
+    }, 0);
+  }
+
   ngOnDestroy(): void {
     this.clearAssistFlow();
-    if (this.transitionTimeoutId) window.clearTimeout(this.transitionTimeoutId);
-    if (this.placedAnimationTimeoutId)
-      window.clearTimeout(this.placedAnimationTimeoutId);
-    this.clearReadingState();
+    if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
     this.session.stopHintTimer();
+    this.ttsSessionId++;
+    window.speechSynthesis.onvoiceschanged = null;
+    window.speechSynthesis.cancel();
     if (!this.state.finished) {
       this.saveSession(true);
     }
@@ -96,39 +93,17 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   }
 
   get progressPercent(): number {
-    return Math.round(
-      ((this.state.index + 1) / this.state.questions.length) * 100,
-    );
-  }
-
-  trackByChoiceId(_index: number, choice: GameAChoice): string {
-    return `${this.question.id}-${choice.id}`;
-  }
-
-  trackByStepId(_index: number, step: GameAStep): string {
-    return `${this.question.id}-${step.id}`;
-  }
-
-  trackByZoneIndex(index: number): number {
-    return index;
+    return Math.round(((this.state.index + 1) / this.state.questions.length) * 100);
   }
 
   private updateShuffledChoices(): void {
-    if (
-      !this.state.finished &&
-      this.question &&
-      this.question.type === 'multiple-choice'
-    ) {
+    if (!this.state.finished && this.question && this.question.type === 'multiple-choice') {
       this.shuffledChoices = this.shuffleArray(this.question.choices || []);
     }
   }
 
   private initializeChronoOrder(): void {
-    if (
-      this.question &&
-      this.question.type === 'chrono-order' &&
-      this.question.steps
-    ) {
+    if (this.question && this.question.type === 'chrono-order' && this.question.steps) {
       this.placedSteps = [null, null, null, null];
       this.availableSteps = this.shuffleArray([...this.question.steps]);
     }
@@ -145,15 +120,14 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   onChoose(choiceId: GameAChoice['id']): void {
     if (this.state.locked || this.state.finished) return;
+    this.ttsSessionId++;
+    this.readingChoiceId = null;
+    window.speechSynthesis.cancel();
     this.recordLatency();
-    this.clearReadingState();
     this.clearAssistFlow();
     const q = this.question;
-    if (q?.correctChoiceId && choiceId !== q.correctChoiceId)
-      this.wrongAnswers++;
-    this.soundEffects.play(
-      q?.correctChoiceId === choiceId ? 'success' : 'gentleError',
-    );
+    if (q?.correctChoiceId && choiceId !== q.correctChoiceId) this.wrongAnswers++;
+    this.soundEffects.play(q?.correctChoiceId === choiceId ? 'success' : 'gentleError');
     this.state = this.session.choose(this.state, choiceId);
     if (this.state.locked) {
       if (this.autoNextQuestionTimeoutId) {
@@ -167,7 +141,6 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   onChronoStepClick(step: GameAStep, fromPlaced: boolean = false): void {
     if (this.state.locked || this.state.finished) return;
-    this.clearReadingState();
     this.soundEffects.play('select');
     let hasChanged = false;
 
@@ -183,10 +156,9 @@ export class GameAPageComponent implements OnInit, OnDestroy {
       const index = this.availableSteps.indexOf(step);
       if (index !== -1) {
         this.availableSteps.splice(index, 1);
-        const emptyIndex = this.placedSteps.findIndex((s) => s === null);
+        const emptyIndex = this.placedSteps.findIndex(s => s === null);
         if (emptyIndex !== -1) {
           this.placedSteps[emptyIndex] = step;
-          this.markRecentlyPlacedZone(emptyIndex);
           hasChanged = true;
         }
       }
@@ -200,15 +172,13 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.state = { ...this.state, hint: null, feedback: null };
     this.startAssistFlow();
 
-    if (this.placedSteps.every((s) => s !== null)) {
+    if (this.placedSteps.every(s => s !== null)) {
       this.validateChronoOrder();
     }
   }
 
   private validateChronoOrder(): void {
-    const placedOrder = this.placedSteps
-      .filter((s) => s !== null)
-      .map((s) => s!.id);
+    const placedOrder = this.placedSteps.filter(s => s !== null).map(s => s!.id);
     this.recordLatency();
     this.clearAssistFlow();
     this.state = this.session.validateChronoOrder(this.state, placedOrder);
@@ -228,12 +198,10 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.soundEffects.play('hint');
 
     if (this.question.type === 'chrono-order' && this.question.correctOrder) {
-      const placedIds = this.placedSteps
-        .filter((s) => s !== null)
-        .map((s) => s!.id);
+      const placedIds = this.placedSteps.filter(s => s !== null).map(s => s!.id);
       for (const correctId of this.question.correctOrder) {
         if (!placedIds.includes(correctId)) {
-          const step = this.availableSteps.find((s) => s.id === correctId);
+          const step = this.availableSteps.find(s => s.id === correctId);
           if (step) {
             step.isHinted = true;
           }
@@ -244,59 +212,146 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     } else {
       this.state = this.session.showHint(this.state);
     }
+
+    if (this.state.hint) {
+      this.speak(this.state.hint);
+    }
   }
 
   onSkip(): void {
     if (this.state.finished) return;
     this.skippedCount++;
     this.recordLatency();
-    this.clearReadingState();
     this.clearAssistFlow();
     this.state = this.session.skip(this.state);
   }
 
   onNext(): void {
-    if (this.isTransitioning) return;
-    this.clearReadingState();
-    this.soundEffects.play('transition');
-    if (this.autoNextQuestionTimeoutId)
-      window.clearTimeout(this.autoNextQuestionTimeoutId);
-    this.autoNextQuestionTimeoutId = null;
-    this.clearAssistFlow();
-    this.isAutoRevealed = false;
-    this.isTransitioning = true;
-    this.transitionTimeoutId = window.setTimeout(() => {
+    if (this.navigating) return;
+    this.navigating = true;
+    try {
+      this.ttsSessionId++;
+      window.speechSynthesis.onvoiceschanged = null;
+      this.readingChoiceId = null;
+      window.speechSynthesis.cancel();
+      this.soundEffects.play('transition');
+      if (this.autoNextQuestionTimeoutId) window.clearTimeout(this.autoNextQuestionTimeoutId);
+      this.autoNextQuestionTimeoutId = null;
+      this.clearAssistFlow();
+      this.isAutoRevealed = false;
+
       this.state = this.session.next(this.state);
-      this.isTransitioning = false;
-      this.transitionTimeoutId = null;
 
       if (this.state.finished) {
         this.saveSession();
-        this.router.navigate(['/games/end']);
+        void this.router.navigate(['/games/end']);
         return;
       }
 
       this.updateShuffledChoices();
       this.initializeChronoOrder();
       this.startAssistFlow();
-    }, 350);
+      this.triggerEnterAnimation();
+    } finally {
+      this.navigating = false;
+    }
   }
 
   onReadQuestion(): void {
+    if (this.question.type === 'multiple-choice' && this.shuffledChoices.length) {
+      this.speakQuestionWithHighlights(this.question.prompt, this.shuffledChoices);
+    } else {
+      this.speak(this.question.prompt);
+    }
+  }
+
+  private speakQuestionWithHighlights(prompt: string, choices: GameAChoice[]): void {
     if (!('speechSynthesis' in window)) return;
-    this.readingChoiceId = null;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(this.question.prompt);
-    utterance.lang = 'fr-FR';
-    utterance.rate = 0.85;
-    utterance.pitch = 1;
-    utterance.onend = () => {
-      this.readingChoiceId = null;
+    this.readingChoiceId = null;
+    const sessionId = ++this.ttsSessionId;
+
+    const doSpeak = () => {
+      if (sessionId !== this.ttsSessionId) return;
+      const voice = this.getBestFrenchVoice();
+      const makeUtt = (text: string): SpeechSynthesisUtterance => {
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'fr-FR';
+        utt.rate = 0.82;
+        utt.pitch = 1.05;
+        if (voice) utt.voice = voice;
+        return utt;
+      };
+
+      const questionUtt = makeUtt(prompt);
+      const choiceItems = choices.map(c => ({ id: c.id, utt: makeUtt(c.label) }));
+
+      const speakNext = (index: number) => {
+        if (sessionId !== this.ttsSessionId) {
+          this.readingChoiceId = null;
+          return;
+        }
+        if (index >= choiceItems.length) {
+          this.readingChoiceId = null;
+          return;
+        }
+        const item = choiceItems[index];
+        this.readingChoiceId = item.id;
+        item.utt.onend = () => speakNext(index + 1);
+        window.speechSynthesis.speak(item.utt);
+      };
+
+      questionUtt.onend = () => speakNext(0);
+      window.speechSynthesis.speak(questionUtt);
     };
-    utterance.onerror = () => {
-      this.readingChoiceId = null;
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  }
+
+  private speak(text: string): void {
+    if (!('speechSynthesis' in window)) return;
+    const sessionId = ++this.ttsSessionId;
+    window.speechSynthesis.cancel();
+    this.readingChoiceId = null;
+
+    const doSpeak = () => {
+      if (sessionId !== this.ttsSessionId) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.rate = 0.82;
+      utterance.pitch = 1.05;
+      const voice = this.getBestFrenchVoice();
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
     };
-    window.speechSynthesis.speak(utterance);
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  }
+
+  private getBestFrenchVoice(): SpeechSynthesisVoice | null {
+    const voices = window.speechSynthesis.getVoices();
+    const fr = voices.filter(v => v.lang.startsWith('fr'));
+    return (
+      fr.find(v => v.name.includes('Google')) ||
+      fr.find(v => /natural|neural|enhanced/i.test(v.name)) ||
+      fr.find(v => v.lang === 'fr-FR') ||
+      fr[0] ||
+      null
+    );
   }
 
   onTogglePause(): void {
@@ -321,29 +376,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   }
 
   isAutoHighlighted(choiceId: GameAChoice['id']): boolean {
-    return (
-      this.isAutoRevealed &&
-      this.state.locked &&
-      choiceId === this.question.correctChoiceId
-    );
-  }
-
-  private markRecentlyPlacedZone(index: number): void {
-    this.recentlyPlacedZoneIndex = index;
-    if (this.placedAnimationTimeoutId) {
-      window.clearTimeout(this.placedAnimationTimeoutId);
-    }
-    this.placedAnimationTimeoutId = window.setTimeout(() => {
-      this.recentlyPlacedZoneIndex = null;
-      this.placedAnimationTimeoutId = null;
-    }, 450);
-  }
-
-  private clearReadingState(): void {
-    this.readingChoiceId = null;
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    return this.isAutoRevealed && this.state.locked && choiceId === this.question.correctChoiceId;
   }
 
   private startAssistFlow(): void {
@@ -352,18 +385,13 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.isAutoRevealed = false;
     this.questionStartTime = Date.now();
 
-    this.hintTimeoutId = window.setTimeout(
-      () => {
-        if (!this.state.locked && !this.state.finished) {
-          this.hintCount++;
-          this.onHint();
-        }
-      },
-      (this.state.profile?.hintDelaySeconds || 12) * 1000,
-    );
+    this.hintTimeoutId = window.setTimeout(() => {
+      if (!this.state.locked && !this.state.finished) {
+        this.onHint();
+      }
+    }, (this.state.profile?.hintDelaySeconds || 12) * 1000);
 
-    const revealDelay =
-      ((this.state.profile?.hintDelaySeconds || 12) + 20) * 1000;
+    const revealDelay = ((this.state.profile?.hintDelaySeconds || 12) + 20) * 1000;
     const nextDelay = revealDelay + 5000;
 
     this.autoRevealTimeoutId = window.setTimeout(() => {
@@ -376,30 +404,21 @@ export class GameAPageComponent implements OnInit, OnDestroy {
           const correctId = this.question.correctChoiceId;
           this.state = this.session.choose(this.state, correctId as any);
           this.isAutoRevealed = true;
-          this.state = {
-            ...this.state,
-            feedback: 'Nous vous aidons : voici la bonne réponse ✅',
-          };
+          this.state = { ...this.state, feedback: 'Nous vous aidons : voici la bonne réponse ✅' };
         }
 
         // 2. NOUVEAU COMPORTEMENT POUR ORDRE CHRONOLOGIQUE
-        else if (
-          this.question.type === 'chrono-order' &&
-          this.question.correctOrder
-        ) {
+        else if (this.question.type === 'chrono-order' && this.question.correctOrder) {
           // On va chercher les images dans le bon ordre et on remplit toutes les zones d'un coup
-          const correctSteps = this.question.correctOrder.map(
-            (id) => this.question.steps!.find((s) => s.id === id)!,
+          const correctSteps = this.question.correctOrder.map(id =>
+            this.question.steps!.find(s => s.id === id)!
           );
 
           this.placedSteps = [...correctSteps]; // On remplit les zones en haut
           this.availableSteps = []; // On vide les choix en bas
           this.isAutoRevealed = true;
 
-          this.state = {
-            ...this.state,
-            feedback: 'Nous vous aidons : voici le bon ordre ✅',
-          };
+          this.state = { ...this.state, feedback: 'Nous vous aidons : voici le bon ordre ✅' };
 
           // On valide pour déclencher la lueur verte avant de passer à la suite
           this.validateChronoOrder();
@@ -419,9 +438,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   private computeAvgLatency(): number {
     if (!this.latencies.length) return 0;
-    return Math.round(
-      this.latencies.reduce((a, b) => a + b, 0) / this.latencies.length,
-    );
+    return Math.round(this.latencies.reduce((a, b) => a + b, 0) / this.latencies.length);
   }
 
   private computeSupportLevel(): SupportLevel {
@@ -441,19 +458,14 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   private buildSummary(): string {
     const signals = this.hintCount + this.guidedMoments;
-    if (signals === 0)
-      return 'Séance fluide, aucun indice nécessaire. Augmenter progressivement la difficulté.';
-    if (signals <= 2)
-      return 'Quelques indices utilisés. Maintenir le niveau et observer la séance suivante.';
+    if (signals === 0) return 'Séance fluide, aucun indice nécessaire. Augmenter progressivement la difficulté.';
+    if (signals <= 2) return 'Quelques indices utilisés. Maintenir le niveau et observer la séance suivante.';
     return "Plusieurs moments d'accompagnement. Favoriser des supports plus familiers à la prochaine séance.";
   }
 
   private saveSession(earlyStop = false): void {
     const patient = this.patientContext.getActivePatientSnapshot();
-    const duration = Math.max(
-      1,
-      Math.round((Date.now() - Date.parse(this.startedAt)) / 60000),
-    );
+    const duration = Math.max(1, Math.round((Date.now() - Date.parse(this.startedAt)) / 60000));
     const session = this.sessionSummary.build({
       patientId: patient.id,
       gameType: 'game-a',
@@ -477,8 +489,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     if (this.hintTimeoutId) window.clearTimeout(this.hintTimeoutId);
     if (this.autoRevealTimeoutId) window.clearTimeout(this.autoRevealTimeoutId);
     if (this.autoNextTimeoutId) window.clearTimeout(this.autoNextTimeoutId);
-    if (this.autoNextQuestionTimeoutId)
-      window.clearTimeout(this.autoNextQuestionTimeoutId);
+    if (this.autoNextQuestionTimeoutId) window.clearTimeout(this.autoNextQuestionTimeoutId);
     this.hintTimeoutId = null;
     this.autoRevealTimeoutId = null;
     this.autoNextTimeoutId = null;

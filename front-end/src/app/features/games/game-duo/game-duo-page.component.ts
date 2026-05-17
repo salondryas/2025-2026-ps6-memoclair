@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -47,6 +47,8 @@ export class GameDuoPageComponent implements OnInit {
     private readonly sessionSummary: SessionSummaryService,
     private readonly router: Router,
     private readonly http: HttpClient,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -96,19 +98,32 @@ export class GameDuoPageComponent implements OnInit {
   }
 
   private generateQuestions(patientId: string, patientName: string): void {
+    console.log('[Duo] generateQuestions — patientId:', patientId, 'patientName:', patientName);
     const payload: DuoGenerateRequestDto = { patientName };
     this.http.post<DuoGenerateResponseDto>(
       `${environment.backendUrl}/api/duo/generate/${patientId}`,
       payload,
     ).pipe(timeout(150000)).subscribe({
-      next: ({ rounds }) => {
-        this.state = {
-          ...this.duo.createInitialState(),
-          rounds,
-        };
-        this.pageState = 'ready';
+      next: (response) => {
+        console.log('[Duo] next() — réponse reçue:', response);
+        const { rounds } = response;
+        console.log('[Duo] rounds count:', rounds?.length);
+        this.ngZone.run(() => {
+          try {
+            this.state = {
+              ...this.duo.createInitialState(),
+              rounds,
+            };
+            this.pageState = 'ready';
+            this.cdr.detectChanges();
+            console.log('[Duo] pageState = ready ✓');
+          } catch (err) {
+            console.error('[Duo] ERREUR dans next():', err);
+          }
+        });
       },
       error: (error: HttpErrorResponse) => {
+        console.error('[Duo] error() — statut HTTP:', error.status, error);
         const body = error.error as DuoGenerateErrorDto | DuoNotEnoughMediaErrorDto | null;
         if (body?.error === 'not_enough_media') {
           this.mediaCount = body.count ?? 0;

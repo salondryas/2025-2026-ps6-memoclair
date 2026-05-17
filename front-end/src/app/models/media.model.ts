@@ -1,7 +1,7 @@
 import { PatientId } from './patient.model';
 
 export type MediaKind = 'image' | 'audio';
-export type MemoryCueType = 'location' | 'person' | 'event' | 'music' | 'object';
+export type MemoryCueType = 'location' | 'person' | 'event' | 'music' | 'object' | 'animal';
 
 export interface MediaItem {
   id: string;

@@ -4,8 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./features/home/home-page/home-page.component').then((m) => m.HomePageComponent),
+    loadChildren: () =>
+      import('./features/home/home.routes').then((m) => m.HOME_ROUTES),
   },
   {
     path: 'games',
@@ -21,6 +21,12 @@ const routes: Routes = [
       },
       {
         path: 'patient-selection',
+        loadComponent: () =>
+          import('./features/games/patient-selection/patient-selection-page.component')
+            .then((m) => m.PatientSelectionPageComponent),
+      },
+      {
+        path: 'patient-selection-patient',
         loadComponent: () =>
           import('./features/games/patient-selection/patient-selection-page.component')
             .then((m) => m.PatientSelectionPageComponent),
@@ -51,6 +57,11 @@ const routes: Routes = [
     path: 'caregiver',
     loadChildren: () =>
       import('./features/caregiver/caregiver.routes').then((m) => m.CAREGIVER_ROUTES),
+  },
+  {
+    path: 'settings',
+    loadChildren: () =>
+      import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
   },
   { path: '**', redirectTo: '' },
 ];

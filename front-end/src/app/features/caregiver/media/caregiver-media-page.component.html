@@ -94,7 +94,10 @@
                     [src]="getMediaPreviewUrl(item)"
                     [alt]="item.title">
                 } @else {
-                  <div class="media-card__audio-icon" aria-hidden="true">♫</div>
+                  <img
+                    class="media-card__audio-icon"
+                    src="assets/UI/audio-icon.svg"
+                    alt="Fichier audio">
                 }
               </div>
 

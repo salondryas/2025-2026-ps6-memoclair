@@ -10,17 +10,11 @@ async function listMedia(req, res, next) {
 }
 
 async function uploadMedia(req, res, next) {
-  if (!req.file) {
-    const err = new Error('Fichier manquant ou type non autorisé.')
-    err.statusCode = 400
-    return next(err)
-  }
-
   try {
-    const item = await mediaService.uploadMedia(req.body.patientId, req.file, req.body)
-    return res.status(201).json(item)
+    const result = await mediaService.uploadMedia(req.body.patientId, req.file, req.body)
+    res.status(201).json(result)
   } catch (err) {
-    return next(err)
+    next(err)
   }
 }
 

@@ -48,6 +48,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     { value: 'person', label: 'Personne' },
     { value: 'event', label: 'Événement' },
     { value: 'music', label: 'Musique' },
+    { value: 'animal', label: 'Animal' },
   ];
   private readonly cueLabels: Record<MemoryCueType, string> = {
     location: 'Lieu',
@@ -55,6 +56,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     event: 'Événement',
     music: 'Musique',
     object: 'Objet',
+    animal: 'Animal',
   };
 
   form: MediaFormValue = this.createEmptyForm();
@@ -150,7 +152,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
   }
 
   getMediaPreviewUrl(item: MediaItem): string {
-    return `${environment.backendUrl}/uploads/${encodeURIComponent(item.fileName)}`;
+    return `${environment.backendUrl}/uploads/${item.patientId}/${item.fileName}`;
   }
 
   getCueLabel(cueType: MemoryCueType): string {

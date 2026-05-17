@@ -1,7 +1,25 @@
 const { readStore, writeStore } = require('../repositories/profile.repository')
+const ValidationError = require('../utils/errors/validation-error')
+const NotFoundError = require('../utils/errors/not-found-error')
+const Joi = require('joi')
 
 const PROFILE_TYPES = ['professional', 'patient', 'family']
 const STAGES = ['leger', 'modere', 'avance']
+
+const profileSchema = Joi.object({
+  type: Joi.string().valid('professional', 'patient', 'family').required(),
+  firstName: Joi.string().trim().min(1).required(),
+  lastName: Joi.string().trim().min(1).required(),
+  jobTitle: Joi.when('type', { is: 'professional', then: Joi.string().required() }),
+  organization: Joi.when('type', { is: 'professional', then: Joi.string().required() }),
+  stage: Joi.when('type', { is: 'patient', then: Joi.string().valid('leger', 'modere', 'avance').required() }),
+  relationship: Joi.when('type', { is: 'family', then: Joi.string().required() }),
+  email: Joi.string().email().allow('', null).optional(),
+  phone: Joi.string().allow('', null).optional(),
+  avatarUrl: Joi.string().allow('', null).optional(),
+  createdByProfessionalId: Joi.string().allow(null).optional(),
+  id: Joi.string().optional(),
+})
 
 function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`
@@ -32,12 +50,8 @@ async function listProfiles(type) {
 }
 
 async function createProfile(payload) {
-  const errors = validateProfilePayload(payload)
-  if (errors.length) {
-    const err = new Error(errors.join(' '))
-    err.statusCode = 400
-    throw err
-  }
+  const { error } = profileSchema.validate(payload, { abortEarly: false })
+  if (error) throw new ValidationError(error.details.map((d) => d.message).join(' '))
 
   const now = new Date().toISOString()
   const profile = {
@@ -68,9 +82,7 @@ async function deleteProfile(profileId) {
   const store = await readStore()
   const profile = store.profiles.find((p) => p.id === profileId)
   if (!profile) {
-    const err = new Error('Profil introuvable.')
-    err.statusCode = 404
-    throw err
+    throw new NotFoundError('Profil introuvable.')
   }
 
   store.profiles = store.profiles
@@ -117,9 +129,7 @@ async function listSessions(patientId) {
 
 async function createSession(payload) {
   if (!payload.patientId) {
-    const err = new Error('patientId requis.')
-    err.statusCode = 400
-    throw err
+    throw new ValidationError('patientId requis.')
   }
 
   const store = await readStore()

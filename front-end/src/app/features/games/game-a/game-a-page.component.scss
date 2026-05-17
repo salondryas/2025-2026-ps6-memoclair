@@ -1,4 +1,4 @@
-@use "../../../../styles/tokens" as *;
+@use '../../../../styles/tokens' as *;
 
 :host {
   display: block;
@@ -101,14 +101,15 @@
   padding: $space-5 $space-10;
   gap: $space-4-5;
   height: 100%;
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
 }
 
-.main-game-area.transitioning {
-  opacity: 0;
-  transform: translateX(-$space-3);
+.main-game-area.question-enter {
+  animation: questionFadeIn 0.32s ease forwards;
+}
+
+@keyframes questionFadeIn {
+  from { opacity: 0; transform: translateX(1.2rem); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 ::ng-deep .game-mascot {
@@ -138,11 +139,7 @@
   justify-content: space-between;
   gap: $space-3-5;
   padding: $space-5 $space-7-5 $space-5 $space-40;
-  background: linear-gradient(
-    135deg,
-    $color-clinical-warning-50 0%,
-    $color-clinical-warning-100 100%
-  );
+  background: linear-gradient(135deg, $color-clinical-warning-50 0%, $color-clinical-warning-100 100%);
   border-radius: $radius-xl;
   box-shadow: 0 $space-2-5 $space-6-25 $overlay-warning-15;
   color: $color-clinical-warning-900;
@@ -164,9 +161,7 @@
   padding: $space-2-5 $space-4;
   cursor: pointer;
   box-shadow: 0 $space-2 $space-4-5 $overlay-warning-18;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hint-action-btn:hover {
@@ -225,10 +220,7 @@
   background: $color-neutral-100;
   border: $border-width-2 solid $color-neutral-300;
   color: $color-neutral-900;
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.15s ease;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
 }
 
 .assist-btn:hover:not(:disabled) {
@@ -338,10 +330,6 @@
   background: $color-primary-50;
 }
 
-.zone-card.just-placed {
-  animation: placedStepSettle 0.45s ease-out;
-}
-
 .zone-card:hover {
   border-color: $color-neutral-500;
 }
@@ -404,20 +392,8 @@
   margin-bottom: -$space-1-25; /* On réduit l'écart en dessous pour rapprocher les grilles */
 }
 
-@keyframes placedStepSettle {
-  0% {
-    transform: translateY(-$space-2) scale(1.04);
-    box-shadow: 0 $space-2 $space-5 $overlay-primary-20;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    box-shadow: none;
-  }
-}
-
 @keyframes levitate {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
     box-shadow: 0 $space-1 $space-3 $overlay-primary-20;
   }
@@ -441,20 +417,6 @@
   to {
     opacity: 1;
     transform: translateY($space-0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .main-game-area,
-  .progress-fill,
-  .zone-card,
-  .step-card,
-  .btn-next-question,
-  .hint-levitation,
-  .zone-card.just-placed {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
   }
 }
 

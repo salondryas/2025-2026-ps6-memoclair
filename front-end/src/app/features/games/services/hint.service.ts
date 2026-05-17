@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Hint } from '../../../models/hint.model';
 import { MediaItem, MemoryCueType } from '../../../models/media.model';
 
-const CUE_PRIORITY: readonly MemoryCueType[] = ['location', 'person', 'event', 'music'];
+const CUE_PRIORITY: readonly MemoryCueType[] = ['location', 'person', 'event', 'music', 'animal'];
 
 @Injectable({
   providedIn: 'root',
@@ -88,6 +88,14 @@ export class HintService {
         id: `${media.id}-hint-musique`,
         cueType: 'music',
         text: 'Un rythme fredonné tout doux peut ouvrir la mémoire sans exiger le titre exact.',
+      });
+    }
+
+    if (media.cueType === 'animal') {
+      hints.push({
+        id: `${media.id}-hint-animal`,
+        cueType: 'animal',
+        text: 'Évoquez le compagnon par ses habitudes ou ses bruits : sa façon de se déplacer, de demander à manger, sans exiger le nom.',
       });
     }
 
@@ -196,6 +204,29 @@ export class HintService {
             id: `${baseId}-musique-air`,
             cueType: 'music',
             text: 'Quelques notes fredonnées, sans justesse requise, peuvent suffire en dernier appui.',
+          },
+        ];
+      case 'generic-animal-compagnon':
+        return [
+          {
+            id: `${baseId}-lieu-maison`,
+            cueType: 'location',
+            text: 'Situez d'abord l'endroit où vivait cet animal : la maison, la cour, la ferme.',
+          },
+          {
+            id: `${baseId}-animal-habitude`,
+            cueType: 'animal',
+            text: 'Évoquez une habitude de l'animal : son heure de repas, son coin préféré, son bruit familier.',
+          },
+          {
+            id: `${baseId}-personne-soin`,
+            cueType: 'person',
+            text: 'Qui s'occupait de lui ou d'elle ? Un geste de soin suffit, sans chercher un prénom.',
+          },
+          {
+            id: `${baseId}-objet-gamelle`,
+            cueType: 'event',
+            text: 'La gamelle, la laisse, la cage : un objet concret peut rouvrir le souvenir doucement.',
           },
         ];
       default:

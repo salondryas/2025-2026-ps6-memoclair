@@ -1,8 +1,19 @@
 const path = require('path')
+const Joi = require('joi')
+const ValidationError = require('../utils/errors/validation-error')
+const NotFoundError = require('../utils/errors/not-found-error')
 const {
   readMeta, writeMeta, saveFile, deleteFile,
 } = require('../repositories/media.repository')
 const { clearCache } = require('../repositories/games-cache.repository')
+
+const uploadSchema = Joi.object({
+  patientId: Joi.string().trim().min(1).required(),
+  title: Joi.string().trim().min(1).required(),
+  kind: Joi.string().valid('image', 'audio').required(),
+  cueType: Joi.string().valid('person', 'location', 'event', 'music', 'object', 'animal').optional().default('object'),
+  clinicalNote: Joi.string().allow('', null).optional(),
+})
 
 const DUO_CACHE = 'duo-cache'
 const GAME_B_CACHE = 'game-b-cache'
@@ -25,7 +36,7 @@ function buildMediaItem(patientId, file, body, fileName) {
     fileName,
     originalName: file.originalname,
     mimeType: file.mimetype,
-    cueType: cueType || 'object',
+    cueType,
     clinicalNote: (clinicalNote || '').trim(),
     createdAt: new Date().toISOString(),
     source: 'upload',
@@ -37,12 +48,9 @@ async function listMedia(patientId) {
 }
 
 async function uploadMedia(patientId, file, body) {
-  const { title, kind } = body
-  if (!patientId || !title || !kind) {
-    const err = new Error('Champs obligatoires manquants : patientId, title, kind.')
-    err.statusCode = 400
-    throw err
-  }
+  if (!file) throw new ValidationError('Aucun fichier reçu.')
+  const { error } = uploadSchema.validate(body, { abortEarly: false })
+  if (error) throw new ValidationError(error.details.map((d) => d.message).join(' '))
 
   const fileName = buildFileName(file.originalname)
   await saveFile(patientId, fileName, file.buffer)
@@ -64,9 +72,7 @@ async function deleteMedia(patientId, itemId) {
   const item = items.find((i) => i.id === itemId)
 
   if (!item) {
-    const err = new Error('Média non trouvé.')
-    err.statusCode = 404
-    throw err
+    throw new NotFoundError('Média non trouvé.')
   }
 
   await deleteFile(patientId, item.fileName)

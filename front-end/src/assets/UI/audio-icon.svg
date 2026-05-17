@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <circle cx="40" cy="40" r="40" fill="#e8f1ea"/>
+  <!-- Speaker body -->
+  <path d="M28 33v14h8l10 9V24L36 33H28z" fill="#466654" rx="2"/>
+  <!-- Sound waves -->
+  <path d="M50 30c2.5 2.5 4 5.8 4 10s-1.5 7.5-4 10" stroke="#466654" stroke-width="3" stroke-linecap="round"/>
+  <path d="M55 25c4 4 6.5 9.2 6.5 15s-2.5 11-6.5 15" stroke="#466654" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+</svg>

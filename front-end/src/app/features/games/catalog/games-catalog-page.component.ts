@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 
+import { environment } from '../../../../environments/environment';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { GameCatalogService } from '../services/game-catalog.service';
 import { Game } from 'src/app/models/game.model';
@@ -21,6 +23,7 @@ type CatalogGame = Game & { id: CatalogGameId };
 export class GamesCatalogPageComponent {
   private readonly patientContext = inject(PatientContextService);
   private readonly catalog = inject(GameCatalogService);
+  private readonly http = inject(HttpClient);
 
   readonly activePatient = toSignal(this.patientContext.activePatient$, {
     initialValue: this.patientContext.getActivePatientSnapshot(),
@@ -61,7 +64,15 @@ export class GamesCatalogPageComponent {
     if (!this.showDuoToggleFor(game)) {
       return;
     }
+    const enabling = !this.duoEnabledForGameB();
     this.duoEnabledForGameB.update((enabled) => !enabled);
+    if (enabling) {
+      const patient = this.patientContext.getActivePatientSnapshot();
+      this.http.post(
+        `${environment.backendUrl}/api/duo/generate/${patient.id}`,
+        { patientName: patient.firstName },
+      ).subscribe({ error: () => {} });
+    }
   }
 
   isRecommended(game: CatalogGame): boolean {

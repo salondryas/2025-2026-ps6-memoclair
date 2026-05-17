@@ -1,5 +1,6 @@
 const https = require('https')
 const { GEMINI_API_KEY, GEMINI_MODEL } = require('../config/env')
+const logger = require('../utils/logger')
 
 const GEMINI_HOST = 'generativelanguage.googleapis.com'
 
@@ -24,9 +25,16 @@ function callGemini(parts, options = {}, attempt = 1) {
       contents: [{ parts }],
       generationConfig: {
         temperature: options.temperature === undefined ? 0.7 : options.temperature,
-        maxOutputTokens: options.maxOutputTokens === undefined ? 16384 : options.maxOutputTokens,
+        maxOutputTokens: options.maxOutputTokens === undefined ? 4096 : options.maxOutputTokens,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     })
+
+    const payloadKb = (Buffer.byteLength(body) / 1024).toFixed(1)
+    const partsInfo = parts.map((p) => (p.inline_data ? `[image ${p.inline_data.mime_type}]` : `[text ${p.text ? p.text.slice(0, 60).replace(/\n/g, ' ') : ''}…]`)).join(', ')
+    logger.log(`[Gemini] tentative ${attempt} — modèle: ${GEMINI_MODEL} | payload: ${payloadKb} KB | parties: ${partsInfo}`)
+
+    const startTime = Date.now()
 
     const requestOptions = {
       hostname: GEMINI_HOST,
@@ -39,19 +47,28 @@ function callGemini(parts, options = {}, attempt = 1) {
     }
 
     const req = https.request(requestOptions, (res) => {
+      logger.log(`[Gemini] réponse HTTP ${res.statusCode} reçue après ${Date.now() - startTime} ms`)
       let data = ''
       res.on('data', (chunk) => { data += chunk })
       res.on('end', async () => {
+        logger.log(`[Gemini] corps complet reçu (${(data.length / 1024).toFixed(1)} KB) — total: ${Date.now() - startTime} ms`)
         let parsed
         try {
           parsed = JSON.parse(data)
         } catch (parseErr) {
+          logger.log(`[Gemini] ERREUR parse JSON: ${data.slice(0, 200)}`)
           reject(new Error(`Réponse Gemini non parseable (HTTP ${res.statusCode}).`))
           return
         }
 
+        if (parsed.error) {
+          logger.log(`[Gemini] ERREUR API: ${JSON.stringify(parsed.error)}`)
+        }
+
         if (res.statusCode === 429 && attempt === 1) {
-          await sleep(extractRetryDelay(parsed))
+          const delay = extractRetryDelay(parsed)
+          logger.log(`[Gemini] 429 rate-limit — attente ${delay} ms avant retry`)
+          await sleep(delay)
           try {
             resolve(await callGemini(parts, options, 2))
           } catch (err) {
@@ -60,12 +77,22 @@ function callGemini(parts, options = {}, attempt = 1) {
           return
         }
 
+        if (parsed.candidates && parsed.candidates[0]) {
+          const finishReason = parsed.candidates[0].finishReason
+          const tokenCount = parsed.usageMetadata ? JSON.stringify(parsed.usageMetadata) : 'inconnu'
+          logger.log(`[Gemini] OK — finishReason: ${finishReason} | tokens: ${tokenCount}`)
+        }
+
         resolve(parsed)
       })
     })
 
-    req.on('error', reject)
+    req.on('error', (err) => {
+      logger.log(`[Gemini] ERREUR réseau: ${err.message}`)
+      reject(err)
+    })
     req.setTimeout(options.timeoutMs === undefined ? 120000 : options.timeoutMs, () => {
+      logger.log(`[Gemini] TIMEOUT après ${Date.now() - startTime} ms`)
       req.destroy()
       reject(new Error('Timeout Gemini.'))
     })

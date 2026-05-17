@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -64,6 +64,9 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   private latencies: number[] = [];
 
   loading = true;
+  isEntering = false;
+  private enterTimeoutId: number | null = null;
+  private ttsSessionId = 0;
 
   constructor(
     private readonly patientContext: PatientContextService,
@@ -73,6 +76,8 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly http: HttpClient,
     private readonly soundEffects: SoundEffectsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -85,20 +90,26 @@ export class GameBPageComponent implements OnInit, OnDestroy {
       payload,
     ).subscribe({
       next: ({ questions: geminiQuestions }) => {
-        this.initializeGame();
-        if (geminiQuestions?.length) {
-          this.questions = [...this.questions, ...geminiQuestions];
-          this.totalQuestions = this.questions.length;
-        }
-        this.loading = false;
-        this.startAssistFlow();
+        this.ngZone.run(() => {
+          this.initializeGame();
+          if (geminiQuestions?.length) {
+            this.questions = [...this.questions, ...geminiQuestions];
+            this.totalQuestions = this.questions.length;
+          }
+          this.loading = false;
+          this.startAssistFlow();
+          this.cdr.detectChanges();
+        });
       },
       error: (error: HttpErrorResponse) => {
         const apiError = error.error as GameBGenerateErrorDto | null;
         console.error('[GameB] Erreur API generate:', apiError?.error ?? error.message);
-        this.initializeGame();
-        this.loading = false;
-        this.startAssistFlow();
+        this.ngZone.run(() => {
+          this.initializeGame();
+          this.loading = false;
+          this.startAssistFlow();
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -127,6 +138,9 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearAssistFlow();
+    if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
+    this.ttsSessionId++;
+    window.speechSynthesis.cancel();
     if (!this.finished && this.totalQuestions > 0) {
       this.saveSession(true);
     }
@@ -166,6 +180,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.soundEffects.play('hint');
     this.hintMessage = this.currentQuestion.hint;
     this.feedbackMessage = 'Prenez votre temps, un repère peut aider.';
+    if (this.hintMessage) this.speak(this.hintMessage);
   }
 
   onHint(): void {
@@ -186,11 +201,75 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   onReadQuestion(): void {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(this.currentQuestion.question);
-    utterance.lang = 'fr-FR';
-    utterance.rate = 0.85;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
+    const sessionId = ++this.ttsSessionId;
+
+    const doSpeak = () => {
+      if (sessionId !== this.ttsSessionId) return;
+      const voice = this.getBestFrenchVoice();
+      const makeUtt = (text: string): SpeechSynthesisUtterance => {
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'fr-FR';
+        utt.rate = 0.82;
+        utt.pitch = 1.05;
+        if (voice) utt.voice = voice;
+        return utt;
+      };
+      const questionUtt = makeUtt(this.currentQuestion.question);
+      const choiceUtts = this.currentQuestion.choices.map(c => makeUtt(c.label));
+      const speakNext = (index: number) => {
+        if (sessionId !== this.ttsSessionId) return;
+        if (index >= choiceUtts.length) return;
+        choiceUtts[index].onend = () => speakNext(index + 1);
+        window.speechSynthesis.speak(choiceUtts[index]);
+      };
+      questionUtt.onend = () => speakNext(0);
+      window.speechSynthesis.speak(questionUtt);
+    };
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  }
+
+  private speak(text: string): void {
+    if (!('speechSynthesis' in window)) return;
+    const sessionId = ++this.ttsSessionId;
+    window.speechSynthesis.cancel();
+    const doSpeak = () => {
+      if (sessionId !== this.ttsSessionId) return;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'fr-FR';
+      utt.rate = 0.82;
+      utt.pitch = 1.05;
+      const voice = this.getBestFrenchVoice();
+      if (voice) utt.voice = voice;
+      window.speechSynthesis.speak(utt);
+    };
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  }
+
+  private getBestFrenchVoice(): SpeechSynthesisVoice | null {
+    const voices = window.speechSynthesis.getVoices();
+    const fr = voices.filter(v => v.lang.startsWith('fr'));
+    return (
+      fr.find(v => v.name.includes('Google')) ||
+      fr.find(v => /natural|neural|enhanced/i.test(v.name)) ||
+      fr.find(v => v.lang === 'fr-FR') ||
+      fr[0] ||
+      null
+    );
   }
 
   onNext(): void {
@@ -212,6 +291,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.feedbackMessage = '';
     this.hintMessage = null;
 
+    this.triggerEnterAnimation();
     this.startAssistFlow();
   }
 
@@ -263,6 +343,15 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.autoNextTimeoutId = window.setTimeout(() => {
       if (!this.finished) this.onNext();
     }, nextDelay);
+  }
+
+  private triggerEnterAnimation(): void {
+    if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
+    this.isEntering = false;
+    window.setTimeout(() => {
+      this.isEntering = true;
+      this.enterTimeoutId = window.setTimeout(() => { this.isEntering = false; }, 350);
+    }, 0);
   }
 
   private recordLatency(): void {

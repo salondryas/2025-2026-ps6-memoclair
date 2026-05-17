@@ -1,10 +1,12 @@
 const path = require('path')
+const ValidationError = require('../utils/errors/validation-error')
 const { readFile, stat } = require('fs/promises')
 const { callGemini, parseGeminiText } = require('./gemini.service')
 const { readMeta } = require('../repositories/media.repository')
 const {
   readCache, writeCache, getFingerprint,
 } = require('../repositories/games-cache.repository')
+const logger = require('../utils/logger')
 
 const UPLOADS_BASE = path.join(__dirname, '../../uploads')
 const GAME_B_CACHE = 'game-b-cache'
@@ -81,17 +83,19 @@ async function transformDuoToGameB(rounds) {
 }
 
 async function buildGameBParts(items, patientName) {
+  const base64List = await Promise.all(
+    items.map(item => readFileAsBase64(path.join(UPLOADS_BASE, item.patientId, item.fileName)))
+  )
   const parts = []
-  await Promise.all(items.map(async (item, i) => {
-    const filePath = path.join(UPLOADS_BASE, item.patientId, item.fileName)
-    const base64 = await readFileAsBase64(filePath)
-    if (base64) {
-      parts.push({ inline_data: { mime_type: item.mimeType, data: base64 } })
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (base64List[i]) {
+      parts.push({ inline_data: { mime_type: item.mimeType, data: base64List[i] } })
     }
     parts.push({
       text: `Souvenir ${i + 1} — MOT-CLÉ : "${item.title}"\n- Type : ${item.kind === 'image' ? 'Photo' : 'Audio / Musique'}\n- Description : ${item.clinicalNote}`,
     })
-  }))
+  }
 
   parts.push({
     text: `Tu es un thérapeute spécialisé en réminiscence pour les patients atteints d'Alzheimer.
@@ -189,15 +193,18 @@ const CUE_LABELS = {
   location: 'Lieu / endroit',
   event: 'Événement',
   music: 'Musique / son',
+  animal: 'Animal / compagnon',
 }
 
 async function buildDuoParts(items, patientName) {
+  const base64List = await Promise.all(
+    items.map(item => readFileAsBase64(path.join(UPLOADS_BASE, item.patientId, item.fileName)))
+  )
   const parts = []
-  await Promise.all(items.map(async (item, i) => {
-    const filePath = path.join(UPLOADS_BASE, item.patientId, item.fileName)
-    const base64 = await readFileAsBase64(filePath)
-    if (base64) {
-      parts.push({ inline_data: { mime_type: item.mimeType, data: base64 } })
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (base64List[i]) {
+      parts.push({ inline_data: { mime_type: item.mimeType, data: base64List[i] } })
     }
     parts.push({
       text: `Souvenir ${i + 1} — MOT-CLÉ : "${item.title}"
@@ -205,7 +212,7 @@ async function buildDuoParts(items, patientName) {
 - Catégorie : ${CUE_LABELS[item.cueType] || item.cueType}
 - Description : ${item.clinicalNote}`,
     })
-  }))
+  }
 
   parts.push({
     text: `Tu es un thérapeute spécialisé en réminiscence pour les patients atteints d'Alzheimer.
@@ -260,10 +267,14 @@ function parseDuoRounds(response, items, baseUrl) {
 }
 
 async function generateDuoRounds(patientId, patientName, baseUrl) {
+  logger.log(`[Duo] generateDuoRounds — patient: ${patientId}`)
   const items = await readMeta(patientId)
+  logger.log(`[Duo] ${items.length} médias trouvés pour ${patientId}`)
+
   if (items.length < 9) {
-    const err = new Error(`Il faut 9 médias pour générer les questions. Ce patient en a ${items.length}.`)
-    err.statusCode = 400
+    const err = new ValidationError(
+      `Il faut au moins 9 médias. Ce patient en a ${items.length}.`
+    )
     err.errorCode = 'not_enough_media'
     err.count = items.length
     throw err
@@ -273,12 +284,21 @@ async function generateDuoRounds(patientId, patientName, baseUrl) {
   const fingerprint = getFingerprint(nineItems)
   const cached = await readCache(DUO_CACHE, patientId)
   if (cached && cached.fingerprint === fingerprint) {
+    logger.log(`[Duo] cache hit — fingerprint: ${fingerprint}`)
     return { rounds: cached.rounds, fromCache: true }
   }
 
+  logger.log(`[Duo] cache miss — construction des parts pour ${nineItems.length} médias`)
+  const t0 = Date.now()
   const parts = await buildDuoParts(nineItems, patientName || patientId)
+  logger.log(`[Duo] parts construites en ${Date.now() - t0} ms — appel Gemini...`)
+
+  const t1 = Date.now()
   const response = await callGemini(parts)
+  logger.log(`[Duo] Gemini a répondu en ${Date.now() - t1} ms`)
+
   const rounds = parseDuoRounds(response, nineItems, baseUrl)
+  logger.log(`[Duo] ${rounds.length} rounds générés — écriture cache`)
   await writeCache(DUO_CACHE, patientId, fingerprint, { rounds })
   return { rounds }
 }

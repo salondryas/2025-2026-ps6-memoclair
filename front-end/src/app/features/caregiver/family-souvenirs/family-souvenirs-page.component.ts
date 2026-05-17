@@ -46,6 +46,7 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
     { value: 'location', label: 'Un lieu' },
     { value: 'event',    label: 'Un moment / événement' },
     { value: 'music',    label: 'Une musique / chanson' },
+    { value: 'animal',   label: 'Un animal / compagnon' },
   ];
 
   form: SouvenirFormValue = this.emptyForm();

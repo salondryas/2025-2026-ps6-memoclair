@@ -137,6 +137,20 @@ const GENERIC_PROMPT_PARTIALS: Array<Omit<GameBPrompt, 'relances'>> = [
     ],
     consolidatedKeywords: ['fête', 'village', 'bal', 'danse', 'musique', 'été'],
   },
+  {
+    id: 'generic-animal-compagnon',
+    source: 'generic',
+    headline: 'Les animaux de compagnie',
+    patientLine: 'Un chien, un chat, des poules dans la cour… Est-ce qu'un animal vous revient en mémoire ?',
+    supportLabel: 'Animal compagnon',
+    supportEmoji: '🐾',
+    choices: [
+      { id: 'g-a-1', label: 'Un compagnon fidèle à la maison', anchorWords: ['chien', 'chat', 'compagnon', 'fidèle'] },
+      { id: 'g-a-2', label: 'Les animaux de la ferme ou du jardin', anchorWords: ['ferme', 'poule', 'lapin', 'vache'] },
+      { id: 'g-a-3', label: 'Une promenade ou un jeu avec un animal', anchorWords: ['promenade', 'jeu', 'caresse', 'nature'] },
+    ],
+    consolidatedKeywords: ['animal', 'chien', 'chat', 'ferme', 'compagnon', 'nature', 'poule', 'lapin'],
+  },
 ];
 
 @Injectable({
@@ -356,7 +370,7 @@ export class GameBReminiscenceService {
       headline: item.title,
       patientLine: `Cette image parle de « ${item.title} ». Est-ce que cela vous évoque un moment ou une sensation ?`,
       supportLabel: item.title,
-      supportEmoji: item.cueType === 'music' ? '🎵' : '🖼️',
+      supportEmoji: item.cueType === 'music' ? '🎵' : item.cueType === 'animal' ? '🐾' : '🖼️',
       choices: [
         { id: `${item.id}-lieu`, label: 'Un lieu ou un cadre qui revient', anchorWords: ['lieu', 'maison', 'jardin', 'dehors'] },
         { id: `${item.id}-proche`, label: 'Une personne ou une présence proche', anchorWords: ['famille', 'ami', 'proche'] },

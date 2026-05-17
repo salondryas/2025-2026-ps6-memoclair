@@ -13,7 +13,7 @@
 
   <section *ngIf="!loading && !finished" class="main-layout">
     <main class="game-panel">
-      <div class="game-container main-game-area">
+      <div class="game-container main-game-area" [class.question-enter]="isEntering">
         <app-mascot-decorator mascotUrl="assets/UI/mascotte-famme2.png" positionClass="game-mascot"></app-mascot-decorator>
 
         <div class="progress-wrap">
@@ -43,14 +43,20 @@
           </app-large-audio-controls>
         </div>
 
+        <h2 class="question-text">{{ currentQuestion.question }}</h2>
+
         <div class="hint-box">
-          <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
+          <span class="hint-text" [class.hint-text--active]="!!state.hint">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
           <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
         </div>
 
         <div class="feedback-box" [class.is-empty]="!feedbackMessage">
-          {{ feedbackMessage || '\u00A0' }}
+          {{ feedbackMessage || '&nbsp;' }}
         </div>
+
+        <button *ngIf="locked && !finished" type="button" class="btn-next-question" (click)="onNext()">
+          Question suivante ➔
+        </button>
 
         <div class="choices-grid">
           <button
@@ -74,7 +80,7 @@
     <aside class="sidebar sidebar-right">
       <div class="assist-actions">
         <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="profile.audioReadingEnabled">
-          🔊 Lire la question
+          🔊 Aide sonore
         </button>
         <button type="button" class="assist-btn hint-btn" (click)="onHint()" [disabled]="locked">
           💡 Indice

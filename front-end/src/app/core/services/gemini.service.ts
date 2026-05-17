@@ -116,6 +116,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide de ${items.length} objets dans l
       location: 'Lieu / endroit',
       event: 'Événement',
       music: 'Musique / son',
+      animal: 'Animal / compagnon',
     };
     return labels[cueType] ?? cueType;
   }

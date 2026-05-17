@@ -104,6 +104,15 @@
   height: 100%;
 }
 
+.main-game-area.question-enter {
+  animation: questionFadeIn 0.32s ease forwards;
+}
+
+@keyframes questionFadeIn {
+  from { opacity: 0; transform: translateX(1.2rem); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .question-text {
   margin: 0;
   text-align: center;
@@ -206,6 +215,15 @@
   font-weight: 600;
 }
 
+.hint-text--active {
+  animation: hintAppear 0.4s ease;
+}
+
+@keyframes hintAppear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .hint-action-btn {
   min-height: $space-14;
   border-radius: $radius-pill;
@@ -244,18 +262,18 @@
 
 .choice-btn {
   position: relative;
-  min-height: 6.25rem;
+  min-height: 7.5rem;
   border: $border-width-2 solid $color-neutral-300;
   border-radius: $radius-lg;
   background: $color-neutral-0;
-  padding: $space-4;
+  padding: $space-5;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
   box-shadow: 0 $space-1 $space-3 $overlay-dark-5;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 700;
   transition: all 0.25s ease;
 }
@@ -372,6 +390,30 @@
   align-items: center;
   justify-content: center;
   visibility: visible;
+}
+
+.btn-next-question {
+  min-height: $space-20;
+  padding: $space-0 $space-8;
+  border: none;
+  border-radius: $radius-lg;
+  background: $color-primary-500;
+  color: $color-neutral-0;
+  font-size: $font-size-4xl;
+  font-weight: 700;
+  margin: $space-4 auto;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.btn-next-question:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY($space-1); }
+  to   { opacity: 1; transform: translateY($space-0); }
 }
 
 .is-empty {
