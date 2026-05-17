@@ -1,4 +1,7 @@
-<div class="app-container" [class.high-contrast]="state.profile.highContrastEnabled">
+<div
+  class="app-container"
+  [class.high-contrast]="state.profile.highContrastEnabled"
+>
   <app-game-header
     [patientName]="(patientName$ | async)?.firstName ?? ''"
     title="Association et Quotidien"
@@ -8,34 +11,62 @@
 
   <section *ngIf="!state.finished" class="main-layout">
     <main class="game-panel">
-      <div class="game-container main-game-area" [class.transitioning]="isTransitioning">
+      <div
+        class="game-container main-game-area"
+        [class.transitioning]="isTransitioning"
+      >
         <app-mascot-decorator
           mascotUrl="assets/UI/Mascotte-homme-indice.png"
-          [positionClass]="question.type === 'chrono-order' ? 'game-mascot game-mascot--hidden' : 'game-mascot'">
+          [positionClass]="
+            question.type === 'chrono-order'
+              ? 'game-mascot game-mascot--hidden'
+              : 'game-mascot'
+          "
+        >
         </app-mascot-decorator>
 
         <div class="progress-wrap">
           <div class="progress-bar">
             <div class="progress-fill" [style.width.%]="progressPercent"></div>
           </div>
-          <p class="progress-value">{{ state.index + 1 }}/{{ state.questions.length }}</p>
+          <p class="progress-value">
+            {{ state.index + 1 }}/{{ state.questions.length }}
+          </p>
         </div>
 
-        <img *ngIf="question.type === 'multiple-choice'" [src]="question.promptImage" alt="Objet principal" class="prompt-image" />
+        <img
+          *ngIf="question.type === 'multiple-choice'"
+          [src]="question.promptImage"
+          alt="Objet principal"
+          class="prompt-image"
+        />
 
-        <h2 class="question-text" 
-            [class.chrono-title]="question.type === 'chrono-order'"
-            [style.fontSize.em]="state.profile.textSize">
+        <h2
+          class="question-text"
+          [class.chrono-title]="question.type === 'chrono-order'"
+          [style.fontSize.em]="state.profile.textSize"
+        >
           {{ question.prompt }}
         </h2>
 
         <div class="hint-box">
-          <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
-          <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
+          <span class="hint-text">{{
+            state.hint
+              ? "💡 Indice : " + state.hint
+              : "💡 Prenez votre temps..."
+          }}</span>
+          <button
+            *ngIf="!state.hint"
+            type="button"
+            class="hint-action-btn"
+            (click)="onHint()"
+          >
+            Demander un indice
+          </button>
         </div>
 
         <div class="feedback-box" [class.is-empty]="!state.feedback">
-          {{ state.feedback || '&nbsp;' }}
+          {{ state.feedback || "&nbsp;" }}
         </div>
 
         @if (state.locked && !state.finished) {
@@ -48,7 +79,7 @@
         <ng-container *ngIf="question.type === 'multiple-choice'">
           <div class="choices-grid">
             <app-choice-card
-              *ngFor="let c of shuffledChoices"
+              *ngFor="let c of shuffledChoices; trackBy: trackByChoiceId"
               [choice]="c"
               [isCorrect]="isCorrectChoice(c.id)"
               [isWrong]="isWrongSelectedChoice(c.id)"
@@ -66,19 +97,29 @@
           <div class="chrono-layout">
             <div class="zones-grid">
               <div
-                *ngFor="let zone of placedSteps; let i = index"
+                *ngFor="
+                  let zone of placedSteps;
+                  let i = index;
+                  trackBy: trackByZoneIndex
+                "
                 class="zone-card"
                 [class.filled]="zone !== null"
+                [class.just-placed]="recentlyPlacedZoneIndex === i"
                 (click)="zone && onChronoStepClick(zone, true)"
               >
-                <img *ngIf="zone" [src]="zone.image" alt="Étape {{ i + 1 }}" class="zone-image" />
+                <img
+                  *ngIf="zone"
+                  [src]="zone.image"
+                  alt="Étape {{ i + 1 }}"
+                  class="zone-image"
+                />
                 <span *ngIf="!zone" class="zone-placeholder">{{ i + 1 }}</span>
               </div>
             </div>
 
             <div class="steps-row">
               <div
-                *ngFor="let step of availableSteps"
+                *ngFor="let step of availableSteps; trackBy: trackByStepId"
                 class="step-card"
                 [class.hint-levitation]="step.isHinted"
                 (click)="onChronoStepClick(step, false)"
@@ -93,10 +134,19 @@
 
     <aside class="sidebar sidebar-right">
       <div class="assist-actions">
-        <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="state.profile.audioReadingEnabled">
+        <button
+          type="button"
+          class="assist-btn read-btn"
+          (click)="onReadQuestion()"
+          *ngIf="state.profile.audioReadingEnabled"
+        >
           🔊 Aide sonore
         </button>
-        <button type="button" class="assist-btn pause-btn" (click)="onTogglePause()">
+        <button
+          type="button"
+          class="assist-btn pause-btn"
+          (click)="onTogglePause()"
+        >
           {{ isPaused ? "▶ Reprendre" : "⏸ Pause" }}
         </button>
       </div>
