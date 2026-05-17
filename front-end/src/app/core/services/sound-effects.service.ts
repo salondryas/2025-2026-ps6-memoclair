@@ -6,7 +6,7 @@ export class SoundEffectsService {
   private volume = 0.35;
   private bgMusic = new Audio('assets/sfx/global-bg-soft.mp3');
   isBgMusicPlaying = false;
-  bgVolume = 0.15;
+  bgVolume = 0.01;
   private wasPlayingBeforeSuspend = false;
 
   private sounds = {

@@ -142,6 +142,30 @@
   }
 }
 
+.btn-duo-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: $space-12;
+  border-radius: $radius-xl;
+  border: $border-width-1 solid $color-accent-emerald-700;
+  background: $color-neutral-0;
+  color: $color-accent-emerald-700;
+  font-size: $font-size-2xl;
+  font-weight: 800;
+  line-height: 1.2;
+  transition: background 0.18s ease;
+}
+
+.btn-duo-toggle:hover {
+  background: $color-neutral-100;
+}
+
+.btn-duo-toggle--active {
+  background: $color-neutral-100;
+}
+
 @keyframes game-card-fade-up {
   from {
     opacity: 0;
@@ -181,6 +205,11 @@
   .btn-jouer {
     min-height: $space-20;
     font-size: $font-size-5xl;
+  }
+
+  .btn-duo-toggle {
+    min-height: $space-11;
+    font-size: $font-size-xl;
   }
 
   .btn-back {

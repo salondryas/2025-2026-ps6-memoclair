@@ -21,8 +21,24 @@
       <article class="game-card">
         <img class="game-card__image" [src]="getThumbnail(game.id)" alt="">
         <h2 class="game-card__title">{{ game.title }}</h2>
-        <a [routerLink]="game.route" class="btn-jouer">
-          Lancer
+
+        @if (showDuoToggleFor(game)) {
+          <button
+            type="button"
+            class="btn-duo-toggle"
+            [class.btn-duo-toggle--active]="isDuoEnabledFor(game)"
+            [attr.aria-pressed]="isDuoEnabledFor(game)"
+            [attr.aria-label]="'Activer le mode duo pour ' + game.title"
+            (click)="toggleDuoFor(game)">
+            {{ isDuoEnabledFor(game) ? 'Mode Duo activé' : 'Activer le mode Duo' }}
+          </button>
+        }
+
+        <a [routerLink]="isDuoEnabledFor(game) ? '/games/game-duo' : game.route"
+           class="btn-jouer"
+           [class.btn-jouer--duo]="isDuoEnabledFor(game)"
+           [attr.aria-label]="'Lancer le jeu ' + game.title + (isDuoEnabledFor(game) ? ' en mode duo' : '')">
+          {{ isDuoEnabledFor(game) ? 'Jouer en Duo' : 'Jouer' }}
         </a>
       </article>
     }

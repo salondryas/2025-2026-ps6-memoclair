@@ -15,6 +15,7 @@ export class ChoiceCardComponent {
   @Input() isWrong = false;
   @Input() isAutoHighlighted = false;
   @Input() isDisabled = false;
+  @Input() isReading = false;
 
   @Output() cardClicked = new EventEmitter<void>();
 

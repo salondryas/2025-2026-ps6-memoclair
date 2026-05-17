@@ -1,7 +1,7 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { PatientId, PatientProfile, PatientSummary } from '../../../models/patient.model';
@@ -28,6 +28,7 @@ export class FamilyDashboardPageComponent {
     private readonly patientContextService: PatientContextService,
     private readonly caregiverProfileService: CaregiverProfileService,
     private readonly location: Location,
+    private readonly router: Router,
   ) {
     this.patients = this.patientContextService.getPatients();
     this.currentPatient = this.patientContextService.getActivePatientSnapshot();
@@ -40,7 +41,7 @@ export class FamilyDashboardPageComponent {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigateByUrl('/games/patient-selection-patient?from=caregiver-family');
   }
 
   onPatientChange(patientId: string): void {

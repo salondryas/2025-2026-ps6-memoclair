@@ -15,6 +15,101 @@
   padding: 2rem 2rem 4rem;
 }
 
+.profile-management-page__content {
+  gap: 0.25rem;  // Réduit de 1.5rem
+}
+
+.profile-management-page__search {
+  margin-bottom: 0.125rem;  // Réduit de 1rem
+}
+
+.profile-management-page__filters {
+  margin-bottom: 0.125rem;  // Réduit de 1.5rem
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.profile-management-page__header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 0.25rem;  // Réduit de 2.5rem
+}
+
+.profile-management-page__header--managed {
+  display: flex;
+  flex-direction: column;  // Column pour empiler h1 et p
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  padding: 0;
+  gap: 0;  // Aucun espacement entre h1 et p
+}
+
+.profile-management-page__subtitle,
+.profile-empty {
+  margin: 0;    // Marge supprimée
+  padding: 0;   // Padding supprimé
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.filter-options {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-option input {
+  margin: 0;
+}
+
+.profile-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  
+  &:focus {
+    border-color: #3a7554;
+    box-shadow: 0 0 0 3px rgba(58, 117, 175, 0.1);
+  }
+}
+
 .profile-management-page__header {
   display: flex;
   align-items: center;
@@ -54,9 +149,28 @@
   margin: 0;
 }
 
+.profile-management-page__subtitle,
+.profile-empty {
+  margin: 0.35rem 0 0;
+  color: #6b7280;
+  font-weight: 600;
+}
+
 .profile-management-page__content {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-management-page__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-start;
   gap: 2rem;
 }
 
@@ -64,6 +178,32 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.profile-list.enable-scroll,
+:host ::ng-deep .profile-list[data-mode="professionals"].enable-scroll,
+:host ::ng-deep .profile-list[data-mode="managed"].enable-scroll {
+  max-height: calc(5 * (120px + 1rem)) !important; // 5 profils + gap
+  overflow-y: auto !important;
+  padding-right: 0.5rem !important;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
 }
 
 .profile-card {
@@ -171,6 +311,126 @@
   }
 }
 
+.profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-shrink: 0;
+}
+
+.profile-type-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.profile-type-tabs button {
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 14px;
+  background: #f9fafb;
+  color: #374151;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profile-type-tabs__btn--active {
+  background: #e8f1ea !important;
+  border-color: #5f8a6f !important;
+  color: #1e3028 !important;
+}
+
+.association-block {
+  padding: 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f9fafb;
+}
+
+.association-title {
+  margin: 0 0 0rem 0;
+  font-weight: 600;
+  color: #374151;
+}
+
+.association-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.association-search-input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+.association-list-container {
+  max-height: 135px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  
+  /* Désactiver le scroll si moins de 4 items */
+  &:not(:has(.association-option:nth-child(4))) {
+    overflow-y: hidden;
+  }
+}
+
+/* Appliquer la même règle au conteneur de liste des aidants familiaux */
+#family-association-list.association-list-container,
+#patient-association-list.association-list-container {
+  /* Hauteur fixe de 135px pour 1+ items */
+  &:has(.association-option:nth-child(n+1)) {
+    max-height: 135px;
+    overflow-y: auto;
+  }
+  
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.association-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.association-block p {
+  margin: 0 0 0.75rem;
+  color: #374151;
+  font-weight: 800;
+}
+
+.association-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  color: #374151;
+  font-weight: 700;
+}
+
+.form-error {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 700;
+}
+
 /* ══════════════════════════════════════════
    Modal pour ajouter un profil
 ══════════════════════════════════════════ */
@@ -190,9 +450,11 @@
 .add-profile-modal__content {
   background: #fff;
   border-radius: 20px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
+  padding: 1.5rem;
+  max-width: 600px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { PatientId } from '../../../models/patient.model';
 import { SessionResult, SupportLevel } from '../../../models/session.model';
+import { environment } from '../../../../environments/environment';
 
 export interface SessionHistoryItem {
   sessionId: string;
@@ -32,8 +34,22 @@ export interface SessionDonutStats {
 export class StatisticsService {
   private readonly mockSessions: SessionResult[] = [];
 
+  constructor(private readonly http: HttpClient) {}
+
   recordSession(session: SessionResult): void {
     this.mockSessions.unshift(session);
+    this.http.post(`${environment.backendUrl}/api/statistics/sessions`, {
+      patientId: session.patientId,
+      gameType: session.gameType,
+      startedAt: session.startedAt,
+      durationSeconds: session.durationMinutes * 60,
+      hintCount: session.observation.hintCount,
+      skippedCount: session.observation.skippedMoments,
+      guidedCount: session.observation.guidedMoments,
+      averageLatencyMs: session.observation.averageLatencySeconds * 1000,
+      earlyStop: session.observation.earlyStop,
+      emotionalState: session.observation.emotionalState,
+    }).subscribe({ error: () => undefined });
   }
 
   getSessionsForPatient(patientId: PatientId): SessionResult[] {

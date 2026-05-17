@@ -172,7 +172,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
   get duoProgress(): string {
     const count = this.mediaItems.length;
     if (count >= DUO_REQUIRED) return `✓ ${count} médias — mode duo disponible`;
-    return `${count} / ${DUO_REQUIRED} médias — pour pouvoir jouer au jeu B en solo ou en duo`;
+    return `${count} / ${DUO_REQUIRED} médias — pour pouvoir jouer au jeu B en duo`;
   }
 
   get duoReady(): boolean {

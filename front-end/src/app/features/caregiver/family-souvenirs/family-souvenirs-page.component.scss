@@ -41,26 +41,6 @@
   }
 }
 
-.fam-nav__select {
-  flex: 1;
-  max-width: 280px;
-  margin: 0 auto;
-  padding: 0.65rem 1.1rem;
-  border-radius: 999px;
-  border: 2px solid #d1d5db;
-  background: #f9fafb;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1e3028;
-  font-family: inherit;
-  cursor: pointer;
-
-  &:focus {
-    outline: 3px solid #3a7554;
-    border-color: #3a7554;
-  }
-}
-
 .fam-nav__back {
   padding: 0.6rem 1rem;
   border: 1px solid #e5e7eb;

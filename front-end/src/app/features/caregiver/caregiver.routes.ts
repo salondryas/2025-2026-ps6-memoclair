@@ -27,7 +27,14 @@ export const CAREGIVER_ROUTES: Routes = [
   {
     path: 'profile-management',
     component: ProfileManagementPageComponent,
-    title: 'MemoClair - Gestion des profils',
+    title: 'MemoClair - Gestion accueillis et aidants',
+    data: { mode: 'managed' },
+  },
+  {
+    path: 'professional-profile-management',
+    component: ProfileManagementPageComponent,
+    title: 'MemoClair - Gestion profils soignants',
+    data: { mode: 'professionals' },
   },
   {
     path: 'media',

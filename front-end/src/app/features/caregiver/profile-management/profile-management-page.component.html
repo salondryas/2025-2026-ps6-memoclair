@@ -1,125 +1,247 @@
-<main class="profile-management-page">
-  <header class="profile-management-page__header">
-    <button type="button" class="btn-back" (click)="goBack()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Retour
-    </button>
-    <h1>Gérer les profils</h1>
-  </header>
+<ng-container *ngIf="mode === 'managed'; else plainPage">
+  <mc-caregiver-shell>
+    <ng-container *ngTemplateOutlet="pageContent"></ng-container>
+  </mc-caregiver-shell>
+</ng-container>
 
+<ng-template #plainPage>
+  <ng-container *ngTemplateOutlet="pageContent"></ng-container>
+</ng-template>
+
+<ng-template #pageContent>
   <div class="profile-management-page__content">
-    <div class="profile-list">
-      <div *ngFor="let patient of patients" class="profile-card">
-        <div class="profile-card__avatar">
-          <img
-            *ngIf="patient.avatarUrl; else fallbackInitial"
-            class="profile-card__avatar-image"
-            [src]="patient.avatarUrl"
-            alt="" />
-          <ng-template #fallbackInitial>
-            {{ patient.firstName[0] }}
-          </ng-template>
+    <!-- Header avec bouton retour (mode création) -->
+    <header class="profile-management-page__header" *ngIf="mode !== 'managed'">
+      <button type="button" class="btn-back" (click)="goBack()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Retour
+      </button>
+      <div>
+        <h1>{{ pageTitle }}</h1>
+        <p class="profile-management-page__subtitle">{{ pageSubtitle }}</p>
+      </div>
+    </header>
+
+    <!-- Header sans bouton retour (mode gestion) -->
+    <header class="profile-management-page__header--managed" *ngIf="mode === 'managed'">
+      <div>
+        <h1>{{ pageTitle }}</h1>
+        <p class="profile-management-page__subtitle">{{ pageSubtitle }}</p>
+      </div>
+    </header>
+
+    <div class="profile-management-page__search" *ngIf="mode === 'managed'">
+      <input type="text" placeholder="Rechercher par nom ou prénom..." [(ngModel)]="searchQuery" (input)="onSearchChange($event)" class="search-input">
+    </div>
+
+    <div class="profile-management-page__filters" *ngIf="mode === 'managed'">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">Type de profil:</label>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="radio" name="profileTypeFilter" value="all" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
+              <span>Tous</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="profileTypeFilter" value="patient" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
+              <span>Patients</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="profileTypeFilter" value="professional" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
+              <span>Professionnels</span>
+            </label>
+          </div>
         </div>
-        <div class="profile-card__info">
-          <h2>{{ patient.firstName }}</h2>
-          <p>{{ patient.stageLabel }}</p>
+
+        <div class="filter-group" *ngIf="selectedProfileType === 'patient'">
+          <label class="filter-label">Stade:</label>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" [checked]="selectedStages.includes('leger')" (change)="toggleStage('leger')" [disabled]="selectedProfileType !== 'patient'">
+              <span>Léger</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" [checked]="selectedStages.includes('modere')" (change)="toggleStage('modere')" [disabled]="selectedProfileType !== 'patient'">
+              <span>Modéré</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" [checked]="selectedStages.includes('avance')" (change)="toggleStage('avance')" [disabled]="selectedProfileType !== 'patient'">
+              <span>Avancé</span>
+            </label>
+          </div>
         </div>
-        <button
-          type="button"
-          class="profile-card__delete"
-          (click)="deletePatient(patient.id)"
-          [disabled]="!canDelete(patient.id)"
-          [attr.aria-label]="'Supprimer ' + patient.firstName">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
       </div>
     </div>
 
-    <button type="button" class="btn-add-profile" (click)="openAddModal()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="16"></line>
-        <line x1="8" y1="12" x2="16" y2="12"></line>
-      </svg>
-      Ajouter un profil
-    </button>
+    <div class="profile-management-page__search" *ngIf="mode === 'professionals'">
+      <input type="text" placeholder="Rechercher par nom ou prénom..." [(ngModel)]="searchQuery" (input)="onSearchChange($event)" class="search-input">
+    </div>
+
+    <div class="profile-list-container">
+      <div class="profile-list" 
+           [attr.data-mode]="mode"
+           [class.enable-scroll]="filteredProfiles.length > 5">
+        <div *ngFor="let profile of filteredProfiles" class="profile-card">
+          <div class="profile-card__avatar">
+            <img
+              *ngIf="hasProfileAvatar(profile); else fallbackInitial"
+              class="profile-card__avatar-image"
+              [src]="profile.avatarUrl"
+              (error)="markAvatarBroken(profile.id)"
+              alt="" />
+            <ng-template #fallbackInitial>
+              {{ profile.firstName[0] }}
+            </ng-template>
+          </div>
+
+          <div class="profile-card__info">
+            <h2>{{ profile.displayName }}</h2>
+            <p>{{ profile.subtitle }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="profile-card__delete"
+            (click)="deleteProfile(profile)"
+            [disabled]="!canDelete(profile)"
+            [attr.aria-label]="'Supprimer ' + profile.displayName">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+
+        <p *ngIf="filteredProfiles.length === 0" class="profile-empty">
+          Aucun profil trouvé pour cette recherche.
+        </p>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button type="button" class="btn-add-profile" (click)="openAddModal('professional')" *ngIf="mode === 'professionals'">
+        Ajouter un profil soignant
+      </button>
+      <button type="button" class="btn-add-profile" (click)="openAddModal('patient')" *ngIf="mode === 'managed'">
+        Ajouter un accueilli
+      </button>
+      <button type="button" class="btn-add-profile" (click)="openAddModal('family')" *ngIf="mode === 'managed'">
+        Ajouter un aidant familial
+      </button>
+    </div>
   </div>
 
-  <!-- Modal pour ajouter un profil -->
-  <div class="add-profile-modal" *ngIf="isAddModalOpen" (click)="closeAddModal()">
-    <div class="add-profile-modal__content" (click)="$event.stopPropagation()">
-      <div class="add-profile-modal__header">
-        <h2>Nouveau profil</h2>
-        <button type="button" class="add-profile-modal__close" (click)="closeAddModal()">✕</button>
-      </div>
+    <div class="add-profile-modal" *ngIf="isAddModalOpen" (click)="closeAddModal()">
+      <div class="add-profile-modal__content" (click)="$event.stopPropagation()">
+        <div class="add-profile-modal__header">
+          <h2>Nouveau profil</h2>
+          <button type="button" class="add-profile-modal__close" (click)="closeAddModal()">✕</button>
+        </div>
 
-      <form class="add-profile-form" (ngSubmit)="submitAddProfile()">
-
-        <!-- Photo optionnelle -->
-        <div class="form-field form-field--photo">
-          <label>Photo (optionnel)</label>
-          <div class="photo-picker" (click)="triggerPhotoInput()" role="button" tabindex="0"
-               (keydown.enter)="triggerPhotoInput()">
-            <div class="photo-picker__preview">
-              <img *ngIf="newProfile.avatarUrl" [src]="newProfile.avatarUrl"
-                   alt="Aperçu" class="photo-picker__img" />
-              <span *ngIf="!newProfile.avatarUrl" class="photo-picker__placeholder">
-                {{ newProfile.firstName ? newProfile.firstName[0].toUpperCase() : '+' }}
+        <form class="add-profile-form" (ngSubmit)="submitAddProfile()">
+          
+          <div class="form-field form-field--photo">
+            <label>Photo (optionnel)</label>
+            <div class="photo-picker" (click)="triggerPhotoInput()" role="button" tabindex="0"
+                 (keydown.enter)="triggerPhotoInput()">
+              <div class="photo-picker__preview">
+                <img *ngIf="newProfile.avatarUrl" [src]="newProfile.avatarUrl"
+                     alt="Aperçu" class="photo-picker__img" />
+                <span *ngIf="!newProfile.avatarUrl" class="photo-picker__placeholder">
+                  {{ newProfile.firstName ? newProfile.firstName[0].toUpperCase() : '+' }}
+                </span>
+              </div>
+              <span class="photo-picker__label">
+                {{ newProfile.avatarUrl ? 'Changer la photo' : 'Ajouter une photo' }}
               </span>
             </div>
-            <span class="photo-picker__label">
-              {{ newProfile.avatarUrl ? 'Changer la photo' : 'Ajouter une photo' }}
-            </span>
+            <input #photoInput type="file" accept="image/*"
+                   class="photo-picker__input" (change)="onPhotoSelected($event)" />
           </div>
-          <input #photoInput type="file" accept="image/*"
-                 class="photo-picker__input" (change)="onPhotoSelected($event)" />
-        </div>
 
-        <div class="form-field">
-          <label for="lastName">Nom</label>
-          <input
-            type="text"
-            id="lastName"
-            [(ngModel)]="newProfile.lastName"
-            name="lastName"
-            required
-            placeholder="Ex: Dupont">
-        </div>
+          <div class="form-field">
+            <label for="lastName">Nom</label>
+            <input type="text" id="lastName" [(ngModel)]="newProfile.lastName" name="lastName" required placeholder="Ex: Dupont">
+          </div>
 
-        <div class="form-field">
-          <label for="firstName">Prénom</label>
-          <input
-            type="text"
-            id="firstName"
-            [(ngModel)]="newProfile.firstName"
-            name="firstName"
-            required
-            placeholder="Ex: Marie">
-        </div>
+          <div class="form-field">
+            <label for="firstName">Prénom</label>
+            <input type="text" id="firstName" [(ngModel)]="newProfile.firstName" name="firstName" required placeholder="Ex: Marie">
+          </div>
 
-        <div class="form-field">
-          <label for="stage">Stade de la maladie</label>
-          <select id="stage" [(ngModel)]="newProfile.stage" name="stage" required>
-            <option value="">Sélectionner...</option>
-            <option value="leger">Léger</option>
-            <option value="modere">Modéré</option>
-            <option value="avance">Avancé</option>
-          </select>
-        </div>
+          <div class="form-field" *ngIf="newProfile.type === 'professional'">
+            <label for="jobTitle">Fonction</label>
+            <input type="text" id="jobTitle" [(ngModel)]="newProfile.jobTitle" name="jobTitle" required placeholder="Ex: Ergothérapeute">
+          </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" (click)="closeAddModal()">Annuler</button>
-          <button type="submit" class="btn-submit" [disabled]="!isFormValid">Créer</button>
-        </div>
-      </form>
+          <div class="form-field" *ngIf="newProfile.type === 'professional'">
+            <label for="organization">Établissement</label>
+            <input type="text" id="organization" [(ngModel)]="newProfile.organization" name="organization" required placeholder="Ex: Accueil de jour Les Tilleuls">
+          </div>
+
+          <div class="form-field" *ngIf="newProfile.type === 'patient'">
+            <label for="stage">Stade de la maladie</label>
+            <select id="stage" [(ngModel)]="newProfile.stage" name="stage" required>
+              <option value="">Sélectionner...</option>
+              <option value="leger">Léger</option>
+              <option value="modere">Modéré</option>
+              <option value="avance">Avancé</option>
+            </select>
+          </div>
+
+          <div class="form-field" *ngIf="newProfile.type === 'family'">
+            <label for="relationship">Lien avec l’accueilli</label>
+            <input type="text" id="relationship" [(ngModel)]="newProfile.relationship" name="relationship" required placeholder="Ex: Fille, conjoint, frère">
+          </div>
+
+          <div class="form-field" *ngIf="newProfile.type !== 'patient'">
+            <label for="email">Email (optionnel)</label>
+            <input type="email" id="email" [(ngModel)]="newProfile.email" name="email" placeholder="nom@exemple.fr">
+          </div>
+
+          <div class="form-field" *ngIf="newProfile.type !== 'patient'">
+            <label for="phone">Téléphone (optionnel)</label>
+            <input type="tel" id="phone" [(ngModel)]="newProfile.phone" name="phone" placeholder="06...">
+          </div>
+
+          <div class="association-block" *ngIf="newProfile.type === 'family' && patients.length">
+            <p class="association-title">Associer à un ou plusieurs accueillis</p>
+            <input type="text" placeholder="Rechercher..." [(ngModel)]="associationSearchQuery" (input)="onAssociationSearchChange($event)" class="association-search-input">
+            <div id="patient-association-list" class="association-list-container" style="align-items: flex-start; margin-top: 1rem;">
+              <div class="association-list">
+                <label *ngFor="let patient of filteredPatientsForAssociation" class="association-option">
+                  <input type="checkbox" [checked]="isPatientAssociated(patient.id)" (change)="togglePatientAssociation(patient.id)">
+                  <span>{{ patient.displayName }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="association-block" *ngIf="newProfile.type === 'patient' && familyProfiles.length">
+            <p class="association-title">Associer à un ou plusieurs aidants familiaux (optionnel)</p>
+            <input type="text" placeholder="Rechercher..." [(ngModel)]="familyAssociationSearchQuery" (input)="onFamilyAssociationSearchChange($event)" class="association-search-input">
+            <div id="family-association-list" class="association-list-container" style="align-items: flex-start; margin-top: 1rem;">
+              <div class="association-list">
+                <label *ngFor="let family of filteredFamilyProfilesForAssociation" class="association-option">
+                  <input type="checkbox" [checked]="isFamilyAssociated(family.id)" (change)="toggleFamilyAssociation(family.id)">
+                  <span>{{ family.displayName }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <p *ngIf="formError" class="form-error">{{ formError }}</p>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="closeAddModal()">Annuler</button>
+            <button type="submit" class="btn-submit" [disabled]="!isFormValid">Créer</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-</main>
+  </ng-template>

@@ -53,6 +53,7 @@
               [isCorrect]="isCorrectChoice(c.id)"
               [isWrong]="isWrongSelectedChoice(c.id)"
               [isAutoHighlighted]="isAutoHighlighted(c.id)"
+              [isReading]="readingChoiceId === c.id"
               [isDisabled]="state.locked"
               [style.fontSize.em]="state.profile.textSize"
               (cardClicked)="onChoose(c.id)"
@@ -93,7 +94,7 @@
     <aside class="sidebar sidebar-right">
       <div class="assist-actions">
         <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="state.profile.audioReadingEnabled">
-          🔊 Lire la question
+          🔊 Aide sonore
         </button>
         <button type="button" class="assist-btn pause-btn" (click)="onTogglePause()">
           {{ isPaused ? "▶ Reprendre" : "⏸ Pause" }}

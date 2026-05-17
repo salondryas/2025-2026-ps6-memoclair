@@ -15,10 +15,7 @@
       <h2>{{ currentPatient.displayName }}</h2>
       <p class="profile-page__patient-meta">{{ currentPatient.stageLabel }}</p>
     </div>
-    <button type="button" class="btn-new-patient" (click)="openCreateForm()">
-      + Nouveau profil
-    </button>
-  </section>
+      </section>
 
   <!-- Formulaire de création -->
   <section *ngIf="showCreateForm" class="create-patient-card">

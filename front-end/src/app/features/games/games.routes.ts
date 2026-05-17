@@ -33,6 +33,11 @@ export const GAMES_ROUTES: Routes = [
           import('./patient-selection/patient-selection-page.component').then((m) => m.PatientSelectionPageComponent),
       },
       {
+        path: 'patient-selection-patient',
+        loadComponent: () =>
+          import('./patient-selection/patient-selection-page.component').then((m) => m.PatientSelectionPageComponent),
+      },
+      {
         path: 'end',
         loadComponent: () =>
           import('./game-end/game-end-page.component').then((m) => m.GameEndPageComponent),
