@@ -72,6 +72,15 @@
   color: $color-neutral-600;
 }
 
+.timer-display {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: $color-primary-600;
+  min-width: 80px;
+  text-align: right;
+}
+
 .game-panel {
   min-width: 0;
   min-height: 0;
@@ -225,6 +234,13 @@
 
 .assist-btn:hover:not(:disabled) {
   background: $color-neutral-200;
+  border-color: $color-neutral-400;
+  transform: translateY(-2px);
+}
+
+.assist-btn:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 .assist-btn:active:not(:disabled) {
@@ -322,6 +338,8 @@
   cursor: pointer;
   transition: all 0.25s ease;
   position: relative;
+  padding: 0;
+  font-size: inherit;
 }
 
 .zone-card.filled {
@@ -332,6 +350,11 @@
 
 .zone-card:hover {
   border-color: $color-neutral-500;
+}
+
+.zone-card:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 .zone-image {
@@ -373,11 +396,18 @@
   cursor: pointer;
   transition: all 0.25s ease;
   background: $color-neutral-0;
+  padding: 0;
+  font-size: inherit;
 }
 
 .step-card:hover {
   border-color: $color-primary-500;
   box-shadow: 0 $space-1 $space-3 $overlay-primary-20;
+}
+
+.step-card:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 .step-card img {
@@ -404,7 +434,6 @@
 }
 
 .hint-levitation {
-  animation: levitate 1.5s ease-in-out infinite;
   border-color: $color-clinical-warning-400 !important;
   background: $color-clinical-warning-50;
 }

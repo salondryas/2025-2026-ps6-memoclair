@@ -375,7 +375,14 @@ export class ProfileManagementPageComponent implements OnInit {
 
     profiles = profiles.filter(profile => {
       if (this.mode === 'professionals') return true;
-      if (this.selectedProfileType === 'all') return true;
+      if (this.selectedProfileType === 'all') {
+        // "Tous" affiche accueillis (patient) et aidants familiaux (family), pas les soignants (professional)
+        return profile.type === 'patient' || profile.type === 'family';
+      }
+      // "Aidants" (professional dans le filtre) affiche les aidants familiaux (family)
+      if (this.selectedProfileType === 'professional') {
+        return profile.type === 'family';
+      }
       return profile.type === this.selectedProfileType;
     });
 

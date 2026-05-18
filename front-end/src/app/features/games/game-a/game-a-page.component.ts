@@ -36,6 +36,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   isAutoRevealed = false;
   isEntering = true;
+  elapsedSeconds = 0;
   private ttsSessionId = 0;
   private navigating = false;
   private enterTimeoutId: number | null = null;
@@ -43,6 +44,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   private autoRevealTimeoutId: number | null = null;
   private autoNextTimeoutId: number | null = null;
   private autoNextQuestionTimeoutId: number | null = null;
+  private timerIntervalId: number | null = null;
 
   private readonly startedAt = new Date().toISOString();
   private hintCount = 0;
@@ -65,6 +67,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.updateShuffledChoices();
     this.initializeChronoOrder();
     this.startAssistFlow();
+    this.startTimer();
   }
 
   private triggerEnterAnimation(): void {
@@ -79,6 +82,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearAssistFlow();
     if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
+    if (this.timerIntervalId) window.clearInterval(this.timerIntervalId);
     this.session.stopHintTimer();
     this.ttsSessionId++;
     window.speechSynthesis.onvoiceschanged = null;
@@ -220,6 +224,8 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   onSkip(): void {
     if (this.state.finished) return;
+    const confirmed = window.confirm('Êtes-vous sûr de vouloir passer cette question ?');
+    if (!confirmed) return;
     this.skippedCount++;
     this.recordLatency();
     this.clearAssistFlow();
@@ -494,5 +500,18 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.autoRevealTimeoutId = null;
     this.autoNextTimeoutId = null;
     this.autoNextQuestionTimeoutId = null;
+  }
+
+  private startTimer(): void {
+    if (this.timerIntervalId) window.clearInterval(this.timerIntervalId);
+    this.timerIntervalId = window.setInterval(() => {
+      this.elapsedSeconds++;
+    }, 1000);
+  }
+
+  get formattedTime(): string {
+    const minutes = Math.floor(this.elapsedSeconds / 60);
+    const seconds = this.elapsedSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 }

@@ -48,11 +48,11 @@
             </label>
             <label class="filter-option">
               <input type="radio" name="profileTypeFilter" value="patient" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
-              <span>Patients</span>
+              <span>Accueillis</span>
             </label>
             <label class="filter-option">
               <input type="radio" name="profileTypeFilter" value="professional" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
-              <span>Professionnels</span>
+              <span>Aidants</span>
             </label>
           </div>
         </div>
@@ -84,7 +84,7 @@
     <div class="profile-list-container">
       <div class="profile-list" 
            [attr.data-mode]="mode"
-           [class.enable-scroll]="filteredProfiles.length > 5">
+           [class.enable-scroll]="filteredProfiles.length > 3">
         <div *ngFor="let profile of filteredProfiles" class="profile-card">
           <div class="profile-card__avatar">
             <img

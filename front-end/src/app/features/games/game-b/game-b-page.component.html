@@ -29,6 +29,7 @@
               [src]="currentQuestion.imageSrc"
               alt="Souvenir personnel"
               class="memory-image"
+              (error)="onImageError()"
             />
             <div class="media-meta" *ngIf="currentQuestion.source || currentQuestion.caption">
               <span class="meta-pill" *ngIf="currentQuestion.source">{{ currentQuestion.source }}</span>
@@ -45,12 +46,12 @@
 
         <h2 class="question-text">{{ currentQuestion.question }}</h2>
 
-        <div class="hint-box">
+        <div class="hint-box" aria-live="polite" aria-atomic="true">
           <span class="hint-text" [class.hint-text--active]="!!state.hint">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
           <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
         </div>
 
-        <div class="feedback-box" [class.is-empty]="!feedbackMessage">
+        <div class="feedback-box" [class.is-empty]="!feedbackMessage" aria-live="assertive" aria-atomic="true">
           {{ feedbackMessage || '&nbsp;' }}
         </div>
 
@@ -88,6 +89,9 @@
         <button type="button" class="assist-btn skip-btn" (click)="skipQuestion()" [disabled]="locked">
           ⏭️ Passer ce souvenir
         </button>
+        <button type="button" class="assist-btn pause-btn" (click)="onTogglePause()">
+          {{ isPaused ? "▶ Reprendre" : "⏸ Pause" }}
+        </button>
       </div>
     </aside>
   </section>
@@ -100,17 +104,22 @@
     align-items: center;
     justify-content: center;
     min-height: 60vh;
-    gap: 1.5rem;
+    gap: 2rem;
     color: #64748b;
     font-size: 1.1rem;
   }
   .gameb-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid #e2e8f0;
+    width: 64px;
+    height: 64px;
+    border: 5px solid #e2e8f0;
     border-top-color: #3b82f6;
     border-radius: 50%;
-    animation: spin-b 0.8s linear infinite;
+    animation: spin-b 1s linear infinite;
   }
   @keyframes spin-b { to { transform: rotate(360deg); } }
+  .gameb-loading p {
+    margin: 0;
+    font-weight: 600;
+    color: #475569;
+  }
 </style>

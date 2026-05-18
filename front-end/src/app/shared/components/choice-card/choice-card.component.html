@@ -6,10 +6,18 @@
   [class.wrong]="isWrong"
   [class.auto-highlight]="isAutoHighlighted"
   [class.reading]="isReading"
+  [class.no-image]="imageLoadFailed"
   [disabled]="isDisabled"
   (click)="onCardClick()"
 >
-  <img [src]="choice.image" [alt]="choice.label" class="choice-image" />
+  <img 
+    *ngIf="!imageLoadFailed"
+    [src]="choice.image" 
+    [alt]="choice.label" 
+    class="choice-image"
+    (error)="onImageError()"
+  />
+  <span *ngIf="imageLoadFailed" class="image-placeholder">🖼️</span>
   <span class="choice-label">{{ choice.label }}</span>
   <span class="check" *ngIf="isCorrect">✓</span>
 </button>

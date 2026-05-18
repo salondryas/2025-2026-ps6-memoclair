@@ -264,7 +264,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'c', label: 'Petite assiette', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/petite-assiette.png' },
     ],
     correctChoiceId: 'a',
-    hint: 'on la place souvent sous une tasse.',
+    hint: 'Pensez à ce qui se place naturellement sous une tasse.',
     goodFeedback: 'Très bien !',
     gentleFeedback: 'Pas de souci, on continue calmement.',
   },

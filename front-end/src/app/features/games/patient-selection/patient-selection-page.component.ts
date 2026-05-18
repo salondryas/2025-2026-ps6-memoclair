@@ -273,19 +273,33 @@ export class PatientSelectionPageComponent implements OnInit {
     
     // Pour la route principale patient-selection
     if (currentPath === 'patient-selection') {
-      // Pour caregiver-professional, toujours rediriger vers role-selection
-      if (this.context === 'caregiver-professional') {
+      // Si on est à l'étape patient dans un contexte caregiver, revenir à l'étape précédente
+      if (this.activeStep === 'patient') {
+        if (this.context === 'caregiver-professional') {
+          // Revenir à l'étape de sélection du soignant
+          this.activeStep = 'professional';
+          this.selectedPatient = null;
+          return;
+        }
+        if (this.context === 'caregiver-family') {
+          // Revenir à l'étape de sélection de l'aidant familial
+          this.activeStep = 'family';
+          this.selectedPatient = null;
+          return;
+        }
+      }
+      
+      // Si on est à l'étape professional ou family, rediriger vers role-selection
+      if (this.activeStep === 'professional' || this.activeStep === 'family') {
         void this.router.navigateByUrl('/caregiver/role-selection');
         return;
       }
+      
       // Pour games, rediriger vers la home page
       if (this.context === 'games') {
         void this.router.navigateByUrl('/');
         return;
       }
-      // Pour caregiver-family, rediriger vers la page de sélection de rôle
-      void this.router.navigateByUrl('/caregiver/role-selection');
-      return;
     }
     
     // Rediriger selon le contexte par défaut
@@ -445,18 +459,17 @@ export class PatientSelectionPageComponent implements OnInit {
   }
 
   private loadLastSelections(): void {
-    // Charger les dernières sélections depuis localStorage
+    // Charger les dernières sélections depuis localStorage selon l'étape active
     const lastProfessionalId = localStorage.getItem('last-selected-professional');
     const lastFamilyId = localStorage.getItem('last-selected-family');
     const lastPatientId = localStorage.getItem('last-selected-patient');
 
-    if (lastProfessionalId) {
+    // Charger la sélection appropriée selon l'étape active
+    if (this.activeStep === 'professional' && lastProfessionalId) {
       this.selectedProfessional = this.professionalCards.find(card => card.profile.id === lastProfessionalId) || null;
-    }
-    if (lastFamilyId) {
+    } else if (this.activeStep === 'family' && lastFamilyId) {
       this.selectedFamily = this.familyCards.find(card => card.profile.id === lastFamilyId) || null;
-    }
-    if (lastPatientId) {
+    } else if (this.activeStep === 'patient' && lastPatientId) {
       this.selectedPatient = this.cards.find(card => card.patient.id === lastPatientId) || null;
     }
   }

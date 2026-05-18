@@ -19,6 +19,7 @@
             <div class="progress-fill" [style.width.%]="progressPercent"></div>
           </div>
           <p class="progress-value">{{ state.index + 1 }}/{{ state.questions.length }}</p>
+          <p class="timer-display">⏱️ {{ formattedTime }}</p>
         </div>
 
         <img *ngIf="question.type === 'multiple-choice'" [src]="question.promptImage" alt="Objet principal" class="prompt-image" />
@@ -29,12 +30,12 @@
           {{ question.prompt }}
         </h2>
 
-        <div class="hint-box">
+        <div class="hint-box" aria-live="polite" aria-atomic="true">
           <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
           <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
         </div>
 
-        <div class="feedback-box" [class.is-empty]="!state.feedback">
+        <div class="feedback-box" [class.is-empty]="!state.feedback" aria-live="assertive" aria-atomic="true">
           {{ state.feedback || '&nbsp;' }}
         </div>
 
@@ -65,26 +66,31 @@
         <ng-container *ngIf="question.type === 'chrono-order'">
           <div class="chrono-layout">
             <div class="zones-grid">
-              <div
+              <button
                 *ngFor="let zone of placedSteps; let i = index"
+                type="button"
                 class="zone-card"
                 [class.filled]="zone !== null"
+                [attr.aria-label]="zone ? 'Zone ' + (i + 1) + ' remplie avec ' + zone.id : 'Zone ' + (i + 1) + ' vide'"
+                [attr.aria-pressed]="zone !== null"
                 (click)="zone && onChronoStepClick(zone, true)"
               >
                 <img *ngIf="zone" [src]="zone.image" alt="Étape {{ i + 1 }}" class="zone-image" />
                 <span *ngIf="!zone" class="zone-placeholder">{{ i + 1 }}</span>
-              </div>
+              </button>
             </div>
 
             <div class="steps-row">
-              <div
+              <button
                 *ngFor="let step of availableSteps"
+                type="button"
                 class="step-card"
                 [class.hint-levitation]="step.isHinted"
+                [attr.aria-label]="'Choix ' + step.id + (step.isHinted ? ' (indice)' : '')"
                 (click)="onChronoStepClick(step, false)"
               >
                 <img [src]="step.image" alt="Choix" />
-              </div>
+              </button>
             </div>
           </div>
         </ng-container>

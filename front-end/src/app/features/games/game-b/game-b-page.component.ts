@@ -45,6 +45,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
   locked = false;
   finished = false;
+  isPaused = false;
   selectedChoiceId: string | null = null;
 
   feedbackMessage = '';
@@ -172,6 +173,11 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.feedbackMessage = choice?.isCorrect
       ? 'Très bien 🌿'
       : "D'accord, regardons ensemble la bonne réponse 🌿";
+
+    // Set up auto-next timeout after feedback delay
+    this.autoNextTimeoutId = window.setTimeout(() => {
+      if (!this.finished) this.onNext();
+    }, 5000);
   }
 
   requestHint(): void {
@@ -196,6 +202,11 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.locked = true;
     this.selectedChoiceId = null;
     this.feedbackMessage = 'Très bien, passons au souvenir suivant.';
+
+    // Set up auto-next timeout after feedback delay
+    this.autoNextTimeoutId = window.setTimeout(() => {
+      if (!this.finished) this.onNext();
+    }, 5000);
   }
 
   onReadQuestion(): void {
@@ -293,6 +304,15 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
     this.triggerEnterAnimation();
     this.startAssistFlow();
+  }
+
+  onTogglePause(): void {
+    this.isPaused = !this.isPaused;
+    if (this.isPaused) {
+      this.clearAssistFlow();
+      return;
+    }
+    if (!this.finished && !this.locked) this.startAssistFlow();
   }
 
   isCorrectChoice(choiceId: string): boolean {
@@ -415,5 +435,9 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.hintTimeoutId = null;
     this.autoRevealTimeoutId = null;
     this.autoNextTimeoutId = null;
+  }
+
+  onImageError(): void {
+    console.warn('Failed to load image for question:', this.currentQuestion.id);
   }
 }

@@ -281,6 +281,12 @@
 .choice-btn:hover:not(:disabled) {
   border-color: $color-primary-500;
   box-shadow: 0 $space-1-5 $space-4 $overlay-primary-15;
+  transform: translateY(-2px);
+}
+
+.choice-btn:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 .choice-btn:disabled {
@@ -349,6 +355,13 @@
 
 .assist-btn:hover:not(:disabled) {
   background: $color-neutral-200;
+  border-color: $color-neutral-400;
+  transform: translateY(-2px);
+}
+
+.assist-btn:focus-visible {
+  outline: $border-width-3 solid $color-primary-700;
+  outline-offset: $space-0-5;
 }
 
 .assist-btn:active:not(:disabled) {
@@ -373,6 +386,11 @@
 .skip-btn {
   background: $color-clinical-error-100;
   border-color: $color-clinical-error-300;
+}
+
+.pause-btn {
+  background: $color-neutral-100;
+  border-color: $color-neutral-400;
 }
 
 .feedback-box {

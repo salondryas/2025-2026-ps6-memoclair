@@ -123,7 +123,10 @@ export class PatientRepositoryMock {
   }
 
   getPatientManagedProfiles(): ManagedProfile[] {
-    return this.getManagedProfiles().filter((profile) => profile.type === 'patient');
+    return [
+      ...this.builtInPatients.map((patient) => this.mapPatientToManagedProfile(patient)),
+      ...this.managedProfiles.filter((profile) => profile.type === 'patient'),
+    ].map((profile) => ({ ...profile }));
   }
 
   getFamilyAssociations(familyId: string): FamilyPatientAssociation[] {

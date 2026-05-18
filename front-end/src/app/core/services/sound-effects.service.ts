@@ -42,8 +42,14 @@ export class SoundEffectsService {
       this.bgMusic.pause();
       this.isBgMusicPlaying = false;
     } else {
-      this.bgMusic.play().catch(err => console.warn('BGM play prevented:', err));
-      this.isBgMusicPlaying = true;
+      this.bgMusic.play()
+        .then(() => {
+          this.isBgMusicPlaying = true;
+        })
+        .catch(err => {
+          console.warn('BGM play prevented:', err);
+          this.isBgMusicPlaying = false;
+        });
     }
   }
 
@@ -61,8 +67,15 @@ export class SoundEffectsService {
   }
 
   resumeBgMusic(): void {
-    if (this.wasPlayingBeforeSuspend && this.isBgMusicPlaying) {
-      this.bgMusic.play().catch(err => console.warn('BGM resume prevented:', err));
+    if (this.wasPlayingBeforeSuspend && !this.isBgMusicPlaying) {
+      this.bgMusic.play()
+        .then(() => {
+          this.isBgMusicPlaying = true;
+        })
+        .catch(err => {
+          console.warn('BGM resume prevented:', err);
+          this.isBgMusicPlaying = false;
+        });
     }
   }
 }

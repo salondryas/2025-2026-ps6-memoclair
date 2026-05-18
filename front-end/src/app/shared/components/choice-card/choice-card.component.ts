@@ -19,7 +19,13 @@ export class ChoiceCardComponent {
 
   @Output() cardClicked = new EventEmitter<void>();
 
+  imageLoadFailed = false;
+
   onCardClick(): void {
     this.cardClicked.emit();
+  }
+
+  onImageError(): void {
+    this.imageLoadFailed = true;
   }
 }
