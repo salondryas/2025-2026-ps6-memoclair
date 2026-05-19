@@ -421,6 +421,13 @@
   outline-offset: $space-0-5;
 }
 
+.auto-next-countdown {
+  margin: -$space-2 0 $space-2;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $color-primary-700;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY($space-1); }
   to   { opacity: 1; transform: translateY($space-0); }

@@ -8,7 +8,12 @@
 
   <section *ngIf="!state.finished" class="main-layout">
     <main class="game-panel">
-      <div class="game-container main-game-area" [class.question-enter]="isEntering">
+      <div
+        class="game-container main-game-area"
+        [class.question-enter]="isEntering"
+        role="region"
+        aria-labelledby="gamea-question"
+        aria-describedby="gamea-hint gamea-feedback">
         <app-mascot-decorator
           mascotUrl="assets/UI/Mascotte-homme-indice.png"
           [positionClass]="question.type === 'chrono-order' ? 'game-mascot game-mascot--hidden' : 'game-mascot'">
@@ -23,18 +28,18 @@
 
         <img *ngIf="question.type === 'multiple-choice'" [src]="question.promptImage" alt="Objet principal" class="prompt-image" />
 
-        <h2 class="question-text" 
+        <h2 id="gamea-question" class="question-text" 
             [class.chrono-title]="question.type === 'chrono-order'"
             [style.fontSize.em]="state.profile.textSize">
           {{ question.prompt }}
         </h2>
 
-        <div class="hint-box" aria-live="polite" aria-atomic="true">
+        <div id="gamea-hint" class="hint-box" aria-live="polite" aria-atomic="true">
           <span class="hint-text">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
           <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
         </div>
 
-        <div class="feedback-box" [class.is-empty]="!state.feedback" aria-live="assertive" aria-atomic="true">
+        <div id="gamea-feedback" class="feedback-box" [class.is-empty]="!state.feedback" aria-live="polite" aria-atomic="true">
           {{ state.feedback || '&nbsp;' }}
         </div>
 
@@ -55,6 +60,7 @@
               [isAutoHighlighted]="isAutoHighlighted(c.id)"
               [isReading]="readingChoiceId === c.id"
               [isDisabled]="state.locked"
+              describedBy="gamea-question gamea-hint"
               [style.fontSize.em]="state.profile.textSize"
               (cardClicked)="onChoose(c.id)"
             ></app-choice-card>
@@ -71,6 +77,7 @@
                 class="zone-card"
                 [class.filled]="zone !== null"
                 [attr.aria-label]="zone ? 'Zone ' + (i + 1) + ' remplie avec ' + zone.id : 'Zone ' + (i + 1) + ' vide'"
+                aria-describedby="gamea-question gamea-hint"
                 [attr.aria-pressed]="zone !== null"
                 (click)="zone && onChronoStepClick(zone, true)"
               >
@@ -86,6 +93,7 @@
                 class="step-card"
                 [class.hint-levitation]="step.isHinted"
                 [attr.aria-label]="'Choix ' + step.id + (step.isHinted ? ' (indice)' : '')"
+                aria-describedby="gamea-question gamea-hint"
                 (click)="onChronoStepClick(step, false)"
               >
                 <img [src]="step.image" alt="Choix" />

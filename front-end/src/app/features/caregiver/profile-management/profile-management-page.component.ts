@@ -454,6 +454,7 @@ export class ProfileManagementPageComponent implements OnInit {
       questionCount: preset.questionCount,
       answerCount: preset.answerCount,
       hintDelaySeconds: preset.hintDelaySeconds,
+      autoNextMode: '5s',
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,

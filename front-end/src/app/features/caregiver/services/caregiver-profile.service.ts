@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import {
   ATTENTION_OPTIONS,
   ClinicalStage,
+  GameBAutoNextMode,
   MOTOR_OPTIONS,
   MotorLevel,
   PatientId,
@@ -15,6 +16,7 @@ import {
 } from '../../../models/patient.model';
 import { PatientRepositoryMock } from '../../../mocks/patient-repository.mock';
 import { StorageService } from '../../../core/services/storage.service';
+import { sanitizeProfileGameConfig } from './profile-game-config.util';
 
 const PROFILE_STORAGE_PREFIX = 'mc_caregiver_profile_';
 
@@ -41,24 +43,27 @@ export class CaregiverProfileService {
       return defaultProfile;
     }
 
+    const sanitizedConfig = sanitizeProfileGameConfig({
+      questionCount: storedProfile.questionCount ?? defaultProfile.questionCount,
+      answerCount: storedProfile.answerCount ?? defaultProfile.answerCount,
+      hintDelaySeconds: storedProfile.hintDelaySeconds ?? defaultProfile.hintDelaySeconds,
+      autoNextMode: storedProfile.autoNextMode ?? defaultProfile.autoNextMode,
+    });
+
     return {
       ...defaultProfile,
       ...storedProfile,
-      // Ensure fields are numbers and present
-      questionCount: Number(storedProfile.questionCount ?? defaultProfile.questionCount),
-      answerCount: Number(storedProfile.answerCount ?? defaultProfile.answerCount),
-      hintDelaySeconds: Number(storedProfile.hintDelaySeconds ?? defaultProfile.hintDelaySeconds),
+      ...sanitizedConfig,
       highContrastEnabled: !!(storedProfile.highContrastEnabled ?? defaultProfile.highContrastEnabled),
       themes: [...(storedProfile.themes ?? defaultProfile.themes)],
     };
   }
 
   saveProfile(profile: PatientProfile): PatientProfile {
+    const sanitizedConfig = sanitizeProfileGameConfig(profile);
     const sanitizedProfile: PatientProfile = {
       ...profile,
-      questionCount: Number(profile.questionCount),
-      answerCount: Number(profile.answerCount),
-      hintDelaySeconds: Number(profile.hintDelaySeconds),
+      ...sanitizedConfig,
       themes: [...profile.themes],
       updatedAt: new Date().toISOString(),
     };
@@ -72,6 +77,7 @@ export class CaregiverProfileService {
     if (profile.questionCount < 1) errors.push('Le nombre de questions doit être au moins 1.');
     if (profile.questionCount > 20) errors.push('Le nombre de questions ne peut pas dépasser 20.');
     if (profile.answerCount < 2) errors.push('Le nombre de réponses doit être au moins 2.');
+    if (profile.answerCount > 4) errors.push('Le nombre de réponses ne peut pas dépasser 4.');
     if (profile.hintDelaySeconds < 1) errors.push('Le délai avant indice doit être au moins 1 seconde.');
     if (profile.hintDelaySeconds > 30) errors.push('Le délai avant indice ne peut pas dépasser 30 secondes.');
     return errors;
@@ -86,6 +92,7 @@ export class CaregiverProfileService {
       `Nombre de questions : ${profile.questionCount}.`,
       `Nombre de réponses : ${profile.answerCount}.`,
       `Délai avant indice : ${profile.hintDelaySeconds}s.`,
+      `Passage automatique : ${this.mapAutoNextModeToSummary(profile.autoNextMode)}.`,
       `Contraste élevé : ${profile.highContrastEnabled ? 'Actif' : 'Inactif'}.`,
       `Durée maximale conseillée : ${profile.attentionSpanMinutes} minutes.`,
     ];
@@ -192,5 +199,11 @@ export class CaregiverProfileService {
       ['metier', 'métier'],
       ['lieux', 'lieux connus'],
     ]);
+  }
+
+  private mapAutoNextModeToSummary(mode: GameBAutoNextMode): string {
+    if (mode === 'manual') return 'manuel';
+    if (mode === '8s') return 'automatique (8s)';
+    return 'automatique (5s)';
   }
 }

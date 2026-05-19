@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import {
   ClinicalStage,
   DIFFICULTY_PRESETS,
+  GameBAutoNextMode,
   GameDifficulty,
   MotorLevel,
   PatientId,
@@ -47,6 +48,11 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     { value: 'personnalise', label: 'Personnalisé' },
   ];
   readonly difficultyPresets = DIFFICULTY_PRESETS;
+  readonly autoNextOptions: ReadonlyArray<SelectOption<GameBAutoNextMode>> = [
+    { value: 'manual', label: 'Manuel' },
+    { value: '5s', label: 'Auto (5s)' },
+    { value: '8s', label: 'Auto (8s)' },
+  ];
 
   readonly stageOptions: ReadonlyArray<SelectOption<ClinicalStage>>;
   readonly visionOptions: ReadonlyArray<SelectOption<VisionLevel>>;
@@ -105,6 +111,11 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
 
   toggleAudio(enabled: boolean): void {
     this.profile = { ...this.profile, audioReadingEnabled: enabled };
+    this.clearMessages();
+  }
+
+  selectAutoNextMode(mode: GameBAutoNextMode): void {
+    this.profile = { ...this.profile, autoNextMode: mode };
     this.clearMessages();
   }
 
@@ -251,6 +262,7 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
       questionCount: 10,
       answerCount: 3,
       hintDelaySeconds: 20,
+      autoNextMode: '5s',
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,

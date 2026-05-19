@@ -5,6 +5,7 @@ export type VisionLevel = 'leger' | 'modere' | 'important';
 export type MotorLevel = 'leger' | 'modere' | 'important';
 export type ThemeTag = 'famille' | 'quotidien' | 'musique' | 'enfance' | 'metier' | 'lieux';
 export type GameDifficulty = 'facile' | 'moyen' | 'difficile' | 'personnalise';
+export type GameBAutoNextMode = 'manual' | '5s' | '8s';
 
 export interface PatientSummary {
   id: PatientId;
@@ -29,6 +30,7 @@ export interface PatientProfile {
   questionCount: number;
   answerCount: number;
   hintDelaySeconds: number;
+  autoNextMode: GameBAutoNextMode;
   audioReadingEnabled: boolean;
   highContrastEnabled: boolean;
   textSize: number; // 1 = normal, 1.5 = large, etc.

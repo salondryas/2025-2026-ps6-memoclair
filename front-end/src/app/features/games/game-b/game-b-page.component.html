@@ -13,7 +13,12 @@
 
   <section *ngIf="!loading && !finished" class="main-layout">
     <main class="game-panel">
-      <div class="game-container main-game-area" [class.question-enter]="isEntering">
+      <div
+        class="game-container main-game-area"
+        [class.question-enter]="isEntering"
+        role="region"
+        aria-labelledby="gameb-question"
+        aria-describedby="gameb-hint gameb-feedback">
         <app-mascot-decorator mascotUrl="assets/UI/mascotte-famme2.png" positionClass="game-mascot"></app-mascot-decorator>
 
         <div class="progress-wrap">
@@ -44,20 +49,23 @@
           </app-large-audio-controls>
         </div>
 
-        <h2 class="question-text">{{ currentQuestion.question }}</h2>
+        <h2 id="gameb-question" class="question-text">{{ currentQuestion.question }}</h2>
 
-        <div class="hint-box" aria-live="polite" aria-atomic="true">
+        <div id="gameb-hint" class="hint-box" aria-live="polite" aria-atomic="true">
           <span class="hint-text" [class.hint-text--active]="!!state.hint">{{ state.hint ? '💡 Indice : ' + state.hint : '💡 Prenez votre temps...' }}</span>
           <button *ngIf="!state.hint" type="button" class="hint-action-btn" (click)="onHint()">Demander un indice</button>
         </div>
 
-        <div class="feedback-box" [class.is-empty]="!feedbackMessage" aria-live="assertive" aria-atomic="true">
+        <div id="gameb-feedback" class="feedback-box" [class.is-empty]="!feedbackMessage" aria-live="polite" aria-atomic="true">
           {{ feedbackMessage || '&nbsp;' }}
         </div>
 
         <button *ngIf="locked && !finished" type="button" class="btn-next-question" (click)="onNext()">
           Question suivante ➔
         </button>
+        <p class="auto-next-countdown" *ngIf="autoNextCountdownSeconds !== null && locked && !finished">
+          Passage automatique dans {{ autoNextCountdownSeconds }}s
+        </p>
 
         <div class="choices-grid">
           <button
@@ -67,6 +75,7 @@
             [class.correct]="isCorrectChoice(c.id)"
             [class.wrong]="isWrongSelectedChoice(c.id)"
             [class.auto-highlight]="isAutoHighlighted(c.id)"
+            aria-describedby="gameb-question gameb-hint"
             [disabled]="locked"
             (click)="onChoose(c.id)"
           >
