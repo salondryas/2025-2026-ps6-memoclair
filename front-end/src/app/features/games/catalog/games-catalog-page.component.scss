@@ -28,21 +28,32 @@
   box-shadow: $shadow-soft;
 }
 
+.header-left-group {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  gap: $space-4;
+
+  ::ng-deep .brand-img {
+    height: $space-16;
+  }
+}
+
 .btn-back {
   display: inline-flex;
   align-items: center;
-  justify-self: start;
-  gap: $space-2;
+  gap: $space-3;
   text-decoration: none;
   color: $color-neutral-700;
   background: $color-neutral-100;
   border: $border-width-1 solid $color-neutral-300;
-  padding: $space-3 $space-5;
+  padding: $space-4 $space-7;
   border-radius: $radius-pill;
   font-weight: 700;
-  font-size: $font-size-base;
-  min-height: $space-11;
+  font-size: 1.5 * $font-size-base;
+  min-height: $space-16;
   transition: background 0.18s;
+  cursor: pointer;
 
   &:hover {
     background: $color-neutral-150;
@@ -219,5 +230,16 @@
 
   .patient-photo-circle {
     justify-self: center;
+  }
+}
+
+:host-context(.high-contrast) {
+  .catalog { background: transparent !important; }
+  .game-card, .catalog-header, .btn-back, .game-card__image,
+  .btn-duo-toggle {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    color: #ffffff !important;
   }
 }

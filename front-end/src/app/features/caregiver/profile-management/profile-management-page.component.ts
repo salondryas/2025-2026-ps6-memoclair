@@ -12,7 +12,6 @@ import {
   PatientSummary,
 } from '../../../models/patient.model';
 import { ManagedProfile, ManagedProfileDraft, ManagedProfileType } from '../../../models/profile.model';
-import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { ProfileSelectionService } from '../services/profile-selection.service';
 
@@ -22,7 +21,7 @@ type ProfileTypeFilter = 'all' | 'patient' | 'professional';
 @Component({
   selector: 'app-profile-management-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, CaregiverShellComponent, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './profile-management-page.component.html',
   styleUrl: './profile-management-page.component.scss',
 })
@@ -87,6 +86,12 @@ export class ProfileManagementPageComponent implements OnInit {
     this.activeProfessionalId = this.profileSelectionService.getActiveProfessionalId();
     this.newProfile = this.createEmptyDraft(this.mode === 'professionals' ? 'professional' : 'patient');
     this.refreshLists();
+
+    const action = this.route.snapshot.queryParamMap.get('action');
+    const type = this.route.snapshot.queryParamMap.get('type') as ManagedProfileType | null;
+    if (action === 'add') {
+      this.openAddModal(type ?? undefined);
+    }
   }
 
   get pageTitle(): string {
@@ -272,12 +277,7 @@ export class ProfileManagementPageComponent implements OnInit {
   }
 
   goBack(): void {
-    const from = this.route.snapshot.queryParamMap.get('from');
-    if (from === 'professional-selection') {
-      void this.router.navigateByUrl('/games/patient-selection?from=caregiver-professional');
-      return;
-    }
-    this.location.back();
+    void this.router.navigate(['/games/patient-selection-patient'], { queryParams: { from: 'caregiver-professional' } });
   }
 
   private refreshLists(): void {

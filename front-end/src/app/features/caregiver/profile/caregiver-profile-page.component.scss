@@ -464,3 +464,44 @@
   }
 }
 
+
+:host-context(.high-contrast) {
+  .profile-page { background: transparent !important; }
+
+  .profile-page__hero, .profile-page__patient-card, .profile-card,
+  .create-patient-card, .difficulty-details, .text-sample,
+  .create-patient-input, .custom-settings__input,
+  .profile-page__selector select, .profile-card--summary {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    color: #ffffff !important;
+  }
+
+  .profile-page__kicker {
+    background: rgba(20, 50, 30, 0.9) !important;
+    color: #ffffff !important;
+  }
+
+  .profile-card__index {
+    background: rgba(20, 50, 30, 0.9) !important;
+    color: #ffffff !important;
+  }
+
+  .chip {
+    background: rgba(30, 60, 40, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+
+  .chip--active {
+    background: rgba(50, 120, 70, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .btn-create-cancel {
+    background: rgba(30, 30, 30, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+}

@@ -1,0 +1,86 @@
+@use 'src/styles/tokens' as *;
+
+.card {
+  flex: 1;
+  min-width: 320px;
+  padding: $space-8 $space-6;
+  border-radius: $space-10; // 40px
+  background: $overlay-white-85;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: $border-width-1 solid $overlay-white-90;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: $shadow-card;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-12px);
+    box-shadow: $shadow-card-strong;
+    background: $color-neutral-0;
+
+    .card__image {
+      transform: scale(1.06);
+    }
+  }
+
+  &__image-wrapper {
+    margin-bottom: $space-6;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__image {
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__title {
+    font-size: $font-size-5xl;
+    color: $color-neutral-950;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  &__description {
+    font-size: $font-size-lg;
+    color: $color-neutral-600;
+    margin: 0;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .card {
+    min-width: 280px;
+    &__image-wrapper {
+      height: 180px;
+    }
+    &__title {
+      font-size: $font-size-3xl;
+    }
+  }
+}
+
+:host-context(.high-contrast) {
+  .card {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+  }
+}

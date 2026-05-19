@@ -406,3 +406,16 @@
     flex-direction: column;
   }
 }
+
+:host-context(.high-contrast) {
+  .stats-page { background: transparent !important; }
+  .donut-card, .session-card, .warning-card, .global-section,
+  .patient-bar, .empty-state, .session-note {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    color: #ffffff !important;
+  }
+  .patient-bar select { background: rgba(20, 20, 20, 0.95) !important; color: #ffffff !important; }
+  .badge-duration { background: rgba(40, 40, 40, 0.9) !important; color: #ffffff !important; }
+}

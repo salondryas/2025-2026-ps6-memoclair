@@ -1,25 +1,57 @@
-<div class="home-container">
-
-  <div class="logo-wrapper">
+<div class="landing-page">
+  
+  <header class="top-header">
     <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="brand-logo" />
-  </div>
+  </header>
 
-  <div class="main-content">
-    <p class="tagline">Bienvenue ! Choisissez votre espace pour commencer.</p>
+  <main class="hero-center">
+    
+    <div class="hero-text-block">
+      <h1 class="hero-title">
+        MemoClair stimule la mémoire par des souvenirs personnalisés.
+      </h1>
+      <p class="hero-subtitle">
+        Une solution bienveillante pour accompagner les troubles cognitifs au quotidien, sans mise en échec.
+      </p>
+    </div>
 
     <div class="portals-wrapper">
       <a [routerLink]="['/games/patient-selection']" [queryParams]="{ from: 'games' }" class="portal-card patient-card">
-        <img src="assets/UI/Mascotte-famme-bienveneu.png" alt="Espace Jeu" />
+        <img src="assets/UI/Mascotte-famme-bienveneu.png" alt="Espace Jeu" class="mascot-img" />
         <h2>Espace Jeu</h2>
         <p>Démarrer une session de stimulation</p>
       </a>
 
       <a routerLink="/caregiver" class="portal-card caregiver-card">
-        <img src="assets/UI/Mascotte-aidant.png" alt="Espace Aidant" />
+        <img src="assets/UI/Mascotte-aidant.png" alt="Espace Aidant" class="mascot-img" />
         <h2>Espace Aidant</h2>
         <p>Suivi, statistiques et configuration</p>
       </a>
     </div>
-  </div>
+
+  </main>
+
+  <footer class="benefits-row">
+    <div class="glass-card">
+      <lucide-icon name="heart-handshake" class="icon-svg"></lucide-icon>
+      <h3>Stimulation douce</h3>
+      <p>Des jeux sans stress pour valoriser chaque réussite.</p>
+    </div>
+    <div class="glass-card">
+      <lucide-icon name="image-icon" class="icon-svg"></lucide-icon>
+      <h3>Souvenirs intégrés</h3>
+      <p>Intégrez vos photos et musiques pour une vraie réminiscence.</p>
+    </div>
+    <div class="glass-card">
+      <lucide-icon name="users" class="icon-svg"></lucide-icon>
+      <h3>Pour les familles</h3>
+      <p>Recréez du lien et partagez des moments complices.</p>
+    </div>
+    <div class="glass-card">
+      <lucide-icon name="building-2" class="icon-svg"></lucide-icon>
+      <h3>Pour les EHPAD</h3>
+      <p>Un outil thérapeutique facile à déployer en institution.</p>
+    </div>
+  </footer>
 
 </div>

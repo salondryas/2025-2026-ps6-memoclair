@@ -1,5 +1,29 @@
 @use './styles/tokens' as *;
 
+html {
+  font-size: 62%; /* Simule un zoom à 62% pour que le rendu à 100% soit plus compact */
+  transition: font-size 0.2s ease-in-out;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Amélioration de la lisibilité pour l'espace soignant (Profile, Media, Stats) */
+html:has(app-caregiver-profile-page),
+html:has(app-caregiver-media-page),
+html:has(app-caregiver-statistics-page) {
+  font-size: 70%;
+
+  body {
+    background-image: none;
+    background-color: #f0f4f1;
+  }
+}
+
+/* Version un peu plus grande pour la gestion des profils */
+html:has(app-profile-management-page) {
+  font-size: 75%;
+}
+
 :root {
   color-scheme: light;
 }
@@ -10,19 +34,8 @@
   box-sizing: border-box;
 }
 
-html,
 body {
   height: 100%;
-  margin: 0;
-}
-
-app-root {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-body {
   margin: 0;
   font-family: Inter, "Segoe UI", Roboto, sans-serif;
   color: $color-accent-moss-900;
@@ -32,6 +45,46 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+body.high-contrast {
+  background-image: url('/assets/UI/global-bg-contra.png');
+  color: #ffffff;
+}
+
+body.high-contrast * {
+  color: #ffffff !important;
+}
+
+body.high-contrast app-root {
+  background-color: transparent !important;
+}
+
+/* ══════════════════════════════════════════
+   Scrollbar Globale
+══════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5f8a6f;
+  border-radius: 10px;
+  border: 3px solid #f1f5f3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a6d57;
 }
 
 button,

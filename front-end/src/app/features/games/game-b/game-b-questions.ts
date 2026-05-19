@@ -132,7 +132,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q10',
     mediaType: 'image',
-    imageSrc: `${BASE}/q10/Scrabble.png`,
+    imageSrc: `${BASE}/q10/q10-scrabble.png`,
     question: 'Quel jeu de lettres passionnait les familles lors des longues soirées d\'hiver ?',
     source: 'Souvenir du quotidien',
     caption: 'Jeu de société',
@@ -146,7 +146,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q11',
     mediaType: 'image',
-    imageSrc: `${BASE}/q11/Appareil-photo.png`,
+    imageSrc: `${BASE}/q11/q11-appareil-photo.png`,
     question: 'Quel appareil permettait de capturer les moments précieux avant l\'ère numérique ?',
     source: 'Souvenir du quotidien',
     caption: 'Appareil photo argentique',
@@ -160,7 +160,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q12',
     mediaType: 'image',
-    imageSrc: `${BASE}/q12/Magnetophone.png`,
+    imageSrc: `${BASE}/q12/q12-magnetophone.png`,
     question: 'Quel appareil permettait d\'enregistrer et de réécouter ses chansons préférées sur cassettes ?',
     source: 'Souvenir du quotidien',
     caption: 'Magnétophone à cassettes',
@@ -174,7 +174,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q13',
     mediaType: 'audio',
-    audioSrc: `${BASE}/q13/Grosses-tetes-RTL.mp3`,
+    audioSrc: `${BASE}/q13/q13-radio-generique.mp3`,
     question: 'Écoutez cet extrait culte. Quel jeu radiophonique des années 80 réunissait les plus grands humoristes français ?',
     source: 'Souvenir du quotidien',
     caption: 'Jeu radiophonique',
@@ -188,7 +188,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q14',
     mediaType: 'image',
-    imageSrc: `${BASE}/q14/Calculatrice.png`,
+    imageSrc: `${BASE}/q14/q14-calculatrice.png`,
     question: 'Quel petit appareil révolutionnaire permettait de faire des calculs complexes en quelques secondes ?',
     source: 'Souvenir du quotidien',
     caption: 'Calculatrice de poche',
@@ -202,7 +202,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q15',
     mediaType: 'image',
-    imageSrc: `${BASE}/q15/Montre.png`,
+    imageSrc: `${BASE}/q15/q15-montre.png`,
     question: 'Quel accessoire indispensable au poignet marquait le passage du temps dans la vie quotidienne ?',
     source: 'Souvenir du quotidien',
     caption: 'Montre mécanique',
@@ -216,7 +216,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q16',
     mediaType: 'image',
-    imageSrc: `${BASE}/q16/Stylo-Bic.png`,
+    imageSrc: `${BASE}/q16/q16-stylo-bic.png`,
     question: 'Quel stylo à bille bleu révolutionnaire était l\'outil d\'écriture par excellence à l\'école et au bureau ?',
     source: 'Souvenir du quotidien',
     caption: 'Stylo à bille',
@@ -230,7 +230,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q17',
     mediaType: 'image',
-    imageSrc: `${BASE}/q17/Lampe-bureau.png`,
+    imageSrc: `${BASE}/q17/q17-lampe-bureau.png`,
     question: 'Quel objet éclairait les bureaux et les tables de nuit avec son design caractéristique des années 70 ?',
     source: 'Souvenir du quotidien',
     caption: 'Lampe de bureau',
@@ -244,7 +244,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q18',
     mediaType: 'image',
-    imageSrc: `${BASE}/q18/Disque-vinyle.png`,
+    imageSrc: `${BASE}/q18/q18-disque-vinyle.png`,
     question: 'Quel format musical noir et rond était le roi incontesté avant l\'arrivée des cassettes ?',
     source: 'Souvenir du quotidien',
     caption: 'Disque vinyle 33 tours',
@@ -258,7 +258,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q19',
     mediaType: 'image',
-    imageSrc: `${BASE}/q19/Chaise-cuisine.png`,
+    imageSrc: `${BASE}/q19/q19-chaise-cuisine.png`,
     question: 'Quel meuble de cuisine aux pieds chromés était présent dans presque tous les foyers des années 70 ?',
     source: 'Souvenir du quotidien',
     caption: 'Chaise de cuisine vintage',
@@ -272,7 +272,7 @@ export const GAME_B_QUESTIONS: GameBQuestionDto[] = [
   {
     id: 'b-q20',
     mediaType: 'image',
-    imageSrc: `${BASE}/q20/Horloge-murale.png`,
+    imageSrc: `${BASE}/q20/q20-horloge-murale.png`,
     question: 'Quel objet rond et coloré indiquait l\'heure dans les cuisines des années 70 avec son design rétro ?',
     source: 'Souvenir du quotidien',
     caption: 'Horloge murale vintage',

@@ -254,13 +254,9 @@
   gap: $space-7-5;                  /* L'espacement parfait (tu peux ajuster cette valeur) */
 }
 
-/* On s'assure que les cartes se partagent bien l'espace */
-.choice-card {
-  flex: 1;                    /* Chaque carte prend la même largeur */
-  /* ... (Garde le reste de ton CSS pour .choice-card ici : border, padding, etc.) ... */
-}
 
 .choice-btn {
+  flex: 1;
   position: relative;
   min-height: 7.5rem;
   border: $border-width-2 solid $color-neutral-300;
@@ -373,11 +369,6 @@
   cursor: not-allowed;
 }
 
-.read-btn {
-  background: $color-primary-50;
-  border-color: $color-primary-300;
-}
-
 .hint-btn {
   background: $color-clinical-warning-100;
   border-color: $color-clinical-warning-300;
@@ -465,6 +456,33 @@
   }
 
   .choices-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
+}
+
+.app-container.high-contrast {
+  background-image: url('/assets/UI/global-bg-contra.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  * { color: #ffffff !important; }
+
+  .main-layout { background: transparent !important; }
+
+  .game-panel, .game-container, .main-game-area, .sidebar, .hint-box,
+  .hint-action-btn, .assist-btn, .hint-btn, .skip-btn,
+  .feedback-box, .meta-pill {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+  }
+
+  .choice-btn {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+  }
+  .choice-btn.correct { background: rgba(0, 80, 40, 0.9) !important; }
+  .choice-btn.wrong   { background: rgba(100, 0, 0, 0.9) !important; }
+  .choice-btn.auto-highlight { background: rgba(0, 100, 50, 0.9) !important; }
 }

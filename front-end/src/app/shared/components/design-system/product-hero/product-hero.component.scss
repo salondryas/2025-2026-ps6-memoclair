@@ -1,0 +1,59 @@
+@use 'src/styles/tokens' as *;
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  padding-bottom: $space-12;
+
+  &__logo-container {
+    background: $overlay-white-70;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: $space-4 $space-10;
+    border-radius: $radius-pill;
+    box-shadow: $shadow-soft;
+    border: $border-width-1 solid $overlay-white-90;
+    margin-bottom: $space-12;
+    z-index: 10;
+  }
+
+  &__logo {
+    height: $layout-sidebar-width; // 200px
+    width: auto;
+    display: block;
+  }
+
+  &__title {
+    font-size: $font-size-7xl;
+    color: $color-neutral-950;
+    margin: 0 0 $space-2 0;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  &__tagline {
+    font-size: $font-size-2xl;
+    color: $color-neutral-600;
+    margin: 0;
+    font-weight: 500;
+    max-width: 720px;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .hero {
+    &__logo {
+      height: 150px;
+    }
+    &__title {
+      font-size: $font-size-5xl;
+    }
+    &__tagline {
+      font-size: $font-size-xl;
+    }
+  }
+}

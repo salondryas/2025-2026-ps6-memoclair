@@ -1,6 +1,14 @@
 .caregiver-shell {
   min-height: 100vh;
-  background: transparent;
+  background-image: url('/assets/UI/global-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+:host-context(body.high-contrast) .caregiver-shell {
+  background-image: url('/assets/UI/global-bg-contra.png');
 }
 
 .caregiver-shell__main {

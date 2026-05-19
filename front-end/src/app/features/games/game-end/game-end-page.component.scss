@@ -95,3 +95,13 @@
     max-width: $size-content-max-md;
   }
 }
+
+:host-context(.high-contrast) {
+  .end-screen-layout {
+    background-image: url('/assets/UI/global-bg-contra.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    backdrop-filter: none !important;
+  }
+}

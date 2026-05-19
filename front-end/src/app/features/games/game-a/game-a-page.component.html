@@ -19,7 +19,6 @@
             <div class="progress-fill" [style.width.%]="progressPercent"></div>
           </div>
           <p class="progress-value">{{ state.index + 1 }}/{{ state.questions.length }}</p>
-          <p class="timer-display">⏱️ {{ formattedTime }}</p>
         </div>
 
         <img *ngIf="question.type === 'multiple-choice'" [src]="question.promptImage" alt="Objet principal" class="prompt-image" />
@@ -99,9 +98,11 @@
 
     <aside class="sidebar sidebar-right">
       <div class="assist-actions">
-        <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="state.profile.audioReadingEnabled">
-          🔊 Aide sonore
-        </button>
+        <app-audio-help-button
+          *ngIf="state.profile.audioReadingEnabled"
+          [texts]="readTexts"
+          (itemStart)="onReadItemStart($event)">
+        </app-audio-help-button>
         <button type="button" class="assist-btn pause-btn" (click)="onTogglePause()">
           {{ isPaused ? "▶ Reprendre" : "⏸ Pause" }}
         </button>

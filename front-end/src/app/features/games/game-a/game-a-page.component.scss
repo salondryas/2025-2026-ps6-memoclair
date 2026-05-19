@@ -24,6 +24,8 @@
   grid-template-columns: 1fr $layout-sidebar-width;
   height: 100%;
   overflow: hidden;
+  gap: $space-3;
+  padding: $space-3;
 }
 
 .sidebar {
@@ -33,7 +35,7 @@
   flex-direction: column;
   gap: $space-4-5;
   padding: $space-4;
-  background: $overlay-white-10;
+  background: $overlay-white-60;
   backdrop-filter: blur($space-3);
   border: $border-width-1 solid $overlay-white-80;
   border-radius: $radius-lg;
@@ -72,14 +74,6 @@
   color: $color-neutral-600;
 }
 
-.timer-display {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  color: $color-primary-600;
-  min-width: 80px;
-  text-align: right;
-}
 
 .game-panel {
   min-width: 0;
@@ -94,11 +88,10 @@
   min-height: 0;
   height: 100%;
   position: relative;
-  background: $overlay-white-10;
+  background: $overlay-white-60;
   backdrop-filter: blur($space-3);
   border: $border-width-1 solid $overlay-white-80;
   border-radius: $radius-xl;
-  box-shadow: $shadow-card;
   overflow: hidden;
 }
 
@@ -203,8 +196,8 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  max-width: 68.75rem;
-  gap: $space-25;
+  max-width: $size-content-max-lg;
+  gap: $space-7-5;
   margin: 0 auto;
   min-height: 0;
   align-items: stretch;
@@ -250,11 +243,6 @@
 .assist-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-.read-btn {
-  background: $color-primary-50;
-  border-color: $color-primary-300;
 }
 
 .pause-btn {
@@ -422,20 +410,27 @@
   margin-bottom: -$space-1-25; /* On réduit l'écart en dessous pour rapprocher les grilles */
 }
 
-@keyframes levitate {
-  0%, 100% {
+@keyframes floatAnimation {
+  0% {
     transform: translateY(0);
-    box-shadow: 0 $space-1 $space-3 $overlay-primary-20;
+    box-shadow: 0 $space-1 $space-3-75 $overlay-warning-20;
   }
   50% {
-    transform: translateY(-$space-2-5);
-    box-shadow: 0 $space-2 $space-5 $overlay-primary-40;
+    transform: translateY(-$space-3) scale(1.02);
+    box-shadow: 0 $space-3-75 $space-7-5 $overlay-warning-20;
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 $space-1 $space-3-75 $overlay-warning-20;
   }
 }
 
 .hint-levitation {
   border-color: $color-clinical-warning-400 !important;
   background: $color-clinical-warning-50;
+  animation: floatAnimation 1.5s ease-in-out infinite !important;
+  z-index: 10;
+  transition: all 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -468,5 +463,24 @@
 
   .sidebar-right {
     justify-content: center;
+  }
+}
+
+.app-container.high-contrast {
+  background-image: url('/assets/UI/global-bg-contra.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  * { color: #ffffff !important; }
+
+  .main-layout, .main-game-area { background: transparent !important; }
+
+  .game-panel, .game-container, .sidebar, .hint-box,
+  .hint-action-btn, .assist-btn,
+  .feedback-box, .zone-card, .step-card {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
   }
 }

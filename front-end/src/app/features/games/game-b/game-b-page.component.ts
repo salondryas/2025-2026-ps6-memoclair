@@ -18,6 +18,8 @@ import { SoundEffectsService } from '../../../core/services/sound-effects.servic
 import { CaregiverProfileService } from '../../caregiver/services/caregiver-profile.service';
 import { PatientProfile } from '../../../models/patient.model';
 import { GAME_B_QUESTIONS } from './game-b-questions';
+import { TtsService } from '../../../core/services/tts.service';
+import { AudioHelpButtonComponent } from '../../../shared/components/audio-help-button/audio-help-button.component';
 
 @Component({
   selector: 'app-game-b-page',
@@ -29,7 +31,8 @@ import { GAME_B_QUESTIONS } from './game-b-questions';
     GameHeaderComponent,
     MascotDecoratorComponent,
     ChoiceCardComponent,
-    GuideMascotComponent
+    GuideMascotComponent,
+    AudioHelpButtonComponent,
   ],
   templateUrl: './game-b-page.component.html',
   styleUrls: ['./game-b-page.component.scss'],
@@ -67,7 +70,6 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   loading = true;
   isEntering = false;
   private enterTimeoutId: number | null = null;
-  private ttsSessionId = 0;
 
   constructor(
     private readonly patientContext: PatientContextService,
@@ -79,6 +81,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     private readonly soundEffects: SoundEffectsService,
     private readonly cdr: ChangeDetectorRef,
     private readonly ngZone: NgZone,
+    private readonly tts: TtsService,
   ) {}
 
   ngOnInit(): void {
@@ -140,8 +143,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearAssistFlow();
     if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
-    this.ttsSessionId++;
-    window.speechSynthesis.cancel();
+    this.tts.cancel();
     if (!this.finished && this.totalQuestions > 0) {
       this.saveSession(true);
     }
@@ -176,17 +178,21 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
     // Set up auto-next timeout after feedback delay
     this.autoNextTimeoutId = window.setTimeout(() => {
-      if (!this.finished) this.onNext();
+      this.ngZone.run(() => {
+        if (!this.finished) this.onNext();
+      });
     }, 5000);
   }
 
   requestHint(): void {
     if (this.locked || this.finished) return;
+    const alreadyShown = !!this.hintMessage;
     this.hintCount++;
     this.soundEffects.play('hint');
     this.hintMessage = this.currentQuestion.hint;
     this.feedbackMessage = 'Prenez votre temps, un repère peut aider.';
-    if (this.hintMessage) this.speak(this.hintMessage);
+    if (this.hintMessage && !alreadyShown) this.tts.speak(this.hintMessage);
+    this.cdr.detectChanges();
   }
 
   onHint(): void {
@@ -205,88 +211,22 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
     // Set up auto-next timeout after feedback delay
     this.autoNextTimeoutId = window.setTimeout(() => {
-      if (!this.finished) this.onNext();
+      this.ngZone.run(() => {
+        if (!this.finished) this.onNext();
+      });
     }, 5000);
   }
 
-  onReadQuestion(): void {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const sessionId = ++this.ttsSessionId;
-
-    const doSpeak = () => {
-      if (sessionId !== this.ttsSessionId) return;
-      const voice = this.getBestFrenchVoice();
-      const makeUtt = (text: string): SpeechSynthesisUtterance => {
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'fr-FR';
-        utt.rate = 0.82;
-        utt.pitch = 1.05;
-        if (voice) utt.voice = voice;
-        return utt;
-      };
-      const questionUtt = makeUtt(this.currentQuestion.question);
-      const choiceUtts = this.currentQuestion.choices.map(c => makeUtt(c.label));
-      const speakNext = (index: number) => {
-        if (sessionId !== this.ttsSessionId) return;
-        if (index >= choiceUtts.length) return;
-        choiceUtts[index].onend = () => speakNext(index + 1);
-        window.speechSynthesis.speak(choiceUtts[index]);
-      };
-      questionUtt.onend = () => speakNext(0);
-      window.speechSynthesis.speak(questionUtt);
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
-    }
-  }
-
-  private speak(text: string): void {
-    if (!('speechSynthesis' in window)) return;
-    const sessionId = ++this.ttsSessionId;
-    window.speechSynthesis.cancel();
-    const doSpeak = () => {
-      if (sessionId !== this.ttsSessionId) return;
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = 'fr-FR';
-      utt.rate = 0.82;
-      utt.pitch = 1.05;
-      const voice = this.getBestFrenchVoice();
-      if (voice) utt.voice = voice;
-      window.speechSynthesis.speak(utt);
-    };
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
-    }
-  }
-
-  private getBestFrenchVoice(): SpeechSynthesisVoice | null {
-    const voices = window.speechSynthesis.getVoices();
-    const fr = voices.filter(v => v.lang.startsWith('fr'));
-    return (
-      fr.find(v => v.name.includes('Google')) ||
-      fr.find(v => /natural|neural|enhanced/i.test(v.name)) ||
-      fr.find(v => v.lang === 'fr-FR') ||
-      fr[0] ||
-      null
-    );
+  get readTexts(): string[] {
+    if (this.finished) return [];
+    return [this.currentQuestion.question, ...this.currentQuestion.choices.map(c => c.label)];
   }
 
   onNext(): void {
     this.soundEffects.play('transition');
     this.clearAssistFlow();
     this.isAutoRevealed = false;
+    this.tts.cancel();
 
     const nextIndex = this.currentQuestionIndex + 1;
     if (nextIndex >= this.totalQuestions) {
@@ -340,28 +280,32 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     const nextDelay = revealDelay + 5000;
 
     this.hintTimeoutId = window.setTimeout(() => {
-      if (!this.locked && !this.finished) {
-        this.hintCount++;
-        this.hintMessage = this.currentQuestion.hint;
-        this.feedbackMessage = '💡 Indice automatique affiché.';
-      }
+      this.ngZone.run(() => {
+        this.requestHint();
+        this.cdr.detectChanges();
+      });
     }, hintDelay);
 
     this.autoRevealTimeoutId = window.setTimeout(() => {
-      if (!this.locked && !this.finished) {
-        this.guidedMoments++;
-        this.recordLatency();
-        const correct = this.currentQuestion.choices.find((c) => c.isCorrect);
-        if (!correct) return;
-        this.locked = true;
-        this.selectedChoiceId = correct.id;
-        this.isAutoRevealed = true;
-        this.feedbackMessage = 'Nous vous aidons : voici la bonne réponse ✅';
-      }
+      this.ngZone.run(() => {
+        if (!this.locked && !this.finished) {
+          this.guidedMoments++;
+          this.recordLatency();
+          const correct = this.currentQuestion.choices.find((c) => c.isCorrect);
+          if (!correct) return;
+          this.locked = true;
+          this.selectedChoiceId = correct.id;
+          this.isAutoRevealed = true;
+          this.feedbackMessage = 'Nous vous aidons : voici la bonne réponse ✅';
+          this.cdr.detectChanges();
+        }
+      });
     }, revealDelay);
 
     this.autoNextTimeoutId = window.setTimeout(() => {
-      if (!this.finished) this.onNext();
+      this.ngZone.run(() => {
+        if (!this.finished) this.onNext();
+      });
     }, nextDelay);
   }
 

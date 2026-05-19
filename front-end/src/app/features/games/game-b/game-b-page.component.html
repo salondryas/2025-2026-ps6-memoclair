@@ -80,9 +80,10 @@
 
     <aside class="sidebar sidebar-right">
       <div class="assist-actions">
-        <button type="button" class="assist-btn read-btn" (click)="onReadQuestion()" *ngIf="profile.audioReadingEnabled">
-          🔊 Aide sonore
-        </button>
+        <app-audio-help-button
+          *ngIf="profile.audioReadingEnabled"
+          [texts]="readTexts">
+        </app-audio-help-button>
         <button type="button" class="assist-btn hint-btn" (click)="onHint()" [disabled]="locked">
           💡 Indice
         </button>

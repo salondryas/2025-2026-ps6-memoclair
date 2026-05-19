@@ -181,36 +181,16 @@
   }
 }
 
-:host-context(.high-contrast) .choice-card {
-  background: $color-black;
-  color: $color-neutral-0;
-  border: $border-width-4 solid $color-neutral-0;
-  box-shadow: none;
-
-  .choice-label {
-    color: $color-neutral-0;
+:host-context(.high-contrast) {
+  .choice-card {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
   }
-
-  &.correct {
-    background: $color-neutral-0;
-    color: $color-black;
-    .choice-label { color: $color-black; }
-  }
-
-  &.wrong {
-    opacity: 0.5;
-    border-color: $color-accent-gray-500;
-  }
-}
-
-:host:nth-child(1) .choice-card {
-  animation-delay: 0.1s;
-}
-
-:host:nth-child(2) .choice-card {
-  animation-delay: 0.2s;
-}
-
-:host:nth-child(3) .choice-card {
-  animation-delay: 0.3s;
+  .choice-card.correct { background: rgba(0, 80, 40, 0.9) !important; }
+  .choice-card.wrong   { background: rgba(100, 0, 0, 0.9) !important; }
+  .choice-card.auto-highlight { background: rgba(0, 100, 50, 0.9) !important; }
+  .choice-image, .image-placeholder { background: rgba(20, 20, 20, 0.9) !important; }
 }

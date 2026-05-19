@@ -1,0 +1,7 @@
+<button
+  type="button"
+  class="audio-help-btn"
+  [class.is-reading]="tts.isReading()"
+  (click)="toggle()">
+  {{ tts.isReading() ? '⏹ Arrêter' : '🔊 Aide sonore' }}
+</button>

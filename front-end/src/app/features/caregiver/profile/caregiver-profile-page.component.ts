@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -18,6 +18,7 @@ import {
 } from '../../../models/patient.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { CaregiverProfileService } from '../services/caregiver-profile.service';
+import { AccessibilityPreferencesService } from '../../../core/services/accessibility-preferences.service';
 import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
 
 @Component({
@@ -58,6 +59,8 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
   constructor(
     private readonly patientContextService: PatientContextService,
     private readonly caregiverProfileService: CaregiverProfileService,
+    private readonly accessibilityPrefs: AccessibilityPreferencesService,
+    private readonly router: Router
   ) {
     this.stageOptions = this.caregiverProfileService.stageOptions;
     this.visionOptions = this.caregiverProfileService.visionOptions;
@@ -107,6 +110,7 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
 
   toggleHighContrast(enabled: boolean): void {
     this.profile = { ...this.profile, highContrastEnabled: enabled };
+    this.accessibilityPrefs.setHighContrast(enabled);
     this.clearMessages();
   }
 
@@ -167,6 +171,11 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     const currentPatient = this.currentPatient;
     this.validationMessage = '';
     this.saveStatus = `Profil de ${currentPatient.firstName} enregistré pour les prochaines séances.`;
+
+    // Rediriger vers l'accueil après un court délai pour laisser l'utilisateur voir le message
+    setTimeout(() => {
+      void this.router.navigateByUrl('/');
+    }, 800);
   }
 
   isThemeSelected(theme: ThemeTag): boolean {
@@ -200,6 +209,7 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
 
   private loadProfile(patientId: PatientId): void {
     this.profile = this.caregiverProfileService.getProfile(patientId);
+    this.accessibilityPrefs.applyFromProfile(this.profile);
     this.validationMessage = '';
     this.saveStatus = '';
   }

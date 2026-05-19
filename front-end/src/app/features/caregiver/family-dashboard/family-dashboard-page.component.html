@@ -1,65 +1,24 @@
-<!-- Navbar famille -->
-<nav class="fam-nav">
-  <div class="fam-nav__left">
-    <a routerLink="/" class="fam-nav__logo">
-      <img src="assets/UI/memo-brand.png" alt="Logo MemoClair" class="fam-nav__logo-img" />
-    </a>
-    <button type="button" class="fam-nav__back" (click)="goBack()">← Retour</button>
-  </div>
-</nav>
+<div class="dashboard-layout">
+  <header class="dashboard-header">
+    <h1>Espace Famille</h1>
+    <p>Gérez les souvenirs de votre proche ou lancez directement une séance de jeu.</p>
+  </header>
 
-<main class="dashboard">
-
-  <!-- Prénom — point d'attention immédiat -->
-  <h1 class="dashboard-name">{{ currentPatient.firstName }}</h1>
-
-  <!-- KPI row -->
-  <div class="kpi-row">
-
-    <div class="kpi-card">
-      <span class="kpi-icon" aria-hidden="true">⏱</span>
-      <span class="kpi-value">{{ currentProfile.attentionSpanMinutes }}</span>
-      <span class="kpi-unit">min</span>
-      <span class="kpi-label">Attention</span>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-icon" aria-hidden="true">🎯</span>
-      <span class="kpi-value kpi-value--stage">{{ currentPatient.stageLabel }}</span>
-      <span class="kpi-label">Stade</span>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-icon" aria-hidden="true">🏷</span>
-      <span class="kpi-value">{{ currentProfile.themes.length }}</span>
-      <span class="kpi-unit">thème{{ currentProfile.themes.length > 1 ? 's' : '' }}</span>
-      <span class="kpi-label">Centres d'intérêt</span>
-    </div>
-
-  </div>
-
-  <!-- Thèmes sous forme de pills uniquement -->
-  <div class="theme-row" role="list" aria-label="Thèmes porteurs">
-    <span *ngFor="let t of currentProfile.themes"
-          class="theme-pill"
-          role="listitem">
-      {{ getThemeLabel(t) }}
-    </span>
-  </div>
-
-  <!-- Deux actions massives -->
-  <div class="action-row">
-
-    <a routerLink="/caregiver/family-souvenirs" class="action-btn action-btn--amber">
-      <span class="action-btn__icon" aria-hidden="true">📸</span>
-      <span class="action-btn__label">Ajouter des souvenirs</span>
+  <div class="cards-container">
+    <a routerLink="/games" class="glass-card">
+      <div class="card-icon-wrapper">
+        <lucide-icon name="gamepad-2" class="card-icon card-icon--game"></lucide-icon>
+      </div>
+      <h2>Jouer avec mon proche</h2>
+      <p>Lancer une séance de stimulation ou de réminiscence en duo.</p>
     </a>
 
-    <a routerLink="/games" class="action-btn action-btn--green">
-      <span class="action-btn__icon" aria-hidden="true">🎮</span>
-      <span class="action-btn__label">Jouer</span>
+    <a routerLink="../media" class="glass-card">
+      <div class="card-icon-wrapper">
+        <lucide-icon name="image-icon" class="icon-svg"></lucide-icon>
+      </div>
+      <h2>Médiathèque</h2>
+      <p>Ajouter des photos de famille pour personnaliser les jeux.</p>
     </a>
-
   </div>
-
-</main>
+</div>

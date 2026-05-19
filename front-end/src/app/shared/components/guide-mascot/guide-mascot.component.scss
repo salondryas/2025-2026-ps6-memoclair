@@ -40,3 +40,11 @@
     border-top-left-radius: 24px;
   }
 }
+
+:host-context(.high-contrast) {
+  .speech-bubble {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+}

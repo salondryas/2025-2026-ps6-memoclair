@@ -55,7 +55,11 @@ export class SoundEffectsService {
 
   setBgVolume(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.bgVolume = parseFloat(input.value);
+    this.setBgVolumeValue(parseFloat(input.value));
+  }
+
+  setBgVolumeValue(volume: number): void {
+    this.bgVolume = Math.max(0, Math.min(1, volume));
     this.bgMusic.volume = this.bgVolume;
   }
 

@@ -70,7 +70,7 @@ export class CaregiverProfileService {
   validateProfile(profile: PatientProfile): string[] {
     const errors: string[] = [];
     if (profile.questionCount < 1) errors.push('Le nombre de questions doit être au moins 1.');
-    if (profile.questionCount > 13) errors.push('Le nombre de questions ne peut pas dépasser 13.');
+    if (profile.questionCount > 20) errors.push('Le nombre de questions ne peut pas dépasser 20.');
     if (profile.answerCount < 2) errors.push('Le nombre de réponses doit être au moins 2.');
     if (profile.hintDelaySeconds < 1) errors.push('Le délai avant indice doit être au moins 1 seconde.');
     if (profile.hintDelaySeconds > 30) errors.push('Le délai avant indice ne peut pas dépasser 30 secondes.');

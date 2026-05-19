@@ -5,7 +5,7 @@
   height: $layout-header-height;
   align-items: center;
   gap: $space-3;
-  padding: 0 $space-8;
+  padding: 0 $space-10;
   background: $overlay-white-70;
   backdrop-filter: blur($space-4);
   -webkit-backdrop-filter: blur($space-4);
@@ -40,7 +40,7 @@
 
 h1 {
   margin: 0;
-  font-size: 1.9rem;
+  font-size: 2.2rem;
   font-weight: 800;
 }
 
@@ -53,8 +53,8 @@ h1 {
   background: $color-neutral-0;
   border: none;
   border-radius: $radius-pill;
-  padding: $space-2-5 $space-3;
-  font-size: 1.8rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: $color-accent-cyan-600;
   white-space: nowrap;
@@ -67,19 +67,19 @@ h1 {
   gap: $space-2-5;
   text-decoration: none;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: $color-neutral-975;
   background: $color-neutral-0;
   border: $border-width-3 solid $color-neutral-500;
   border-radius: $space-3-5;
-  padding: $space-3 $space-4-5;
+  padding: 0.8rem 1.5rem;
   box-shadow: 0 $space-2-5 $space-5 $overlay-dark-14;
 }
 
 .next-btn {
   border-radius: $radius-md;
-  padding: $space-3 $space-4-5;
-  font-size: 1.2rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1.3rem;
   font-weight: 800;
   cursor: pointer;
   background: $color-neutral-200;
@@ -94,8 +94,8 @@ h1 {
   color: $color-neutral-0;
   border: none;
   border-radius: $radius-pill;
-  padding: $space-3-5 $space-8;
-  font-size: 1.2rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   box-shadow: 0 $space-2 $space-5 $overlay-primary-30;
   transition: all 0.2s ease;
@@ -138,5 +138,13 @@ h1 {
   }
   100% {
     box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+:host-context(.high-contrast) {
+  .app-header {
+    background: rgba(0, 0, 0, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
   }
 }

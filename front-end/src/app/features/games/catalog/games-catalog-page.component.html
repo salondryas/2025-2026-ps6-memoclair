@@ -1,12 +1,15 @@
 <main class="catalog">
   <header class="catalog-header">
-    <a routerLink="/games/patient-selection" class="btn-back" aria-label="Retour à la sélection d'accueilli">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Retour
-    </a>
+    <div class="header-left-group">
+      <app-brand-logo></app-brand-logo>
+      <a (click)="goBack()" class="btn-back" aria-label="Retour à la sélection d'accueilli">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Retour
+      </a>
+    </div>
 
     <h1 class="catalog-patient">{{ patientFirstName() }}</h1>
 
@@ -16,9 +19,16 @@
       [alt]="'Photo de ' + patientFirstName()">
   </header>
 
+  <!-- Recommandation personnalisée -->
+  <div class="reco-container" *ngIf="recommendedGameId()">
+    <app-recommended-game-badge
+      [gameTitle]="recommendedGameId() === 'game-a' ? 'Entraînement Cérébral' : 'Souvenirs en Image'">
+    </app-recommended-game-badge>
+  </div>
+
   <section class="catalog-grid" aria-label="Jeux disponibles">
     @for (game of games; track game.id) {
-      <article class="game-card">
+      <article class="game-card" [class.is-recommended]="isRecommended(game)">
         <img class="game-card__image" [src]="getThumbnail(game.id)" alt="">
         <h2 class="game-card__title">{{ game.title }}</h2>
 
@@ -37,6 +47,7 @@
         <a [routerLink]="isDuoEnabledFor(game) ? '/games/game-duo' : game.route"
            class="btn-jouer"
            [class.btn-jouer--duo]="isDuoEnabledFor(game)"
+           [class.btn-jouer--recommended]="isRecommended(game)"
            [attr.aria-label]="'Lancer le jeu ' + game.title + (isDuoEnabledFor(game) ? ' en mode duo' : '')">
           {{ isDuoEnabledFor(game) ? 'Jouer en Duo' : 'Jouer' }}
         </a>

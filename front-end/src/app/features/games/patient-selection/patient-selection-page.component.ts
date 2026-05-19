@@ -47,7 +47,6 @@ export class PatientSelectionPageComponent implements OnInit {
   readonly context: Context = this.getContext();
 
   activeStep: SelectionStep = 'patient';
-  isModalOpen = false;
   edgeCaseDialog: EdgeCaseDialog | null = null;
   selectedPatient: PatientCardData | null = null;
   selectedProfessional: ProfileCardData | null = null;
@@ -101,7 +100,7 @@ export class PatientSelectionPageComponent implements OnInit {
       return this.activeStep === 'professional' ? 'Quel soignant ?' : 'Quel accueilli ?';
     }
     if (this.context === 'caregiver-family') {
-      return this.activeStep === 'family' ? 'Quel aidant familial ?' : 'Quel accueilli ?';
+      return 'Quel aidant familial ?';
     }
     return 'Pour qui ?';
   }
@@ -157,48 +156,42 @@ export class PatientSelectionPageComponent implements OnInit {
     this.brokenAvatarKeys.add(`patient:${patientId}`);
   }
 
-  get primaryButtonLabel(): string {
-    if (!this.hasSelectionForStep()) {
-      if (this.activeStep === 'professional') return 'Voir les soignants';
-      if (this.activeStep === 'family') return 'Voir les aidants familiaux';
-      return 'Voir les accueillis';
-    }
-    return this.canContinueDirectly() ? 'Continuer' : 'Choisir l’accueilli';
-  }
-
-  openPatientList(): void {
-    this.isModalOpen = true;
-  }
-
-  closePatientList(): void {
-    this.isModalOpen = false;
+  public canContinueDirectly(): boolean {
+    return this.activeStep === 'patient' && Boolean(this.selectedPatient);
   }
 
   selectPatient(id: PatientId): void {
     this.selectedPatient = this.cards.find((card) => card.patient.id === id) ?? null;
     if (this.selectedPatient) {
       this.saveLastSelection('patient', this.selectedPatient.patient.id);
+      this.continue();
     }
-    this.closePatientList();
   }
 
   selectProfessional(id: string): void {
     this.selectedProfessional = this.professionalCards.find((card) => card.profile.id === id) ?? null;
-    this.closePatientList();
     if (this.selectedProfessional) {
       this.saveLastSelection('professional', this.selectedProfessional.profile.id);
       this.profileSelection.setActiveProfessionalId(this.selectedProfessional.profile.id);
+      
+      // Mettre à jour la liste des patients pour ce soignant
+      this.cards = this.buildPatientCards();
+      this.initializeFilteredLists();
+      
+      // Passer à l'étape suivante
       this.activeStep = 'patient';
+      this.searchQuery = '';
     }
   }
 
   selectFamily(id: string): void {
     this.selectedFamily = this.familyCards.find((card) => card.profile.id === id) ?? null;
-    this.closePatientList();
     if (this.selectedFamily) {
       this.saveLastSelection('family', this.selectedFamily.profile.id);
       this.profileSelection.setActiveFamilyId(this.selectedFamily.profile.id);
       this.cards = this.buildPatientCardsForFamily(this.selectedFamily.profile.id);
+      this.initializeFilteredLists();
+
       if (this.cards.length === 0) {
         this.edgeCaseDialog = {
           title: 'Aucun accueilli associé',
@@ -208,36 +201,25 @@ export class PatientSelectionPageComponent implements OnInit {
         };
         return;
       }
-      this.activeStep = 'patient';
+
+      // L'aidant est déjà lié à son accueilli — sélection automatique sans étape supplémentaire
+      this.selectedPatient = this.cards[0];
+      this.saveLastSelection('patient', this.selectedPatient.patient.id);
+      this.continue();
     }
   }
 
   handlePrimaryAction(): void {
-    if (!this.hasSelectionForStep()) {
-      // Pour caregiver-family à l'étape family, ouvrir la modal des aidants familiaux
-      if (this.context === 'caregiver-family' && this.activeStep === 'family') {
-        this.openPatientList();
-        return;
-      }
-      // Pour caregiver-professional à l'étape professional, ouvrir la modal des soignants
-      if (this.context === 'caregiver-professional' && this.activeStep === 'professional') {
-        this.openPatientList();
-        return;
-      }
-      // Si on est déjà à l'étape patient sans sélection, ouvrir la modal
-      this.openPatientList();
-      return;
-    }
+    if (!this.hasSelectionForStep()) return;
 
     if (this.canContinueDirectly()) {
       this.continue();
       return;
     }
 
-    // Naviguer vers la page de sélection des patients
-    const fromParam = this.context === 'caregiver-family' ? '?from=caregiver-family' : 
-                      this.context === 'caregiver-professional' ? '?from=caregiver-professional' : '';
-    void this.router.navigateByUrl(`/games/patient-selection-patient${fromParam}`);
+    // Naviguer vers l'étape suivante (patient)
+    this.activeStep = 'patient';
+    this.searchQuery = '';
   }
 
   continue(): void {
@@ -385,20 +367,15 @@ export class PatientSelectionPageComponent implements OnInit {
 
   private buildPatientCards(): PatientCardData[] {
     let patients = this.patientContext.getPatients();
-    
-    // Filtrer les patients selon le contexte
-    if (this.context === 'caregiver-professional' && this.selectedProfessional) {
-      // N'afficher que les patients associés au soignant sélectionné
-      const professionalAssociations = this.patientRepository.getPatientAssociations(this.selectedProfessional.profile.id);
-      const associatedPatientIds = professionalAssociations.map(assoc => assoc.patientId);
-      patients = patients.filter(patient => associatedPatientIds.includes(patient.id));
-    } else if (this.context === 'caregiver-family' && this.selectedFamily) {
-      // N'afficher que les patients responsables familiaux de l'aidant sélectionné
+
+    // Filtrer les patients selon le contexte (uniquement pour la famille)
+    if (this.context === 'caregiver-family' && this.selectedFamily) {
+      // N'afficher que les patients associés à l'aidant sélectionné
       const familyAssociations = this.patientRepository.getFamilyAssociations(this.selectedFamily.profile.id);
-      const associatedPatientIds = familyAssociations.map(assoc => assoc.patientId);
-      patients = patients.filter(patient => associatedPatientIds.includes(patient.id));
+      const associatedPatientIds = familyAssociations.map((assoc) => assoc.patientId);
+      patients = patients.filter((patient) => associatedPatientIds.includes(patient.id));
     }
-    
+
     return this.mapPatientsToCards(patients);
   }
 
@@ -425,10 +402,6 @@ export class PatientSelectionPageComponent implements OnInit {
     if (this.activeStep === 'professional') return Boolean(this.selectedProfessional);
     if (this.activeStep === 'family') return Boolean(this.selectedFamily);
     return Boolean(this.selectedPatient);
-  }
-
-  private canContinueDirectly(): boolean {
-    return this.activeStep === 'patient' && Boolean(this.selectedPatient);
   }
 
   onSearchChange(event: Event): void {

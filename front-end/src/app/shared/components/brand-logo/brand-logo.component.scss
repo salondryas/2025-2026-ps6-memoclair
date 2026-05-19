@@ -1,5 +1,7 @@
+@use '../../../../styles/tokens' as *;
+
 .brand-img {
-  height: 135px;
+  height: $layout-header-height; /* Remplit toute la hauteur de la navbar */
   width: auto;
   object-fit: contain;
   cursor: pointer;

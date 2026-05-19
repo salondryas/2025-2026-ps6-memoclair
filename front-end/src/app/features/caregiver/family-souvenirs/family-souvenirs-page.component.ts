@@ -8,6 +8,7 @@ import { MediaItem, MediaKind, MemoryCueType } from '../../../models/media.model
 import { PatientId, PatientSummary } from '../../../models/patient.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { MediaLibraryService } from '../services/media-library.service';
+import { environment } from '../../../../environments/environment';
 
 const DUO_REQUIRED = 9;
 
@@ -150,6 +151,23 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
   trackById(_: number, item: MediaItem): string {
     return item.id;
   }
+
+  getMediaPreviewUrl(item: MediaItem): string {
+    return `${environment.backendUrl}/uploads/${item.patientId}/${item.fileName}`;
+  }
+
+  getCueLabel(cueType: MemoryCueType): string {
+    return this.cueLabels[cueType];
+  }
+
+  private readonly cueLabels: Record<MemoryCueType, string> = {
+    location: 'Lieu',
+    person: 'Famille',
+    event: 'Événement',
+    music: 'Musique',
+    object: 'Objet',
+    animal: 'Animal',
+  };
 
   get currentPatient(): PatientSummary {
     return (

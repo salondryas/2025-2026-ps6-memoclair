@@ -1,0 +1,23 @@
+@use 'src/styles/tokens' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: $color-primary-50;
+  border: $border-width-1 solid $color-primary-100;
+  border-radius: $radius-pill;
+  color: $color-primary-700;
+  font-weight: 700;
+  font-size: $font-size-md;
+
+  &--small {
+    padding: $space-1 $space-3;
+    font-size: $font-size-sm;
+  }
+
+  &__icon {
+    font-size: $font-size-lg;
+  }
+}

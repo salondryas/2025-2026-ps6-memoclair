@@ -8,113 +8,119 @@
   </div>
 </nav>
 
-<main class="souvenirs-page">
+<main class="media-page">
 
-  <!-- En-tête -->
-  <header class="souvenirs-page__header">
+  <!-- Titre -->
+  <header class="media-page__hero">
+    <p class="media-page__kicker">Espace famille</p>
     <h1>Souvenirs de {{ currentPatient.firstName }}</h1>
-    <p class="souvenirs-page__subtitle">
-      Ajoutez des photos et des musiques qui rappellent de bons moments.
-    </p>
   </header>
 
   <!-- Progression duo -->
-  <div class="duo-banner" [class.duo-banner--ready]="duoReady">
-    <span class="duo-banner__icon">{{ duoReady ? '✓' : '🎮' }}</span>
-    <span>{{ duoProgress }}</span>
-  </div>
+  <section class="media-panel" [class.media-panel--success]="duoReady" [class.media-panel--progress]="!duoReady">
+    <p class="duo-progress-label">{{ duoProgress }}</p>
+    <div class="duo-progress-bar">
+      <div class="duo-progress-bar__fill" [style.width.%]="(mediaItems.length / duoRequired) * 100"></div>
+    </div>
+  </section>
 
-  <!-- Formulaire ajout -->
-  <section class="souvenir-card">
-    <h2 class="souvenir-card__title">
-      <span aria-hidden="true">📸</span> Ajouter un souvenir
-    </h2>
+  <!-- Formulaire d'ajout -->
+  <section class="media-panel">
+    <h3 class="media-panel__title">Ajouter un souvenir</h3>
 
-    <form class="souvenir-form" (ngSubmit)="addSouvenir()">
+    <form class="media-form" (ngSubmit)="addSouvenir()">
 
-      <!-- Description -->
-      <div class="form-field">
-        <label for="description">Décrivez ce souvenir</label>
+      <label class="media-field media-field--desc">
         <textarea
-          id="description"
           name="description"
           [(ngModel)]="form.description"
           rows="3"
           [disabled]="uploading"
-          placeholder="Ex : Anniversaire de Paul en 2018 avec ses enfants à la mer…"></textarea>
+          placeholder="Décrivez ce souvenir : qui, quoi, où, quand… (ex : Anniversaire de Paul en 2018 avec ses enfants)"></textarea>
+      </label>
+
+      <div class="media-form-grid">
+        <label class="media-field">
+          <span>Type de fichier</span>
+          <select name="kind" [(ngModel)]="form.kind" [disabled]="uploading">
+            <option *ngFor="let option of kindOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+
+        <label class="media-field">
+          <span>Ce souvenir parle de…</span>
+          <select name="cueType" [(ngModel)]="form.cueType" [disabled]="uploading">
+            <option *ngFor="let option of cueOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
       </div>
 
-      <!-- Type de fichier + Ce souvenir parle de -->
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="kind">Type de fichier</label>
-          <select id="kind" name="kind" [(ngModel)]="form.kind" [disabled]="uploading">
-            <option *ngFor="let opt of kindOptions" [value]="opt.value">{{ opt.label }}</option>
-          </select>
-        </div>
-
-        <div class="form-field">
-          <label for="cueType">Ce souvenir parle de…</label>
-          <select id="cueType" name="cueType" [(ngModel)]="form.cueType" [disabled]="uploading">
-            <option *ngFor="let opt of cueOptions" [value]="opt.value">{{ opt.label }}</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Fichier -->
-      <div class="form-field">
-        <label>Fichier (photo ou musique)</label>
+      <div class="media-field">
+        <span>Fichier (photo ou musique)</span>
         <label class="file-picker">
-          <input type="file" accept="image/*,audio/*"
-                 (change)="onFileSelected($event)" [disabled]="uploading"
-                 aria-label="Choisir un fichier">
-          <span class="file-picker__btn">Choisir un fichier</span>
+          <input type="file" accept="image/*,audio/*" (change)="onFileSelected($event)" [disabled]="uploading" aria-label="Choisir un fichier">
+          <span class="file-picker__button">Choisir un fichier</span>
           <span class="file-picker__name">{{ fileInputLabel }}</span>
         </label>
       </div>
 
-      <p *ngIf="validationMessage" class="form-message form-message--error">
+      <p *ngIf="validationMessage" class="media-message media-message--error">
         {{ validationMessage }}
       </p>
 
-      <button type="submit" class="btn-submit" [disabled]="uploading">
+      <button type="submit" class="media-form__submit" [disabled]="uploading">
         {{ uploading ? 'Enregistrement…' : 'Ajouter ce souvenir' }}
       </button>
-
-      <p *ngIf="saveStatus" class="form-message form-message--success">{{ saveStatus }}</p>
+      <p *ngIf="saveStatus" class="media-message media-message--success">{{ saveStatus }}</p>
     </form>
   </section>
 
   <!-- Liste des souvenirs -->
-  <section class="souvenir-card">
-    <h2 class="souvenir-card__title">
-      <span aria-hidden="true">🗂️</span>
+  <section class="media-panel">
+    <h3 class="media-panel__title">
       Souvenirs enregistrés
-      <span class="souvenir-count">{{ mediaItems.length }}</span>
-    </h2>
+      <span class="media-count">{{ mediaItems.length }}</span>
+    </h3>
 
-    <p *ngIf="emptyState" class="souvenir-empty">
-      Aucun souvenir enregistré pour l'instant.
-    </p>
+    @if (emptyState) {
+      <div class="media-empty-state" role="status">
+        <p class="media-empty-state__text">Aucun souvenir ajouté pour le moment</p>
+      </div>
+    } @else {
+      <section class="media-grid" aria-label="Galerie de souvenirs">
+        @for (item of mediaItems; track item.id) {
+          <article class="media-card">
+            <div class="media-card__preview">
+              @if (item.kind === 'image') {
+                <img
+                  class="media-card__image"
+                  [src]="getMediaPreviewUrl(item)"
+                  [alt]="item.title">
+              } @else {
+                <img
+                  class="media-card__audio-icon"
+                  src="assets/UI/audio-icon.svg"
+                  alt="Fichier audio">
+              }
+            </div>
 
-    <div *ngIf="!emptyState" class="souvenir-list">
-      <article *ngFor="let item of mediaItems; trackBy: trackById" class="souvenir-item">
-        <div class="souvenir-item__icon" [class.souvenir-item__icon--audio]="item.kind === 'audio'">
-          {{ item.kind === 'audio' ? '🎵' : '📷' }}
-        </div>
-        <div class="souvenir-item__content">
-          <h3>{{ item.title }}</h3>
-          <p *ngIf="item.clinicalNote" class="souvenir-item__note">{{ item.clinicalNote }}</p>
-        </div>
-        <button
-          type="button"
-          class="souvenir-item__delete"
-          (click)="deleteSouvenir(item.id)"
-          [attr.aria-label]="'Supprimer ' + item.title">
-          ✕
-        </button>
-      </article>
-    </div>
+            <div class="media-card__info">
+              <div class="media-card__meta">
+                <h4 class="media-card__title">{{ item.title }}</h4>
+                <span class="media-tag">{{ getCueLabel(item.cueType) }}</span>
+              </div>
+              <button
+                type="button"
+                class="media-card__delete"
+                (click)="deleteSouvenir(item.id)"
+                [attr.aria-label]="'Supprimer ' + item.title">
+                <span aria-hidden="true">✕</span>
+              </button>
+            </div>
+          </article>
+        }
+      </section>
+    }
   </section>
 
 </main>

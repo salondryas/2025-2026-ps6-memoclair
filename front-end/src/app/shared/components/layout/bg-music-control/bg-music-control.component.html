@@ -1,0 +1,26 @@
+<div class="audio-widget" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+  <button
+    type="button"
+    class="main-btn"
+    (click)="toggleMute()"
+    [attr.aria-label]="soundService.isBgMusicPlaying ? 'Couper la musique' : 'Activer la musique'"
+  >
+    <lucide-icon [name]="soundService.isBgMusicPlaying ? 'volume-2' : 'volume-x'" class="icon-main"></lucide-icon>
+  </button>
+
+  <div class="expandable-bar" [class.is-open]="isOpen">
+    <button type="button" class="vol-btn" (click)="decreaseVolume()" aria-label="Baisser le volume">
+      <lucide-icon name="minus" class="icon-small"></lucide-icon>
+    </button>
+
+    <div class="vol-indicator" aria-hidden="true">
+      <div class="vol-dot" [class.active]="activeDotsCount >= 1"></div>
+      <div class="vol-dot" [class.active]="activeDotsCount >= 2"></div>
+      <div class="vol-dot" [class.active]="activeDotsCount >= 3"></div>
+    </div>
+
+    <button type="button" class="vol-btn" (click)="increaseVolume()" aria-label="Augmenter le volume">
+      <lucide-icon name="plus" class="icon-small"></lucide-icon>
+    </button>
+  </div>
+</div>

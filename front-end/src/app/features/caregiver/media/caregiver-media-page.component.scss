@@ -430,3 +430,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+:host-context(.high-contrast) {
+  .media-page { background: transparent !important; }
+  .media-page__hero, .media-page__patient-card, .media-panel,
+  .media-card, .media-card__preview, .media-empty-state,
+  .media-empty-state__icon, .media-field input,
+  .media-field select, .media-field textarea {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    color: #ffffff !important;
+  }
+  .media-tag { background: rgba(20, 50, 30, 0.9) !important; color: #ffffff !important; }
+  .media-card__delete { background: rgba(100, 0, 0, 0.88) !important; color: #ffffff !important; }
+}

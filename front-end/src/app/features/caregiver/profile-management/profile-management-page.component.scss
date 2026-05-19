@@ -1,59 +1,117 @@
 /* ══════════════════════════════════════════
-   Host & fond
+   Host & Layout Base
 ══════════════════════════════════════════ */
 :host {
   display: block;
   min-height: 100vh;
-  background: #f0f4f1;
+  background-image: url('/assets/UI/global-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding: 2rem;
   box-sizing: border-box;
 }
 
-.profile-management-page {
+.profile-management-page__content {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 2rem 4rem;
+  padding: 0 0 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.profile-management-page__content {
-  gap: 0.25rem;  // Réduit de 1.5rem
-}
-
-.profile-management-page__search {
-  margin-bottom: 0.125rem;  // Réduit de 1rem
-}
-
-.profile-management-page__filters {
-  margin-bottom: 0.125rem;  // Réduit de 1.5rem
-  padding: 1rem;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-}
-
+/* ══════════════════════════════════════════
+   Header
+══════════════════════════════════════════ */
 .profile-management-page__header {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  margin-bottom: 0.25rem;  // Réduit de 2.5rem
+  margin-bottom: 2.5rem;
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 900;
+    color: #1e3028;
+    margin: 0;
+  }
 }
 
-.profile-management-page__header--managed {
-  display: flex;
-  flex-direction: column;  // Column pour empiler h1 et p
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.25rem;
-  padding: 0;
-  gap: 0;  // Aucun espacement entre h1 et p
-}
-
-.profile-management-page__subtitle,
-.profile-empty {
-  margin: 0;    // Marge supprimée
-  padding: 0;   // Padding supprimé
+.profile-management-page__subtitle {
+  margin: 0.35rem 0 0;
   color: #6b7280;
   font-weight: 600;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.1rem 1.9rem;
+  border: 1.5px solid rgba(209, 213, 219, 0.8);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  svg {
+    width: 33px;
+    height: 33px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+/* ══════════════════════════════════════════
+   Search & Filters
+══════════════════════════════════════════ */
+.profile-management-page__search {
+  margin-bottom: 0.125rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+  
+  &:focus {
+    border-color: #3a7554;
+    box-shadow: 0 0 0 3px rgba(58, 117, 175, 0.1);
+  }
+}
+
+.profile-management-page__filters {
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -66,7 +124,6 @@
   font-weight: 600;
   color: #374151;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
 }
 
 .filter-options {
@@ -81,97 +138,21 @@
   gap: 0.5rem;
   font-size: 0.9rem;
   cursor: pointer;
+  
+  input {
+    margin: 0;
+  }
 }
 
-.filter-option input {
-  margin: 0;
-}
-
+/* ══════════════════════════════════════════
+   Profile List
+══════════════════════════════════════════ */
 .profile-list-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   min-height: 0;
   flex: 1;
-  overflow: hidden;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  outline: none;
-  
-  &:focus {
-    border-color: #3a7554;
-    box-shadow: 0 0 0 3px rgba(58, 117, 175, 0.1);
-  }
-}
-
-.profile-management-page__header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.btn-back {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border: 1.5px solid rgba(209, 213, 219, 0.8);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.15s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: #9ca3af;
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-  }
-}
-
-.profile-management-page__header h1 {
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 900;
-  color: #1e3028;
-  margin: 0;
-}
-
-.profile-management-page__subtitle,
-.profile-empty {
-  margin: 0.35rem 0 0;
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.profile-management-page__content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.profile-management-page__filters {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.filter-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
 }
 
 .profile-list {
@@ -180,10 +161,8 @@
   gap: 1rem;
 }
 
-.profile-list.enable-scroll,
-:host ::ng-deep .profile-list[data-mode="professionals"].enable-scroll,
-:host ::ng-deep .profile-list[data-mode="managed"].enable-scroll {
-  max-height: calc(5 * (120px + 1rem)) !important; // 5 profils + gap
+.profile-list.enable-scroll {
+  max-height: calc(5 * (120px + 1rem)) !important;
   overflow-y: auto !important;
   padding-right: 0.5rem !important;
   
@@ -246,19 +225,19 @@
 
 .profile-card__info {
   flex: 1;
-}
 
-.profile-card__info h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1e3028;
-  margin: 0 0 0.25rem 0;
-}
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3028;
+    margin: 0 0 0.25rem 0;
+  }
 
-.profile-card__info p {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
+  p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+  }
 }
 
 .profile-card__delete {
@@ -282,6 +261,30 @@
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+  }
+}
+
+.profile-empty {
+  margin: 0.35rem 0 0;
+  color: #6b7280;
+  font-weight: 600;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ══════════════════════════════════════════
+   Actions
+══════════════════════════════════════════ */
+.profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-shrink: 0;
+
+  &--top {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -311,128 +314,8 @@
   }
 }
 
-.profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
-  flex-shrink: 0;
-}
-
-.profile-type-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.profile-type-tabs button {
-  padding: 0.85rem 1rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 14px;
-  background: #f9fafb;
-  color: #374151;
-  font: inherit;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.profile-type-tabs__btn--active {
-  background: #e8f1ea !important;
-  border-color: #5f8a6f !important;
-  color: #1e3028 !important;
-}
-
-.association-block {
-  padding: 1rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 16px;
-  background: #f9fafb;
-}
-
-.association-title {
-  margin: 0 0 0rem 0;
-  font-weight: 600;
-  color: #374151;
-}
-
-.association-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.association-search-input {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  outline: none;
-  
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-  }
-}
-
-.association-list-container {
-  max-height: 135px;
-  overflow-y: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  
-  /* Désactiver le scroll si moins de 4 items */
-  &:not(:has(.association-option:nth-child(4))) {
-    overflow-y: hidden;
-  }
-}
-
-/* Appliquer la même règle au conteneur de liste des aidants familiaux */
-#family-association-list.association-list-container,
-#patient-association-list.association-list-container {
-  /* Hauteur fixe de 135px pour 1+ items */
-  &:has(.association-option:nth-child(n+1)) {
-    max-height: 135px;
-    overflow-y: auto;
-  }
-  
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.association-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
-}
-
-.association-block p {
-  margin: 0 0 0.75rem;
-  color: #374151;
-  font-weight: 800;
-}
-
-.association-option {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0;
-  color: #374151;
-  font-weight: 700;
-}
-
-.form-error {
-  margin: 0;
-  color: #dc2626;
-  font-weight: 700;
-}
-
 /* ══════════════════════════════════════════
-   Modal pour ajouter un profil
+   Modal for adding a profile
 ══════════════════════════════════════════ */
 .add-profile-modal {
   position: fixed;
@@ -463,13 +346,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-}
 
-.add-profile-modal__header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1e3028;
-  margin: 0;
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3028;
+    margin: 0;
+  }
 }
 
 .add-profile-modal__close {
@@ -499,26 +382,27 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
 
-.form-field label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-}
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+  }
 
-.form-field input,
-.form-field select {
-  padding: 0.75rem 1rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: border-color 0.15s;
+  input,
+  select {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
 
-  &:focus {
-    outline: none;
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    &:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
   }
 }
 
@@ -563,8 +447,14 @@
   }
 }
 
+.form-error {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 700;
+}
+
 /* ══════════════════════════════════════════
-   Photo picker
+   Photo Picker
 ══════════════════════════════════════════ */
 .form-field--photo {
   align-items: flex-start;
@@ -619,4 +509,78 @@
 
 .photo-picker__input {
   display: none;
+}
+
+/* ══════════════════════════════════════════
+   Associations
+══════════════════════════════════════════ */
+.association-block {
+  padding: 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f9fafb;
+
+  p {
+    margin: 0 0 0.75rem;
+    color: #374151;
+    font-weight: 800;
+  }
+}
+
+.association-title {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.association-search-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+.association-list-container {
+  max-height: 135px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.association-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.association-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  color: #374151;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+:host-context(.high-contrast) {
+  :host { background: transparent !important; }
+  .btn-back, .profile-management-page__filters, .profile-card,
+  .btn-add-profile, .add-profile-modal__content,
+  .add-profile-modal__close, .association-list-container {
+    background: rgba(0, 0, 0, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: none !important;
+    color: #ffffff !important;
+  }
 }

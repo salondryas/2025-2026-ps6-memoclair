@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
@@ -11,11 +11,13 @@ import { GameHeaderComponent } from '../../../shared/components/game-header/game
 import { MascotDecoratorComponent } from '../../../shared/components/mascot-decorator/mascot-decorator.component';
 import { ChoiceCardComponent } from '../../../shared/components/choice-card/choice-card.component';
 import { SoundEffectsService } from '../../../core/services/sound-effects.service';
+import { TtsService } from '../../../core/services/tts.service';
+import { AudioHelpButtonComponent } from '../../../shared/components/audio-help-button/audio-help-button.component';
 
 @Component({
   selector: 'app-game-a-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GameHeaderComponent, MascotDecoratorComponent, ChoiceCardComponent],
+  imports: [CommonModule, RouterModule, GameHeaderComponent, MascotDecoratorComponent, ChoiceCardComponent, AudioHelpButtonComponent],
   templateUrl: './game-a-page.component.html',
   styleUrls: ['./game-a-page.component.scss']
 })
@@ -36,15 +38,12 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   isAutoRevealed = false;
   isEntering = true;
-  elapsedSeconds = 0;
-  private ttsSessionId = 0;
   private navigating = false;
   private enterTimeoutId: number | null = null;
   private hintTimeoutId: number | null = null;
   private autoRevealTimeoutId: number | null = null;
   private autoNextTimeoutId: number | null = null;
   private autoNextQuestionTimeoutId: number | null = null;
-  private timerIntervalId: number | null = null;
 
   private readonly startedAt = new Date().toISOString();
   private hintCount = 0;
@@ -60,14 +59,21 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     private readonly sessionSummary: SessionSummaryService,
     private readonly session: GameASessionService,
     private readonly router: Router,
-    private readonly soundEffects: SoundEffectsService
+    private readonly soundEffects: SoundEffectsService,
+    private readonly ngZone: NgZone,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly tts: TtsService,
   ) {}
 
   ngOnInit(): void {
+    const maxQuestions = this.state.profile?.questionCount || 10;
+    if (this.state.questions.length > maxQuestions) {
+      this.state.questions = this.shuffleArray(this.state.questions).slice(0, maxQuestions);
+    }
+
     this.updateShuffledChoices();
     this.initializeChronoOrder();
-    this.startAssistFlow();
-    this.startTimer();
+    this.startAssistFlow(true);
   }
 
   private triggerEnterAnimation(): void {
@@ -82,11 +88,8 @@ export class GameAPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearAssistFlow();
     if (this.enterTimeoutId) window.clearTimeout(this.enterTimeoutId);
-    if (this.timerIntervalId) window.clearInterval(this.timerIntervalId);
     this.session.stopHintTimer();
-    this.ttsSessionId++;
-    window.speechSynthesis.onvoiceschanged = null;
-    window.speechSynthesis.cancel();
+    this.tts.cancel();
     if (!this.state.finished) {
       this.saveSession(true);
     }
@@ -102,7 +105,19 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   private updateShuffledChoices(): void {
     if (!this.state.finished && this.question && this.question.type === 'multiple-choice') {
-      this.shuffledChoices = this.shuffleArray(this.question.choices || []);
+      const allChoices = this.question.choices || [];
+      const maxChoices = this.state.profile?.answerCount || 4;
+
+      if (allChoices.length > 0) {
+        const correctChoice = allChoices.find(c => c.id === this.question.correctChoiceId);
+        let wrongChoices = allChoices.filter(c => c.id !== this.question.correctChoiceId);
+        wrongChoices = this.shuffleArray(wrongChoices);
+        const selectedWrong = wrongChoices.slice(0, maxChoices - 1);
+        const finalChoices = correctChoice ? [correctChoice, ...selectedWrong] : selectedWrong;
+        this.shuffledChoices = this.shuffleArray(finalChoices);
+      } else {
+        this.shuffledChoices = [];
+      }
     }
   }
 
@@ -124,11 +139,13 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
   onChoose(choiceId: GameAChoice['id']): void {
     if (this.state.locked || this.state.finished) return;
-    this.ttsSessionId++;
     this.readingChoiceId = null;
-    window.speechSynthesis.cancel();
+    this.tts.cancel();
     this.recordLatency();
     this.clearAssistFlow();
+
+    this.shuffledChoices.forEach(c => (c as any).isHinted = false);
+
     const q = this.question;
     if (q?.correctChoiceId && choiceId !== q.correctChoiceId) this.wrongAnswers++;
     this.soundEffects.play(q?.correctChoiceId === choiceId ? 'success' : 'gentleError');
@@ -174,7 +191,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
       availableStep.isHinted = false;
     }
     this.state = { ...this.state, hint: null, feedback: null };
-    this.startAssistFlow();
+    this.startAssistFlow(false);
 
     if (this.placedSteps.every(s => s !== null)) {
       this.validateChronoOrder();
@@ -196,9 +213,13 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onHint(): void {
+  onHint(isAutomatic: boolean = false): void {
     if (this.state.locked || this.state.finished) return;
-    this.hintCount++;
+
+    if (!isAutomatic) {
+      this.hintCount++;
+    }
+
     this.soundEffects.play('hint');
 
     if (this.question.type === 'chrono-order' && this.question.correctOrder) {
@@ -213,12 +234,22 @@ export class GameAPageComponent implements OnInit, OnDestroy {
         }
       }
       this.state = this.session.showHint(this.state);
-    } else {
+    } else if (this.question.type === 'multiple-choice') {
+      const correctChoice = this.shuffledChoices.find(c => c.id === this.question.correctChoiceId);
+      if (correctChoice) {
+        (correctChoice as any).isHinted = true;
+      }
       this.state = this.session.showHint(this.state);
     }
 
-    if (this.state.hint) {
-      this.speak(this.state.hint);
+    if (isAutomatic && this.state.hint) {
+      this.readingChoiceId = null;
+      this.cdr.detectChanges();
+      this.tts.speak(`Voici un indice. ${this.state.hint}`);
+    } else if (this.state.hint) {
+      this.readingChoiceId = null;
+      this.cdr.detectChanges();
+      this.tts.speak(this.state.hint);
     }
   }
 
@@ -236,10 +267,8 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     if (this.navigating) return;
     this.navigating = true;
     try {
-      this.ttsSessionId++;
-      window.speechSynthesis.onvoiceschanged = null;
       this.readingChoiceId = null;
-      window.speechSynthesis.cancel();
+      this.tts.cancel();
       this.soundEffects.play('transition');
       if (this.autoNextQuestionTimeoutId) window.clearTimeout(this.autoNextQuestionTimeoutId);
       this.autoNextQuestionTimeoutId = null;
@@ -256,108 +285,27 @@ export class GameAPageComponent implements OnInit, OnDestroy {
 
       this.updateShuffledChoices();
       this.initializeChronoOrder();
-      this.startAssistFlow();
+      this.startAssistFlow(true);
       this.triggerEnterAnimation();
     } finally {
       this.navigating = false;
     }
   }
 
-  onReadQuestion(): void {
+  get readTexts(): string[] {
+    if (this.state.finished) return [];
     if (this.question.type === 'multiple-choice' && this.shuffledChoices.length) {
-      this.speakQuestionWithHighlights(this.question.prompt, this.shuffledChoices);
-    } else {
-      this.speak(this.question.prompt);
+      return [this.question.prompt, ...this.shuffledChoices.map(c => c.label)];
     }
+    return [this.question.prompt];
   }
 
-  private speakQuestionWithHighlights(prompt: string, choices: GameAChoice[]): void {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    this.readingChoiceId = null;
-    const sessionId = ++this.ttsSessionId;
-
-    const doSpeak = () => {
-      if (sessionId !== this.ttsSessionId) return;
-      const voice = this.getBestFrenchVoice();
-      const makeUtt = (text: string): SpeechSynthesisUtterance => {
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'fr-FR';
-        utt.rate = 0.82;
-        utt.pitch = 1.05;
-        if (voice) utt.voice = voice;
-        return utt;
-      };
-
-      const questionUtt = makeUtt(prompt);
-      const choiceItems = choices.map(c => ({ id: c.id, utt: makeUtt(c.label) }));
-
-      const speakNext = (index: number) => {
-        if (sessionId !== this.ttsSessionId) {
-          this.readingChoiceId = null;
-          return;
-        }
-        if (index >= choiceItems.length) {
-          this.readingChoiceId = null;
-          return;
-        }
-        const item = choiceItems[index];
-        this.readingChoiceId = item.id;
-        item.utt.onend = () => speakNext(index + 1);
-        window.speechSynthesis.speak(item.utt);
-      };
-
-      questionUtt.onend = () => speakNext(0);
-      window.speechSynthesis.speak(questionUtt);
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
+  onReadItemStart(index: number | null): void {
+    if (index === null || index === 0) {
+      this.readingChoiceId = null;
     } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
+      this.readingChoiceId = this.shuffledChoices[index - 1]?.id ?? null;
     }
-  }
-
-  private speak(text: string): void {
-    if (!('speechSynthesis' in window)) return;
-    const sessionId = ++this.ttsSessionId;
-    window.speechSynthesis.cancel();
-    this.readingChoiceId = null;
-
-    const doSpeak = () => {
-      if (sessionId !== this.ttsSessionId) return;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'fr-FR';
-      utterance.rate = 0.82;
-      utterance.pitch = 1.05;
-      const voice = this.getBestFrenchVoice();
-      if (voice) utterance.voice = voice;
-      window.speechSynthesis.speak(utterance);
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
-    }
-  }
-
-  private getBestFrenchVoice(): SpeechSynthesisVoice | null {
-    const voices = window.speechSynthesis.getVoices();
-    const fr = voices.filter(v => v.lang.startsWith('fr'));
-    return (
-      fr.find(v => v.name.includes('Google')) ||
-      fr.find(v => /natural|neural|enhanced/i.test(v.name)) ||
-      fr.find(v => v.lang === 'fr-FR') ||
-      fr[0] ||
-      null
-    );
   }
 
   onTogglePause(): void {
@@ -366,7 +314,7 @@ export class GameAPageComponent implements OnInit, OnDestroy {
       this.clearAssistFlow();
       return;
     }
-    if (!this.state.finished && !this.state.locked) this.startAssistFlow();
+    if (!this.state.finished && !this.state.locked) this.startAssistFlow(false);
   }
 
   isCorrectChoice(choiceId: GameAChoice['id']): boolean {
@@ -385,55 +333,58 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     return this.isAutoRevealed && this.state.locked && choiceId === this.question.correctChoiceId;
   }
 
-  private startAssistFlow(): void {
+  private startAssistFlow(isNewQuestion: boolean = true): void {
     if (this.isPaused) return;
     this.clearAssistFlow();
     this.isAutoRevealed = false;
-    this.questionStartTime = Date.now();
+
+    if (isNewQuestion) {
+      this.questionStartTime = Date.now();
+    }
 
     this.hintTimeoutId = window.setTimeout(() => {
-      if (!this.state.locked && !this.state.finished) {
-        this.onHint();
-      }
+      this.ngZone.run(() => {
+        if (!this.state.locked && !this.state.finished) {
+          this.onHint(true);
+          this.cdr.detectChanges();
+        }
+      });
     }, (this.state.profile?.hintDelaySeconds || 12) * 1000);
 
     const revealDelay = ((this.state.profile?.hintDelaySeconds || 12) + 20) * 1000;
     const nextDelay = revealDelay + 5000;
 
     this.autoRevealTimeoutId = window.setTimeout(() => {
-      if (!this.state.locked && !this.state.finished) {
-        this.guidedMoments++;
-        this.recordLatency();
+      this.ngZone.run(() => {
+        if (!this.state.locked && !this.state.finished) {
+          this.guidedMoments++;
+          this.recordLatency();
 
-        // 1. COMPORTEMENT POUR CHOIX MULTIPLE
-        if (this.question.type === 'multiple-choice') {
-          const correctId = this.question.correctChoiceId;
-          this.state = this.session.choose(this.state, correctId as any);
-          this.isAutoRevealed = true;
-          this.state = { ...this.state, feedback: 'Nous vous aidons : voici la bonne réponse ✅' };
+          if (this.question.type === 'multiple-choice') {
+            const correctId = this.question.correctChoiceId;
+            this.state = this.session.choose(this.state, correctId as any);
+            this.isAutoRevealed = true;
+            this.state = { ...this.state, feedback: 'Nous vous aidons : voici la bonne réponse ✅' };
+          }
+          else if (this.question.type === 'chrono-order' && this.question.correctOrder) {
+            const correctSteps = this.question.correctOrder.map(id =>
+              this.question.steps!.find(s => s.id === id)!
+            );
+            this.placedSteps = [...correctSteps];
+            this.availableSteps = [];
+            this.isAutoRevealed = true;
+            this.state = { ...this.state, feedback: 'Nous vous aidons : voici le bon ordre ✅' };
+            this.validateChronoOrder();
+          }
+          this.cdr.detectChanges();
         }
-
-        // 2. NOUVEAU COMPORTEMENT POUR ORDRE CHRONOLOGIQUE
-        else if (this.question.type === 'chrono-order' && this.question.correctOrder) {
-          // On va chercher les images dans le bon ordre et on remplit toutes les zones d'un coup
-          const correctSteps = this.question.correctOrder.map(id =>
-            this.question.steps!.find(s => s.id === id)!
-          );
-
-          this.placedSteps = [...correctSteps]; // On remplit les zones en haut
-          this.availableSteps = []; // On vide les choix en bas
-          this.isAutoRevealed = true;
-
-          this.state = { ...this.state, feedback: 'Nous vous aidons : voici le bon ordre ✅' };
-
-          // On valide pour déclencher la lueur verte avant de passer à la suite
-          this.validateChronoOrder();
-        }
-      }
+      });
     }, revealDelay);
 
     this.autoNextTimeoutId = window.setTimeout(() => {
-      if (!this.state.finished) this.onNext();
+      this.ngZone.run(() => {
+        if (!this.state.finished) this.onNext();
+      });
     }, nextDelay);
   }
 
@@ -502,16 +453,5 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     this.autoNextQuestionTimeoutId = null;
   }
 
-  private startTimer(): void {
-    if (this.timerIntervalId) window.clearInterval(this.timerIntervalId);
-    this.timerIntervalId = window.setInterval(() => {
-      this.elapsedSeconds++;
-    }, 1000);
-  }
-
-  get formattedTime(): string {
-    const minutes = Math.floor(this.elapsedSeconds / 60);
-    const seconds = this.elapsedSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
 }
+
