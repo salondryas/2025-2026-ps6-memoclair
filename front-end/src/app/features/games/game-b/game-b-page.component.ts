@@ -14,6 +14,7 @@ import { StatisticsService } from '../../caregiver/services/statistics.service';
 import { EmotionalState, GameBGenerateErrorDto, GameBGenerateRequestDto, GameBGenerateResponseDto, GameBQuestionDto, SupportLevel } from '../../../models/session.model';
 import { SessionSummaryService } from '../services/session-summary.service';
 import { SoundEffectsService } from '../../../core/services/sound-effects.service';
+import { GameBFlowService } from '../services/game-b-flow.service';
 
 import { CaregiverProfileService } from '../../caregiver/services/caregiver-profile.service';
 import { PatientProfile } from '../../../models/patient.model';
@@ -54,10 +55,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   feedbackMessage = '';
   hintMessage: string | null = null;
   isAutoRevealed = false;
-
-  private hintTimeoutId: number | null = null;
-  private autoRevealTimeoutId: number | null = null;
-  private autoNextTimeoutId: number | null = null;
+  autoNextCountdownSeconds: number | null = null;
 
   private readonly startedAt = new Date().toISOString();
   private hintCount = 0;
@@ -82,6 +80,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly ngZone: NgZone,
     private readonly tts: TtsService,
+    private readonly gameBFlow: GameBFlowService,
   ) {}
 
   ngOnInit(): void {
@@ -175,13 +174,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.feedbackMessage = choice?.isCorrect
       ? 'Très bien 🌿'
       : "D'accord, regardons ensemble la bonne réponse 🌿";
-
-    // Set up auto-next timeout after feedback delay
-    this.autoNextTimeoutId = window.setTimeout(() => {
-      this.ngZone.run(() => {
-        if (!this.finished) this.onNext();
-      });
-    }, 5000);
+    this.startResolutionFlow();
   }
 
   requestHint(): void {
@@ -208,13 +201,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.locked = true;
     this.selectedChoiceId = null;
     this.feedbackMessage = 'Très bien, passons au souvenir suivant.';
-
-    // Set up auto-next timeout after feedback delay
-    this.autoNextTimeoutId = window.setTimeout(() => {
-      this.ngZone.run(() => {
-        if (!this.finished) this.onNext();
-      });
-    }, 5000);
+    this.startResolutionFlow();
   }
 
   get readTexts(): string[] {
@@ -249,10 +236,10 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   onTogglePause(): void {
     this.isPaused = !this.isPaused;
     if (this.isPaused) {
-      this.clearAssistFlow();
+      this.gameBFlow.pause();
       return;
     }
-    if (!this.finished && !this.locked) this.startAssistFlow();
+    if (!this.finished) this.gameBFlow.resume();
   }
 
   isCorrectChoice(choiceId: string): boolean {
@@ -274,39 +261,65 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.clearAssistFlow();
     this.isAutoRevealed = false;
     this.questionStartTime = Date.now();
-
+    const autoNextMode = this.resolveAutoNextMode();
     const hintDelay = this.profile.hintDelaySeconds * 1000;
     const revealDelay = hintDelay + 20000;
-    const nextDelay = revealDelay + 5000;
 
-    this.hintTimeoutId = window.setTimeout(() => {
-      this.ngZone.run(() => {
-        this.requestHint();
-        this.cdr.detectChanges();
-      });
-    }, hintDelay);
-
-    this.autoRevealTimeoutId = window.setTimeout(() => {
-      this.ngZone.run(() => {
-        if (!this.locked && !this.finished) {
-          this.guidedMoments++;
-          this.recordLatency();
-          const correct = this.currentQuestion.choices.find((c) => c.isCorrect);
-          if (!correct) return;
-          this.locked = true;
-          this.selectedChoiceId = correct.id;
-          this.isAutoRevealed = true;
-          this.feedbackMessage = 'Nous vous aidons : voici la bonne réponse ✅';
+    this.gameBFlow.startQuestionFlow({
+      hintDelayMs: hintDelay,
+      revealDelayMs: revealDelay,
+      autoNextMode,
+      onHint: () => {
+        this.ngZone.run(() => {
+          if (this.locked || this.finished || this.isPaused) return;
+          this.requestHint();
           this.cdr.detectChanges();
-        }
-      });
-    }, revealDelay);
+        });
+      },
+      onAutoReveal: () => {
+        this.ngZone.run(() => {
+          if (!this.locked && !this.finished && !this.isPaused) {
+            this.guidedMoments++;
+            this.recordLatency();
+            const correct = this.currentQuestion.choices.find((c) => c.isCorrect);
+            if (!correct) return;
+            this.locked = true;
+            this.selectedChoiceId = correct.id;
+            this.isAutoRevealed = true;
+            this.feedbackMessage = 'Nous vous aidons : voici la bonne réponse ✅';
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      onAutoNext: () => {
+        this.ngZone.run(() => {
+          if (!this.finished && !this.isPaused) this.onNext();
+        });
+      },
+      onCountdownTick: (seconds) => {
+        this.ngZone.run(() => {
+          this.autoNextCountdownSeconds = seconds;
+          this.cdr.detectChanges();
+        });
+      },
+    });
+  }
 
-    this.autoNextTimeoutId = window.setTimeout(() => {
-      this.ngZone.run(() => {
-        if (!this.finished) this.onNext();
-      });
-    }, nextDelay);
+  private startResolutionFlow(): void {
+    this.gameBFlow.startResolutionFlow({
+      autoNextMode: this.resolveAutoNextMode(),
+      onAutoNext: () => {
+        this.ngZone.run(() => {
+          if (!this.finished && !this.isPaused) this.onNext();
+        });
+      },
+      onCountdownTick: (seconds) => {
+        this.ngZone.run(() => {
+          this.autoNextCountdownSeconds = seconds;
+          this.cdr.detectChanges();
+        });
+      },
+    });
   }
 
   private triggerEnterAnimation(): void {
@@ -373,12 +386,14 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   }
 
   private clearAssistFlow(): void {
-    if (this.hintTimeoutId) window.clearTimeout(this.hintTimeoutId);
-    if (this.autoRevealTimeoutId) window.clearTimeout(this.autoRevealTimeoutId);
-    if (this.autoNextTimeoutId) window.clearTimeout(this.autoNextTimeoutId);
-    this.hintTimeoutId = null;
-    this.autoRevealTimeoutId = null;
-    this.autoNextTimeoutId = null;
+    this.gameBFlow.clear();
+    this.autoNextCountdownSeconds = null;
+  }
+
+  private resolveAutoNextMode(): 'manual' | '5s' | '8s' {
+    const mode = this.profile.autoNextMode;
+    if (mode === 'manual' || mode === '8s') return mode;
+    return '5s';
   }
 
   onImageError(): void {

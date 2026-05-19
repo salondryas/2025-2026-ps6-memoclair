@@ -8,6 +8,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  max-height: 40vh;
+  width: var(--mascot-width, auto);
+  height: var(--gameb-mascot-size, var(--mascot-size, auto));
   object-fit: contain;
 }

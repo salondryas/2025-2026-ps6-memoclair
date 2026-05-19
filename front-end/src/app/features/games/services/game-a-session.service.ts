@@ -179,28 +179,18 @@ export class GameASessionService {
     const correctChoice = question.choices.find((choice) => choice.id === question.correctChoiceId);
     if (!correctChoice) return question;
 
-    const targetDistractorsCount = requestedChoiceCount - 1;
+    const targetDistractorsCount = Math.max(1, requestedChoiceCount - 1);
     const localDistractors = this.shuffle(
       question.choices.filter((choice) => choice.id !== question.correctChoiceId),
     );
+    const importedDistractors = this.shuffle(this.getImportedDistractors(question.id));
 
-    const allDistractors: GameAChoice[] = [...localDistractors];
-    if (localDistractors.length < targetDistractorsCount) {
-      const importedDistractors = this.shuffle(this.getImportedDistractors(question.id));
-      const usedImages = new Set<string>([
-        ...allDistractors.map((choice) => choice.image),
-        correctChoice.image,
-      ]);
-
-      for (const choice of importedDistractors) {
-        if (allDistractors.length >= targetDistractorsCount) break;
-        if (usedImages.has(choice.image)) continue;
-        usedImages.add(choice.image);
-        allDistractors.push({ ...choice });
-      }
-    }
-
-    const selectedDistractors = allDistractors.slice(0, targetDistractorsCount);
+    const selectedDistractors = this.selectDiversifiedDistractors(
+      localDistractors,
+      importedDistractors,
+      targetDistractorsCount,
+      correctChoice,
+    );
     const shuffledChoices = this.shuffle([correctChoice, ...selectedDistractors]);
     const normalizedChoices = shuffledChoices.map((choice, index) => ({
       ...choice,
@@ -219,8 +209,48 @@ export class GameASessionService {
     };
   }
 
-  private getImportedDistractors(currentQuestionId: string): GameAChoice[] {
-    const imported: GameAChoice[] = [];
+  private selectDiversifiedDistractors(
+    localDistractors: GameAChoice[],
+    importedDistractors: ImportedDistractor[],
+    targetCount: number,
+    correctChoice: GameAChoice,
+  ): GameAChoice[] {
+    const selected: GameAChoice[] = [];
+    const usedImages = new Set<string>([correctChoice.image]);
+    const usedLabels = new Set<string>([correctChoice.label.toLowerCase()]);
+    const usedSources = new Set<string>();
+
+    const pushChoice = (choice: GameAChoice, sourceKey: string): boolean => {
+      const labelKey = choice.label.toLowerCase();
+      if (usedImages.has(choice.image) || usedLabels.has(labelKey)) return false;
+      selected.push({ ...choice });
+      usedImages.add(choice.image);
+      usedLabels.add(labelKey);
+      usedSources.add(sourceKey);
+      return true;
+    };
+
+    for (const choice of localDistractors) {
+      if (selected.length >= targetCount) break;
+      pushChoice(choice, 'local');
+    }
+
+    for (const choice of importedDistractors) {
+      if (selected.length >= targetCount) break;
+      if (usedSources.has(choice.sourceQuestionId) && selected.length + 1 < targetCount) continue;
+      pushChoice(choice, choice.sourceQuestionId);
+    }
+
+    for (const choice of importedDistractors) {
+      if (selected.length >= targetCount) break;
+      pushChoice(choice, choice.sourceQuestionId);
+    }
+
+    return selected.slice(0, targetCount);
+  }
+
+  private getImportedDistractors(currentQuestionId: string): ImportedDistractor[] {
+    const imported: ImportedDistractor[] = [];
 
     for (const question of MULTIPLE_CHOICE_QUESTIONS) {
       if (question.id === currentQuestionId || !question.choices?.length || !question.correctChoiceId) {
@@ -228,7 +258,7 @@ export class GameASessionService {
       }
 
       const distractors = question.choices.filter((choice) => choice.id !== question.correctChoiceId);
-      imported.push(...distractors.map((choice) => ({ ...choice })));
+      imported.push(...distractors.map((choice) => ({ ...choice, sourceQuestionId: question.id })));
     }
 
     return imported;
@@ -251,6 +281,8 @@ export class GameASessionService {
     return shuffled;
   }
 }
+
+type ImportedDistractor = GameAChoice & { sourceQuestionId: string };
 
 const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
