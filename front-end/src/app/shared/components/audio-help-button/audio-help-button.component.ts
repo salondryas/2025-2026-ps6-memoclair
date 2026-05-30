@@ -20,7 +20,7 @@ export class AudioHelpButtonComponent {
     } else {
       this.tts.speakHelp(
         this.texts,
-        (index) => this.itemStart.emit(index),
+        (index: number) => this.itemStart.emit(index),
         () => this.itemStart.emit(null),
       );
     }

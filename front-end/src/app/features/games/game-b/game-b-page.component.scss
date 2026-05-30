@@ -1,7 +1,7 @@
 @use '../../../../styles/tokens' as *;
 
 :host {
-  --gameb-mascot-size: clamp(8rem, 20vh, 12.5rem);
+  --gameb-mascot-size: clamp(20rem, 50vh, 31.25rem);
   display: block;
   width: 100vw;
   height: 100vh;
@@ -100,7 +100,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: $space-5 $space-10 $space-5 calc(var(--gameb-mascot-size) + #{$space-6});
+  padding: $space-5 $space-10 $space-5 calc(var(--gameb-mascot-size) * 0.4 + #{$space-6});
   gap: $space-4-5;
   height: 100%;
 }
@@ -179,12 +179,13 @@
 }
 
 ::ng-deep .game-mascot {
-  --mascot-width: auto;
   position: absolute !important;
   z-index: 0;
   height: var(--gameb-mascot-size);
+  max-height: 85%;
+  width: auto;
   left: clamp(0.5rem, 2vw, 1.5rem);
-  bottom: clamp(0.5rem, 5vh, 3rem);
+  bottom: 0;
   opacity: 0.9;
   filter: drop-shadow(0 $space-2-5 $space-5 $overlay-dark-15);
   pointer-events: none;
