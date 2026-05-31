@@ -10,20 +10,30 @@
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(248, 246, 239, 0.68));
-  border: 1px solid rgba(255, 255, 255, 0.62);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(247, 246, 240, 0.68));
+  border: 1px solid rgba(255, 255, 255, 0.64);
   border-radius: 30px;
   box-shadow: 0 24px 70px rgba(47, 66, 56, 0.14);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
-.hero-card {
+.hero-card,
+.method-card,
+.section-heading,
+.metric-line,
+.card-header,
+.session-card,
+.session-main,
+.session-pills {
   display: flex;
   align-items: center;
+}
+
+.hero-card {
   justify-content: space-between;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding: 1.5rem;
 }
 
@@ -33,12 +43,12 @@
   h1 {
     margin: 0.2rem 0 0.45rem;
     color: #1f3328;
-    font-size: clamp(1.75rem, 4vw, 2.8rem);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
     line-height: 1.05;
   }
 
   p {
-    max-width: 620px;
+    max-width: 650px;
     margin: 0;
     color: #66736e;
     font-size: 1rem;
@@ -74,6 +84,37 @@
   }
 }
 
+.method-card {
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+
+  p {
+    margin: 0.25rem 0 0;
+    color: #53645d;
+    font-weight: 750;
+  }
+}
+
+.launch-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+  border-radius: 999px;
+  padding: 0.85rem 1.2rem;
+  background: #3a7554;
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 10px 22px rgba(58, 117, 84, 0.24);
+
+  &:hover {
+    background: #2e5e42;
+  }
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -82,7 +123,7 @@
 }
 
 .summary-card {
-  min-height: 286px;
+  min-height: 304px;
   padding: 1.25rem;
   overflow: hidden;
   position: relative;
@@ -100,21 +141,11 @@
   }
 
   p {
-    margin: 0.8rem 0 0;
+    margin: 0.85rem 0 0;
     color: #53645d;
     font-size: 0.95rem;
     line-height: 1.45;
   }
-}
-
-.card-header,
-.section-heading,
-.theme-title,
-.metric-line,
-.action-card,
-.session-card {
-  display: flex;
-  align-items: center;
 }
 
 .card-header {
@@ -154,18 +185,24 @@
 }
 
 .metric-line {
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  min-height: 70px;
 
   strong {
     color: #1f3328;
-    font-size: clamp(1.55rem, 2.8vw, 2.15rem);
-    line-height: 1;
+    font-size: clamp(1.55rem, 2.8vw, 2.12rem);
+    line-height: 1.02;
   }
 
   span {
+    max-width: 112px;
     color: #7a877f;
+    font-size: 0.84rem;
     font-weight: 850;
+    line-height: 1.25;
+    text-align: right;
   }
 }
 
@@ -185,99 +222,48 @@
   box-shadow: 0 6px 16px rgba(107, 143, 113, 0.24);
 }
 
-.micro-note {
+.formula-note {
   display: inline-flex;
   margin-top: 1rem;
   color: #466654;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 800;
+  line-height: 1.35;
 }
 
-.tone-calm .progress-fill,
-.engagement-card .progress-fill {
-  background: linear-gradient(90deg, #7b9fd4, #abc2e5);
-}
-
-.tone-alert .progress-fill,
-.tone-supported .progress-fill {
-  background: linear-gradient(90deg, #d4a96a, #e9c98f);
-}
-
-.tone-medium .progress-fill {
-  background: linear-gradient(90deg, #d4a96a, #98b58e);
-}
-
-.themes-card {
-  grid-column: span 1;
-}
-
-.theme-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.theme-row {
-  p {
-    margin-top: 0.4rem;
-    font-size: 0.84rem;
+.tone-medium {
+  .icon-bubble,
+  .status-badge {
+    color: #805c18;
+    background: rgba(212, 169, 106, 0.18);
   }
 
-  .progress-track {
-    height: 8px;
-    margin-top: 0.5rem;
+  .progress-fill {
+    background: linear-gradient(90deg, #d4a96a, #e9c98f);
   }
 }
 
-.theme-title {
-  gap: 0.45rem;
-
-  strong {
-    flex: 1;
-    color: #273b31;
+.tone-attention {
+  .icon-bubble,
+  .status-badge {
+    color: #9b4b35;
+    background: rgba(224, 112, 112, 0.16);
   }
 
-  span:last-child {
-    color: #7a877f;
-    font-weight: 850;
+  .progress-fill {
+    background: linear-gradient(90deg, #e07070, #e9a08f);
   }
 }
 
-.theme-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  flex: 0 0 auto;
-}
-
-.action-card {
-  justify-content: space-between;
-  gap: 1rem;
+.tip-card {
   margin-bottom: 1rem;
   padding: 1.25rem 1.5rem;
 
   h2 {
-    margin: 0.2rem 0 0;
+    margin: 0.25rem 0 0;
     color: #1f3328;
     font-size: clamp(1.05rem, 2vw, 1.45rem);
     line-height: 1.35;
-  }
-}
-
-.launch-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: fit-content;
-  border-radius: 999px;
-  padding: 0.85rem 1.2rem;
-  background: #3a7554;
-  color: #ffffff;
-  font-weight: 900;
-  text-decoration: none;
-  box-shadow: 0 10px 22px rgba(58, 117, 84, 0.24);
-
-  &:hover {
-    background: #2e5e42;
   }
 }
 
@@ -308,39 +294,52 @@
 }
 
 .session-card {
-  gap: 0.55rem;
+  justify-content: space-between;
+  gap: 0.9rem;
   flex-wrap: wrap;
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1rem;
   border: 1px solid rgba(95, 138, 111, 0.14);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.72);
 }
 
+.session-main {
+  gap: 0.75rem;
+
+  strong {
+    color: #24382d;
+  }
+}
+
 .session-date {
   min-width: 92px;
-  color: #24382d;
+  color: #66736e;
   font-weight: 900;
+}
+
+.session-pills {
+  gap: 0.45rem;
+  flex-wrap: wrap;
 }
 
 .session-pill {
   color: #315b43;
   background: rgba(107, 143, 113, 0.14);
 
-  &.autonomy {
+  &.assistance {
     color: #805c18;
     background: rgba(212, 169, 106, 0.18);
   }
 
-  &.time {
+  &.success {
+    color: #315b43;
+    background: rgba(107, 143, 113, 0.16);
+  }
+
+  &.skipped {
     color: #365d93;
     background: rgba(123, 159, 212, 0.18);
   }
-}
-
-.session-theme {
-  margin-left: auto;
-  color: #596b62;
-  font-weight: 750;
 }
 
 @media (max-width: 1080px) {
@@ -355,8 +354,9 @@
   }
 
   .hero-card,
-  .action-card,
-  .section-heading {
+  .method-card,
+  .section-heading,
+  .session-main {
     align-items: stretch;
     flex-direction: column;
   }
@@ -369,9 +369,12 @@
     grid-template-columns: 1fr;
   }
 
-  .session-theme {
-    width: 100%;
-    margin-left: 0;
+  .metric-line span {
+    max-width: none;
+  }
+
+  .session-date {
+    min-width: 0;
   }
 }
 
@@ -392,8 +395,7 @@
   span,
   .hero-copy p,
   .summary-card p,
-  .theme-row p,
-  .session-theme,
+  .method-card p,
   .patient-picker select {
     color: #ffffff !important;
   }

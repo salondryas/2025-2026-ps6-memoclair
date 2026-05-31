@@ -2,11 +2,11 @@
   <main class="stats-page">
     <section class="hero-card glass-card">
       <div class="hero-copy">
-        <span class="eyebrow">Tableau de bord animation</span>
-        <h1>Repères bien-être de {{ currentPatient.firstName }}</h1>
+        <span class="eyebrow">Statistiques utiles à l’accueil de jour</span>
+        <h1>Lecture rapide de la séance de {{ currentPatient.firstName }}</h1>
         <p>
-          Des indicateurs simples pour préparer l’accueil, adapter l’animation et lancer une conversation
-          sans lecture clinique complexe.
+          Les indicateurs ci-dessous ne sont pas des mesures cliniques : ils traduisent uniquement des traces
+          simples de l’application en repères d’animation bienveillants.
         </p>
       </div>
 
@@ -20,108 +20,66 @@
       </label>
     </section>
 
+    <section class="method-card glass-card">
+      <div>
+        <span class="eyebrow">Données réellement traçables</span>
+        <p>{{ dashboard.weeklyRawSummary }}</p>
+      </div>
+      <a routerLink="/games" class="launch-link">Lancer une activité</a>
+    </section>
+
     <section class="kpi-grid" aria-label="Synthèse des indicateurs soignants">
-      <article class="summary-card glass-card mood-card" [ngClass]="'tone-' + dashboard.mood.tone">
+      <article
+        *ngFor="let card of dashboard.cards; trackBy: trackByCard"
+        class="summary-card glass-card"
+        [ngClass]="'tone-' + card.tone">
         <div class="card-header">
           <span class="icon-bubble">
-            <lucide-icon name="smile"></lucide-icon>
+            <lucide-icon [name]="card.icon"></lucide-icon>
           </span>
-          <span class="status-badge">Humeur post-séance</span>
+          <span class="status-badge">{{ card.title }}</span>
         </div>
-        <div class="metric-line">
-          <strong>{{ dashboard.mood.label }}</strong>
-          <span>{{ dashboard.mood.percent }}%</span>
-        </div>
-        <div class="progress-track" aria-hidden="true">
-          <span class="progress-fill" [style.width.%]="dashboard.mood.percent"></span>
-        </div>
-        <p>{{ dashboard.mood.detail }}</p>
-        <span class="micro-note">{{ dashboard.mood.trend }}</span>
-      </article>
 
-      <article class="summary-card glass-card autonomy-card" [ngClass]="'tone-' + dashboard.autonomy.tone">
-        <div class="card-header">
-          <span class="icon-bubble">
-            <lucide-icon name="battery"></lucide-icon>
-          </span>
-          <span class="status-badge">Niveau d’autonomie</span>
-        </div>
         <div class="metric-line">
-          <strong>{{ dashboard.autonomy.label }}</strong>
-          <span>{{ dashboard.autonomy.percent }}%</span>
+          <strong>{{ card.value }}</strong>
+          <span>{{ card.subtitle }}</span>
         </div>
-        <div class="progress-track" aria-hidden="true">
-          <span class="progress-fill" [style.width.%]="dashboard.autonomy.percent"></span>
-        </div>
-        <p>{{ dashboard.autonomy.detail }}</p>
-        <span class="micro-note">{{ dashboard.autonomy.helperLoad }}</span>
-      </article>
 
-      <article class="summary-card glass-card engagement-card">
-        <div class="card-header">
-          <span class="icon-bubble">
-            <lucide-icon name="clock"></lucide-icon>
-          </span>
-          <span class="status-badge">Engagement</span>
-        </div>
-        <div class="metric-line">
-          <strong>{{ dashboard.engagement.weeklyMinutes }} min</strong>
-          <span>{{ dashboard.engagement.sessionsDone }}/{{ dashboard.engagement.sessionsGoal }} séances</span>
-        </div>
         <div class="progress-track" aria-hidden="true">
-          <span class="progress-fill" [style.width.%]="dashboard.engagement.percent"></span>
+          <span class="progress-fill" [style.width.%]="card.percent"></span>
         </div>
-        <p>{{ dashboard.engagement.detail }}</p>
-        <span class="micro-note">Temps de jeu total cette semaine</span>
-      </article>
 
-      <article class="summary-card glass-card themes-card">
-        <div class="card-header">
-          <span class="icon-bubble">
-            <lucide-icon name="message-circle"></lucide-icon>
-          </span>
-          <span class="status-badge">Thèmes préférés</span>
-        </div>
-        <div class="theme-list">
-          <div *ngFor="let theme of dashboard.favoriteThemes; trackBy: trackByTheme" class="theme-row">
-            <div class="theme-title">
-              <span class="theme-dot" [style.background]="theme.color"></span>
-              <strong>{{ theme.label }}</strong>
-              <span>{{ theme.percent }}%</span>
-            </div>
-            <div class="progress-track" aria-hidden="true">
-              <span class="progress-fill" [style.width.%]="theme.percent" [style.background]="theme.color"></span>
-            </div>
-            <p>{{ theme.prompt }}</p>
-          </div>
-        </div>
+        <p>{{ card.detail }}</p>
+        <span class="formula-note">Calcul : {{ card.formula }}</span>
       </article>
     </section>
 
-    <section class="action-card glass-card">
-      <div>
-        <span class="eyebrow">À retenir pour l’équipe</span>
-        <h2>{{ dashboard.quickTip }}</h2>
-      </div>
-      <a routerLink="/games" class="launch-link">Lancer une activité</a>
+    <section class="tip-card glass-card">
+      <span class="eyebrow">À retenir pour l’équipe</span>
+      <h2>{{ dashboard.practicalTip }}</h2>
     </section>
 
     <section class="sessions-section glass-card">
       <div class="section-heading">
         <div>
           <span class="eyebrow">Historique simplifié</span>
-          <h2>Dernières séances utiles à l’animation</h2>
+          <h2>Dernières séances, sans jargon clinique</h2>
         </div>
-        <span class="sessions-count">{{ dashboard.recentSessions.length }} repères</span>
+        <span class="sessions-count">{{ dashboard.recentSessions.length }} séance(s)</span>
       </div>
 
       <div class="session-list">
         <article *ngFor="let session of dashboard.recentSessions; trackBy: trackBySession" class="session-card">
-          <span class="session-date">{{ session.dateLabel }}</span>
-          <span class="session-pill mood">{{ session.mood }}</span>
-          <span class="session-pill autonomy">{{ session.autonomy }}</span>
-          <span class="session-pill time">{{ session.engagement }}</span>
-          <span class="session-theme">Discussion : {{ session.theme }}</span>
+          <div class="session-main">
+            <span class="session-date">{{ session.dateLabel }}</span>
+            <strong>{{ session.activityLabel }}</strong>
+          </div>
+          <div class="session-pills">
+            <span class="session-pill time">{{ session.durationLabel }}</span>
+            <span class="session-pill assistance">{{ session.assistanceLabel }}</span>
+            <span class="session-pill success">{{ session.successLabel }}</span>
+            <span class="session-pill skipped">{{ session.skippedLabel }}</span>
+          </div>
         </article>
       </div>
     </section>
