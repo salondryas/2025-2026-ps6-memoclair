@@ -183,6 +183,8 @@ export class GameDuoPageComponent implements OnInit {
       guidedMoments: this.answerWithPatientCount,
       skippedMoments: this.passCount,
       wrongAnswers: 0,
+      totalQuestions: this.state.rounds.length,
+      correctAnswers: this.agreedCount,
       earlyStop: false,
       latenciesSeconds: this.latencies,
       supportLevel: this.computeSupportLevel(),

@@ -11,6 +11,8 @@ export interface RawSessionMetrics {
   guidedMoments: number;
   skippedMoments: number;
   wrongAnswers: number;
+  totalQuestions?: number;
+  correctAnswers?: number;
   earlyStop: boolean;
   latenciesSeconds: number[];
   durationMinutes?: number;
@@ -34,6 +36,8 @@ export class SessionSummaryService {
       gameType: metrics.gameType,
       startedAt: startedAt.toISOString(),
       durationMinutes,
+      totalQuestions: metrics.totalQuestions,
+      correctAnswers: metrics.correctAnswers,
       summary: metrics.summary ?? this.buildSummaryText(supportLevel, emotionalState, metrics.earlyStop),
       observation: {
         hintCount: metrics.hintCount,

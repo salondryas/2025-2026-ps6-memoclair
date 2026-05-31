@@ -21,6 +21,8 @@ export interface SessionResult {
   gameType: SessionGameType;
   startedAt: string;
   durationMinutes: number;
+  totalQuestions?: number;
+  correctAnswers?: number;
   summary: string;
   observation: SessionObservation;
 }

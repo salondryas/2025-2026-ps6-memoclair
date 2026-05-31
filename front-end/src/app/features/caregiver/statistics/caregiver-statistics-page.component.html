@@ -3,85 +3,88 @@
     <section class="hero-card glass-card">
       <div class="hero-copy">
         <span class="eyebrow">Statistiques utiles à l’accueil de jour</span>
-        <h1>Lecture rapide de la séance de {{ currentPatient.firstName }}</h1>
+        <h1>Lecture rapide de la séance de {{ activePatientName }}</h1>
         <p>
           Les indicateurs ci-dessous ne sont pas des mesures cliniques : ils traduisent uniquement des traces
           simples de l’application en repères d’animation bienveillants.
         </p>
       </div>
-
-      <label class="patient-picker">
-        <span>Accueilli</span>
-        <select [ngModel]="selectedPatientId" (ngModelChange)="onPatientChange($event)">
-          <option *ngFor="let patient of patients" [value]="patient.id">
-            {{ patient.displayName }}
-          </option>
-        </select>
-      </label>
     </section>
 
     <section class="method-card glass-card">
       <div>
         <span class="eyebrow">Données réellement traçables</span>
-        <p>{{ dashboard.weeklyRawSummary }}</p>
+        <p *ngIf="hasSessions; else emptyDataSummary">{{ dashboard.weeklyRawSummary }}</p>
+        <ng-template #emptyDataSummary>
+          <p>Aucune séance enregistrée pour le moment. Lancez une activité pour voir les statistiques.</p>
+        </ng-template>
       </div>
       <a routerLink="/games" class="launch-link">Lancer une activité</a>
     </section>
 
-    <section class="kpi-grid" aria-label="Synthèse des indicateurs soignants">
-      <article
-        *ngFor="let card of dashboard.cards; trackBy: trackByCard"
-        class="summary-card glass-card"
-        [ngClass]="'tone-' + card.tone">
-        <div class="card-header">
-          <span class="icon-bubble">
-            <lucide-icon [name]="card.icon"></lucide-icon>
-          </span>
-          <span class="status-badge">{{ card.title }}</span>
-        </div>
-
-        <div class="metric-line">
-          <strong>{{ card.value }}</strong>
-          <span>{{ card.subtitle }}</span>
-        </div>
-
-        <div class="progress-track" aria-hidden="true">
-          <span class="progress-fill" [style.width.%]="card.percent"></span>
-        </div>
-
-        <p>{{ card.detail }}</p>
-        <span class="formula-note">Calcul : {{ card.formula }}</span>
-      </article>
-    </section>
-
-    <section class="tip-card glass-card">
-      <span class="eyebrow">À retenir pour l’équipe</span>
-      <h2>{{ dashboard.practicalTip }}</h2>
-    </section>
-
-    <section class="sessions-section glass-card">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">Historique simplifié</span>
-          <h2>Dernières séances, sans jargon clinique</h2>
-        </div>
-        <span class="sessions-count">{{ dashboard.recentSessions.length }} séance(s)</span>
-      </div>
-
-      <div class="session-list">
-        <article *ngFor="let session of dashboard.recentSessions; trackBy: trackBySession" class="session-card">
-          <div class="session-main">
-            <span class="session-date">{{ session.dateLabel }}</span>
-            <strong>{{ session.activityLabel }}</strong>
+    <ng-container *ngIf="hasSessions; else emptyState">
+      <section class="kpi-grid" aria-label="Synthèse des indicateurs soignants">
+        <article
+          *ngFor="let card of dashboard.cards; trackBy: trackByCard"
+          class="summary-card glass-card"
+          [ngClass]="'tone-' + card.tone">
+          <div class="card-header">
+            <span class="icon-bubble">
+              <lucide-icon [name]="card.icon"></lucide-icon>
+            </span>
+            <span class="status-badge">{{ card.title }}</span>
           </div>
-          <div class="session-pills">
-            <span class="session-pill time">{{ session.durationLabel }}</span>
-            <span class="session-pill assistance">{{ session.assistanceLabel }}</span>
-            <span class="session-pill success">{{ session.successLabel }}</span>
-            <span class="session-pill skipped">{{ session.skippedLabel }}</span>
+
+          <div class="metric-line">
+            <strong>{{ card.value }}</strong>
+            <span>{{ card.subtitle }}</span>
           </div>
+
+          <div class="progress-track" aria-hidden="true">
+            <span class="progress-fill" [style.width.%]="card.percent"></span>
+          </div>
+
+          <p>{{ card.detail }}</p>
+          <span class="formula-note">Calcul : {{ card.formula }}</span>
         </article>
-      </div>
-    </section>
+      </section>
+
+      <section class="tip-card glass-card">
+        <span class="eyebrow">À retenir pour l’équipe</span>
+        <h2>{{ dashboard.practicalTip }}</h2>
+      </section>
+
+      <section class="sessions-section glass-card">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Historique simplifié</span>
+            <h2>Dernières séances, sans jargon clinique</h2>
+          </div>
+          <span class="sessions-count">{{ dashboard.recentSessions.length }} séance(s)</span>
+        </div>
+
+        <div class="session-list">
+          <article *ngFor="let session of dashboard.recentSessions; trackBy: trackBySession" class="session-card">
+            <div class="session-main">
+              <span class="session-date">{{ session.dateLabel }}</span>
+              <strong>{{ session.activityLabel }}</strong>
+            </div>
+            <div class="session-pills">
+              <span class="session-pill time">{{ session.durationLabel }}</span>
+              <span class="session-pill assistance">{{ session.assistanceLabel }}</span>
+              <span class="session-pill success">{{ session.successLabel }}</span>
+              <span class="session-pill skipped">{{ session.skippedLabel }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <section class="tip-card glass-card" aria-live="polite">
+        <span class="eyebrow">Statistiques à venir</span>
+        <h2>Aucune séance enregistrée pour le moment. Lancez une activité pour voir les statistiques.</h2>
+      </section>
+    </ng-template>
   </main>
 </mc-caregiver-shell>
