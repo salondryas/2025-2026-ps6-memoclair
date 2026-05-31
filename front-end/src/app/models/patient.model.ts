@@ -7,6 +7,13 @@ export type ThemeTag = 'famille' | 'quotidien' | 'musique' | 'enfance' | 'metier
 export type GameDifficulty = 'facile' | 'moyen' | 'difficile' | 'personnalise';
 export type GameBAutoNextMode = 'manual' | '5s' | '8s';
 
+export interface ProfileObjectives {
+  targetEngagementMinutes: number;
+  targetAutonomyHintCount: number;
+  targetSuccessRate: number;
+  targetFluidityErrorCount: number;
+}
+
 export interface PatientSummary {
   id: PatientId;
   firstName: string;
@@ -34,6 +41,7 @@ export interface PatientProfile {
   audioReadingEnabled: boolean;
   highContrastEnabled: boolean;
   textSize: number; // 1 = normal, 1.5 = large, etc.
+  objectives: ProfileObjectives;
 
   updatedAt: string | null;
 }
@@ -96,3 +104,10 @@ export const THEME_OPTIONS: ReadonlyArray<SelectOption<ThemeTag>> = [
   { value: 'metier', label: 'Métier' },
   { value: 'lieux', label: 'Lieux connus' },
 ];
+
+export const DEFAULT_PROFILE_OBJECTIVES: ProfileObjectives = {
+  targetEngagementMinutes: 30,
+  targetAutonomyHintCount: 8,
+  targetSuccessRate: 70,
+  targetFluidityErrorCount: 6,
+};

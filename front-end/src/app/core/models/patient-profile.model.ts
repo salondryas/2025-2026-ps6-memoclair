@@ -1,3 +1,5 @@
+import { ProfileObjectives } from '../../models/patient.model';
+
 export interface PatientProfile {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export interface PatientProfile {
   motorDifficulties: boolean;
   themes: string[];
   maxAttentionMinutes: number;
+  objectives: ProfileObjectives;
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;

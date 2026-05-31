@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { of, Subscription, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ChartData, ChartOptions } from 'chart.js';
 import {
   Battery,
   CircleHelp,
@@ -14,9 +15,12 @@ import {
 } from 'lucide-angular';
 
 import { PatientContextService } from '../../../core/services/patient-context.service';
+import { DEFAULT_PROFILE_OBJECTIVES, ProfileObjectives } from '../../../models/patient.model';
 import { SessionResult as Session } from '../../../models/session.model';
 import { StatisticsService } from '../services/statistics.service';
 import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
+import { NgChartsModule } from 'ng2-charts';
+import { CaregiverProfileService } from '../services/caregiver-profile.service';
 
 type KpiTone = 'good' | 'medium' | 'attention';
 type KpiIcon = 'clock' | 'battery' | 'target' | 'circle-help';
@@ -67,7 +71,7 @@ interface SessionTotals {
 @Component({
   selector: 'app-caregiver-statistics-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule],
+  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule, NgChartsModule],
   providers: [
     {
       provide: LUCIDE_ICONS,
@@ -82,16 +86,81 @@ interface SessionTotals {
 export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   activePatientName = '';
   sessions: Session[] = [];
-  dashboard: CaregiverDashboardView = this.buildDashboard([]);
+  dashboard: CaregiverDashboardView = this.buildDashboard([], this.computeTotals([]));
   hasSessions = false;
   isLoading = true;
+  radarChartData: ChartData<'radar'> = this.buildRadarData([0, 0, 0, 0]);
+  readonly radarChartOptions: ChartOptions<'radar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 700,
+      easing: 'easeOutQuart',
+    },
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          display: false,
+          stepSize: 20,
+          backdropColor: 'transparent',
+        },
+        grid: {
+          color: 'rgba(107, 143, 113, 0.12)',
+          circular: true,
+        },
+        angleLines: {
+          color: 'rgba(107, 143, 113, 0.14)',
+        },
+        pointLabels: {
+          color: '#315b43',
+          font: {
+            size: 13,
+            family: "'Inter', 'Segoe UI', sans-serif",
+            weight: 700,
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: '#315b43',
+          usePointStyle: true,
+          boxWidth: 10,
+          font: {
+            size: 12,
+            weight: 600,
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(31, 51, 40, 0.9)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+      },
+    },
+    elements: {
+      line: {
+        borderWidth: 2,
+        tension: 0.25,
+      },
+      point: {
+        radius: 3,
+        hoverRadius: 5,
+      },
+    },
+  };
 
   private patientSubscription?: Subscription;
   private readonly weeklyGoalMinutes = 45;
+  private objectives: ProfileObjectives = { ...DEFAULT_PROFILE_OBJECTIVES };
 
   constructor(
     private readonly patientContextService: PatientContextService,
     private readonly statisticsService: StatisticsService,
+    private readonly caregiverProfileService: CaregiverProfileService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
@@ -100,6 +169,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((patient) => {
           this.activePatientName = patient.firstName;
+          this.objectives = this.getObjectivesForPatient(patient.id);
           this.isLoading = true;
           this.cdr.markForCheck();
 
@@ -111,7 +181,9 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       .subscribe((sessions) => {
         this.sessions = sessions;
         this.hasSessions = sessions.length > 0;
-        this.dashboard = this.buildDashboard(sessions);
+        const totals = this.computeTotals(sessions);
+        this.dashboard = this.buildDashboard(sessions, totals);
+        this.radarChartData = this.buildRadarData(this.normalizeRadarScores(totals));
         this.isLoading = false;
         this.cdr.markForCheck();
       });
@@ -129,9 +201,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     this.patientSubscription?.unsubscribe();
   }
 
-  private buildDashboard(sessions: Session[]): CaregiverDashboardView {
-    const totals = this.computeTotals(sessions);
-
+  private buildDashboard(sessions: Session[], totals: SessionTotals): CaregiverDashboardView {
     return {
       cards: [
         {
@@ -206,6 +276,64 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       blockingRatio,
       blockingPercent,
       participationPercent: Math.min(Math.round((totalDuration / this.weeklyGoalMinutes) * 100), 100),
+    };
+  }
+
+  private normalizeRadarScores(totals: SessionTotals): [number, number, number, number] {
+    return [
+      this.normalizeHigherIsBetter(totals.totalDuration, this.objectives.targetEngagementMinutes),
+      this.normalizeLowerIsBetter(totals.totalIndices, this.objectives.targetAutonomyHintCount),
+      this.normalizeHigherIsBetter(totals.successRate, this.objectives.targetSuccessRate),
+      this.normalizeLowerIsBetter(totals.totalErrors, this.objectives.targetFluidityErrorCount),
+    ];
+  }
+
+  private buildRadarData(scores: [number, number, number, number]): ChartData<'radar'> {
+    return {
+      labels: ['Engagement', 'Autonomie', 'Réussite', 'Fluidité'],
+      datasets: [
+        {
+          label: 'Performance actuelle',
+          data: scores,
+          borderColor: '#3a7554',
+          backgroundColor: 'rgba(58, 117, 84, 0.22)',
+          pointBackgroundColor: '#3a7554',
+          pointBorderColor: '#ffffff',
+          pointHoverBackgroundColor: '#ffffff',
+          pointHoverBorderColor: '#3a7554',
+        },
+        {
+          label: 'Objectif',
+          data: [100, 100, 100, 100],
+          borderColor: 'rgba(107, 143, 113, 0.55)',
+          borderDash: [7, 5],
+          backgroundColor: 'rgba(107, 143, 113, 0.06)',
+          pointRadius: 0,
+        },
+      ],
+    };
+  }
+
+  private normalizeHigherIsBetter(actual: number, target: number): number {
+    if (target <= 0) return 0;
+    return this.clampScore((actual / target) * 100);
+  }
+
+  private normalizeLowerIsBetter(actual: number, maxExpected: number): number {
+    if (maxExpected < 0) return 0;
+    if (maxExpected === 0) return actual <= 0 ? 100 : 0;
+    return this.clampScore(100 - (actual / maxExpected) * 100);
+  }
+
+  private clampScore(score: number): number {
+    return Math.round(Math.max(0, Math.min(100, score)));
+  }
+
+  private getObjectivesForPatient(patientId: string): ProfileObjectives {
+    const profile = this.caregiverProfileService.getProfile(patientId);
+    return {
+      ...DEFAULT_PROFILE_OBJECTIVES,
+      ...(profile?.objectives ?? {}),
     };
   }
 

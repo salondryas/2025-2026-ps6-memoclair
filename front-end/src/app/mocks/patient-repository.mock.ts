@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { PatientId, PatientProfile, PatientSummary } from '../models/patient.model';
+import { DEFAULT_PROFILE_OBJECTIVES, PatientId, PatientProfile, PatientSummary } from '../models/patient.model';
 import { FamilyPatientAssociation, ManagedProfile } from '../models/profile.model';
 import { StorageService } from '../core/services/storage.service';
 
@@ -55,6 +55,7 @@ export class PatientRepositoryMock {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     },
     jean: {
@@ -72,6 +73,7 @@ export class PatientRepositoryMock {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     },
     paul: {
@@ -89,6 +91,7 @@ export class PatientRepositoryMock {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     },
   };
@@ -221,7 +224,11 @@ export class PatientRepositoryMock {
     } else {
       this.customPatients.push({ ...summary });
     }
-    this.customProfiles[summary.id] = { ...profile, themes: [...profile.themes] };
+    this.customProfiles[summary.id] = {
+      ...profile,
+      themes: [...profile.themes],
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES, ...profile.objectives },
+    };
     this.saveToStorage();
   }
 
@@ -242,11 +249,28 @@ export class PatientRepositoryMock {
 
   getDefaultProfile(patientId: PatientId): PatientProfile {
     const builtIn = this.builtInProfiles[patientId];
-    if (builtIn) return { ...builtIn, themes: [...builtIn.themes] };
+    if (builtIn) {
+      return {
+        ...builtIn,
+        themes: [...builtIn.themes],
+        objectives: { ...DEFAULT_PROFILE_OBJECTIVES, ...builtIn.objectives },
+      };
+    }
     const custom = this.customProfiles[patientId];
-    if (custom) return { ...custom, themes: [...custom.themes] };
+    if (custom) {
+      return {
+        ...custom,
+        themes: [...custom.themes],
+        objectives: { ...DEFAULT_PROFILE_OBJECTIVES, ...custom.objectives },
+      };
+    }
     const fallback = this.builtInProfiles['marcel'];
-    return { ...fallback, patientId, themes: [...fallback.themes] };
+    return {
+      ...fallback,
+      patientId,
+      themes: [...fallback.themes],
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES, ...fallback.objectives },
+    };
   }
 
   private loadFromStorage(): void {
@@ -298,6 +322,7 @@ export class PatientRepositoryMock {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     };
   }

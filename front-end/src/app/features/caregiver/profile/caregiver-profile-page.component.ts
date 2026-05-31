@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import {
   ClinicalStage,
+  DEFAULT_PROFILE_OBJECTIVES,
   DIFFICULTY_PRESETS,
   GameBAutoNextMode,
   GameDifficulty,
@@ -150,6 +151,20 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     this.clearMessages();
   }
 
+  updateObjective(
+    objective: keyof PatientProfile['objectives'],
+    value: number,
+  ): void {
+    this.profile = {
+      ...this.profile,
+      objectives: {
+        ...this.profile.objectives,
+        [objective]: Number(value),
+      },
+    };
+    this.clearMessages();
+  }
+
   toggleTheme(theme: ThemeTag): void {
     const alreadySelected = this.profile.themes.includes(theme);
 
@@ -266,6 +281,7 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     };
 

@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PatientRepositoryMock } from '../../../mocks/patient-repository.mock';
 import {
   ClinicalStage,
+  DEFAULT_PROFILE_OBJECTIVES,
   GameDifficulty,
   PatientId,
   PatientProfile,
@@ -458,6 +459,7 @@ export class ProfileManagementPageComponent implements OnInit {
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
+      objectives: { ...DEFAULT_PROFILE_OBJECTIVES },
       updatedAt: null,
     };
   }
