@@ -1,3 +1,5 @@
+import { ProfileObjectives } from '../../models/patient.model';
+
 export interface PatientProfile {
   id: string;
   name: string;
@@ -10,13 +12,6 @@ export interface PatientProfile {
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface ProfileObjectives {
-  targetEngagementMinutes: number;
-  targetAutonomyHintCount: number;
-  targetSuccessRate: number;
-  targetFluidityErrorCount: number;
 }
 
 export interface GameMetrics {

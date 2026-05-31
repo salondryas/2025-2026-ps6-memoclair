@@ -19,7 +19,7 @@ import { DEFAULT_PROFILE_OBJECTIVES, ProfileObjectives } from '../../../models/p
 import { SessionResult as Session } from '../../../models/session.model';
 import { StatisticsService } from '../services/statistics.service';
 import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
-import { BaseChartDirective } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 import { CaregiverProfileService } from '../services/caregiver-profile.service';
 
 type KpiTone = 'good' | 'medium' | 'attention';
@@ -71,7 +71,7 @@ interface SessionTotals {
 @Component({
   selector: 'app-caregiver-statistics-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule, BaseChartDirective],
+  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule, NgChartsModule],
   providers: [
     {
       provide: LUCIDE_ICONS,
@@ -86,7 +86,7 @@ interface SessionTotals {
 export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   activePatientName = '';
   sessions: Session[] = [];
-  dashboard: CaregiverDashboardView = this.buildDashboard([]);
+  dashboard: CaregiverDashboardView = this.buildDashboard([], this.computeTotals([]));
   hasSessions = false;
   isLoading = true;
   radarChartData: ChartData<'radar'> = this.buildRadarData([0, 0, 0, 0]);
@@ -118,7 +118,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
           font: {
             size: 13,
             family: "'Inter', 'Segoe UI', sans-serif",
-            weight: '700',
+            weight: 700,
           },
         },
       },
@@ -131,7 +131,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
           boxWidth: 10,
           font: {
             size: 12,
-            weight: '600',
+            weight: 600,
           },
         },
       },
@@ -169,7 +169,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((patient) => {
           this.activePatientName = patient.firstName;
-          this.objectives = this.caregiverProfileService.getProfile(patient.id).objectives;
+          this.objectives = this.getObjectivesForPatient(patient.id);
           this.isLoading = true;
           this.cdr.markForCheck();
 
@@ -315,17 +315,26 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   }
 
   private normalizeHigherIsBetter(actual: number, target: number): number {
-    if (target <= 0) return actual > 0 ? 100 : 0;
+    if (target <= 0) return 0;
     return this.clampScore((actual / target) * 100);
   }
 
   private normalizeLowerIsBetter(actual: number, maxExpected: number): number {
-    if (maxExpected <= 0) return actual <= 0 ? 100 : 0;
+    if (maxExpected < 0) return 0;
+    if (maxExpected === 0) return actual <= 0 ? 100 : 0;
     return this.clampScore(100 - (actual / maxExpected) * 100);
   }
 
   private clampScore(score: number): number {
     return Math.round(Math.max(0, Math.min(100, score)));
+  }
+
+  private getObjectivesForPatient(patientId: string): ProfileObjectives {
+    const profile = this.caregiverProfileService.getProfile(patientId);
+    return {
+      ...DEFAULT_PROFILE_OBJECTIVES,
+      ...(profile?.objectives ?? {}),
+    };
   }
 
   private mapSession(session: Session): RecentSessionView {
