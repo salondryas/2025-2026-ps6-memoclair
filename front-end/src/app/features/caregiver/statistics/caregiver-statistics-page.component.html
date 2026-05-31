@@ -49,6 +49,22 @@
         </article>
       </section>
 
+      <section class="radar-card glass-card" aria-label="Comparaison radar des objectifs de séance">
+        <div class="section-heading section-heading--radar">
+          <div>
+            <span class="eyebrow">Objectifs vs performance</span>
+            <h2>Radar de séance (toile d’araignée)</h2>
+          </div>
+          <span class="sessions-count">Scores normalisés /100</span>
+        </div>
+        <p class="radar-card__subtitle">
+          Lecture non clinique : chaque axe traduit les KPIs de jeu en repères simples (Engagement, Autonomie, Réussite, Fluidité).
+        </p>
+        <div class="radar-card__chart">
+          <canvas baseChart [type]="'radar'" [data]="radarChartData" [options]="radarChartOptions"></canvas>
+        </div>
+      </section>
+
       <section class="tip-card glass-card">
         <span class="eyebrow">À retenir pour l’équipe</span>
         <h2>{{ dashboard.practicalTip }}</h2>

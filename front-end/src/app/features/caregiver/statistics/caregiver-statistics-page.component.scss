@@ -267,6 +267,31 @@
   }
 }
 
+.radar-card {
+  margin-bottom: 1rem;
+  padding: 1.25rem 1.5rem 1.4rem;
+}
+
+.section-heading--radar {
+  margin-bottom: 0.65rem;
+}
+
+.radar-card__subtitle {
+  margin: 0 0 1rem;
+  color: #53645d;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.radar-card__chart {
+  position: relative;
+  height: clamp(280px, 48vw, 420px);
+  border-radius: 22px;
+  border: 1px solid rgba(95, 138, 111, 0.12);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(240, 247, 242, 0.4));
+  padding: 0.85rem;
+}
+
 .sessions-section {
   padding: 1.35rem;
 }

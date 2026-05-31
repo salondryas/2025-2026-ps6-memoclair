@@ -6,9 +6,17 @@ export interface PatientProfile {
   motorDifficulties: boolean;
   themes: string[];
   maxAttentionMinutes: number;
+  objectives: ProfileObjectives;
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ProfileObjectives {
+  targetEngagementMinutes: number;
+  targetAutonomyHintCount: number;
+  targetSuccessRate: number;
+  targetFluidityErrorCount: number;
 }
 
 export interface GameMetrics {

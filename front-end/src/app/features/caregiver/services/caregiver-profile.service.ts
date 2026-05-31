@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import {
   ATTENTION_OPTIONS,
   ClinicalStage,
+  DEFAULT_PROFILE_OBJECTIVES,
   GameBAutoNextMode,
   MOTOR_OPTIONS,
   MotorLevel,
@@ -56,6 +57,11 @@ export class CaregiverProfileService {
       ...sanitizedConfig,
       highContrastEnabled: !!(storedProfile.highContrastEnabled ?? defaultProfile.highContrastEnabled),
       themes: [...(storedProfile.themes ?? defaultProfile.themes)],
+      objectives: {
+        ...DEFAULT_PROFILE_OBJECTIVES,
+        ...defaultProfile.objectives,
+        ...storedProfile.objectives,
+      },
     };
   }
 
@@ -65,6 +71,10 @@ export class CaregiverProfileService {
       ...profile,
       ...sanitizedConfig,
       themes: [...profile.themes],
+      objectives: {
+        ...DEFAULT_PROFILE_OBJECTIVES,
+        ...profile.objectives,
+      },
       updatedAt: new Date().toISOString(),
     };
 
@@ -80,6 +90,18 @@ export class CaregiverProfileService {
     if (profile.answerCount > 4) errors.push('Le nombre de réponses ne peut pas dépasser 4.');
     if (profile.hintDelaySeconds < 1) errors.push('Le délai avant indice doit être au moins 1 seconde.');
     if (profile.hintDelaySeconds > 30) errors.push('Le délai avant indice ne peut pas dépasser 30 secondes.');
+    if (profile.objectives.targetEngagementMinutes < 10 || profile.objectives.targetEngagementMinutes > 90) {
+      errors.push('L’objectif d’engagement doit être entre 10 et 90 minutes.');
+    }
+    if (profile.objectives.targetAutonomyHintCount < 0 || profile.objectives.targetAutonomyHintCount > 30) {
+      errors.push('L’objectif d’autonomie doit être entre 0 et 30 indices.');
+    }
+    if (profile.objectives.targetSuccessRate < 40 || profile.objectives.targetSuccessRate > 100) {
+      errors.push('L’objectif de réussite doit être entre 40% et 100%.');
+    }
+    if (profile.objectives.targetFluidityErrorCount < 0 || profile.objectives.targetFluidityErrorCount > 20) {
+      errors.push('L’objectif de fluidité doit être entre 0 et 20 erreurs.');
+    }
     return errors;
   }
 
@@ -95,6 +117,7 @@ export class CaregiverProfileService {
       `Passage automatique : ${this.mapAutoNextModeToSummary(profile.autoNextMode)}.`,
       `Contraste élevé : ${profile.highContrastEnabled ? 'Actif' : 'Inactif'}.`,
       `Durée maximale conseillée : ${profile.attentionSpanMinutes} minutes.`,
+      `Objectifs séance : ${profile.objectives.targetEngagementMinutes} min d’engagement, ${profile.objectives.targetAutonomyHintCount} indices max, ${profile.objectives.targetSuccessRate}% de réussite, ${profile.objectives.targetFluidityErrorCount} erreurs max.`,
     ];
   }
 
