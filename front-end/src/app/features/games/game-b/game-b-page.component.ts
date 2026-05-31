@@ -375,6 +375,8 @@ export class GameBPageComponent implements OnInit, OnDestroy {
       guidedMoments: this.guidedMoments,
       skippedMoments: this.skippedCount,
       wrongAnswers: this.wrongAnswers,
+      totalQuestions: this.totalQuestions,
+      correctAnswers: Math.max(0, this.totalQuestions - this.wrongAnswers - this.skippedCount),
       earlyStop,
       latenciesSeconds: this.latencies,
       supportLevel: this.computeSupportLevel(),

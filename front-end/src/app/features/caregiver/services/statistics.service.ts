@@ -1,9 +1,37 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, map, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { PatientId } from '../../../models/patient.model';
 import { SessionResult, SupportLevel } from '../../../models/session.model';
 import { environment } from '../../../../environments/environment';
+
+
+interface BackendStatisticsResponse {
+  history: BackendSessionDto[];
+}
+
+interface BackendSessionDto {
+  id?: string;
+  patientId: PatientId;
+  gameType?: SessionResult['gameType'];
+  startedAt?: string;
+  createdAt?: string;
+  durationMinutes?: number;
+  durationSeconds?: number;
+  hintCount?: number;
+  skippedCount?: number;
+  guidedCount?: number;
+  wrongAnswers?: number;
+  totalQuestions?: number;
+  correctAnswers?: number;
+  averageLatencyMs?: number;
+  earlyStop?: boolean;
+  emotionalState?: SessionResult['observation']['emotionalState'];
+  supportLevel?: SupportLevel;
+  summary?: string;
+}
 
 export interface SessionHistoryItem {
   sessionId: string;
@@ -36,6 +64,14 @@ export class StatisticsService {
 
   constructor(private readonly http: HttpClient) {}
 
+
+  getSessionHistory(patientId: PatientId): Observable<SessionResult[]> {
+    return this.http.get<BackendStatisticsResponse>(`${environment.backendUrl}/api/statistics/${patientId}`).pipe(
+      map((response) => (response.history ?? []).map((session) => this.mapBackendSession(patientId, session))),
+      catchError(() => of(this.getSessionsForPatient(patientId))),
+    );
+  }
+
   recordSession(session: SessionResult): void {
     this.mockSessions.unshift(session);
     this.http.post(`${environment.backendUrl}/api/statistics/sessions`, {
@@ -46,6 +82,9 @@ export class StatisticsService {
       hintCount: session.observation.hintCount,
       skippedCount: session.observation.skippedMoments,
       guidedCount: session.observation.guidedMoments,
+      wrongAnswers: session.observation.wrongAnswers,
+      totalQuestions: session.totalQuestions,
+      correctAnswers: session.correctAnswers,
       averageLatencyMs: session.observation.averageLatencySeconds * 1000,
       earlyStop: session.observation.earlyStop,
       emotionalState: session.observation.emotionalState,
@@ -108,6 +147,46 @@ export class StatisticsService {
 
   buildClinicalDisclaimer(): string {
     return "Ces repères servent à préparer la prochaine séance. Ils n'ont pas de valeur diagnostique et ne remplacent ni un MMSE, ni une évaluation ADL, ni un avis clinique.";
+  }
+
+
+  private mapBackendSession(patientId: PatientId, session: BackendSessionDto): SessionResult {
+    const durationMinutes = session.durationMinutes ?? Math.max(1, Math.round((session.durationSeconds ?? 0) / 60));
+    const startedAt = session.startedAt ?? session.createdAt ?? new Date().toISOString();
+    const hintCount = Number(session.hintCount ?? 0);
+    const skippedMoments = Number(session.skippedCount ?? 0);
+    const guidedMoments = Number(session.guidedCount ?? 0);
+    const wrongAnswers = Number(session.wrongAnswers ?? 0);
+    const totalQuestions = session.totalQuestions ?? Math.max(0, (session.correctAnswers ?? 0) + wrongAnswers + skippedMoments);
+    const correctAnswers = session.correctAnswers ?? Math.max(0, totalQuestions - wrongAnswers - skippedMoments);
+
+    return {
+      id: session.id ?? `${session.gameType ?? 'game-b'}-${startedAt}`,
+      patientId: session.patientId ?? patientId,
+      gameType: session.gameType ?? 'game-b',
+      startedAt,
+      durationMinutes,
+      totalQuestions,
+      correctAnswers,
+      summary: session.summary ?? 'Séance enregistrée dans MemoClair.',
+      observation: {
+        hintCount,
+        guidedMoments,
+        skippedMoments,
+        wrongAnswers,
+        earlyStop: Boolean(session.earlyStop),
+        averageLatencySeconds: Math.round(Number(session.averageLatencyMs ?? 0) / 1000),
+        supportLevel: session.supportLevel ?? this.computeSupportLevel(hintCount, guidedMoments),
+        emotionalState: session.emotionalState ?? 'apaise',
+      },
+    };
+  }
+
+  private computeSupportLevel(hintCount: number, guidedMoments: number): SupportLevel {
+    const signals = hintCount + guidedMoments;
+    if (signals <= 1) return 'leger';
+    if (signals <= 3) return 'modere';
+    return 'important';
   }
 
   private mapSupportClass(level: SupportLevel): 'support-soft' | 'support-mid' | 'support-high' {
