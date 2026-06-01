@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { DEFAULT_PROFILE_OBJECTIVES, PatientId, PatientProfile, PatientSummary } from '../models/patient.model';
 import { FamilyPatientAssociation, ManagedProfile } from '../models/profile.model';
 import { StorageService } from '../core/services/storage.service';
+import { environment } from '../../environments/environment';
 
 const CUSTOM_PATIENTS_KEY = 'mc_custom_patients';
 const CUSTOM_PROFILES_KEY = 'mc_custom_profiles';
@@ -11,10 +14,32 @@ const FAMILY_PATIENT_ASSOCIATIONS_KEY = 'mc_family_patient_associations';
 
 const BUILT_IN_IDS = ['marcel', 'jean', 'paul'];
 
+type BackendProfileType = 'professional' | 'patient' | 'family';
+type BackendProfileStage = 'leger' | 'modere' | 'avance' | null;
+
+interface BackendProfileDto {
+  id: string;
+  type: BackendProfileType;
+  firstName: string;
+  lastName: string;
+  displayName?: string;
+  createdByProfessionalId?: string | null;
+  stage?: BackendProfileStage;
+  jobTitle?: string | null;
+  organization?: string | null;
+  relationship?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  avatarUrl?: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class PatientRepositoryMock {
+  private readonly profilesApiUrl = `${environment.backendUrl}/api/profiles`;
+  private readonly associationsApiUrl = `${environment.backendUrl}/api/associations`;
+
   private readonly builtInPatients: PatientSummary[] = [
     {
       id: 'marcel',
@@ -101,8 +126,12 @@ export class PatientRepositoryMock {
   private managedProfiles: ManagedProfile[] = [];
   private familyPatientAssociations: FamilyPatientAssociation[] = [];
 
-  constructor(private readonly storage: StorageService) {
+  constructor(
+    private readonly storage: StorageService,
+    private readonly http: HttpClient,
+  ) {
     this.loadFromStorage();
+    this.syncManagedDataFromBackend();
   }
 
   getPatients(): PatientSummary[] {
@@ -110,9 +139,13 @@ export class PatientRepositoryMock {
   }
 
   getManagedProfiles(): ManagedProfile[] {
+    const remoteManagedProfiles = this.managedProfiles.filter(
+      (profile) => !(profile.type === 'patient' && BUILT_IN_IDS.includes(profile.id)),
+    );
+
     return [
       ...this.builtInPatients.map((patient) => this.mapPatientToManagedProfile(patient)),
-      ...this.managedProfiles,
+      ...remoteManagedProfiles,
     ].map((profile) => ({ ...profile }));
   }
 
@@ -129,9 +162,13 @@ export class PatientRepositoryMock {
   }
 
   getPatientManagedProfiles(): ManagedProfile[] {
+    const remotePatientProfiles = this.managedProfiles.filter(
+      (profile) => profile.type === 'patient' && !BUILT_IN_IDS.includes(profile.id),
+    );
+
     return [
       ...this.builtInPatients.map((patient) => this.mapPatientToManagedProfile(patient)),
-      ...this.managedProfiles.filter((profile) => profile.type === 'patient'),
+      ...remotePatientProfiles,
     ].map((profile) => ({ ...profile }));
   }
 
@@ -169,10 +206,17 @@ export class PatientRepositoryMock {
         avatarUrl: profile.avatarUrl,
       };
       this.addPatient(summary, patientProfile ?? this.createDefaultPatientProfile(profile));
-      return;
+    } else {
+      this.saveToStorage();
     }
 
-    this.saveToStorage();
+    this.http.post<BackendProfileDto>(this.profilesApiUrl, this.mapManagedProfileToBackendPayload(profile))
+      .pipe(catchError(() => of(null)))
+      .subscribe((backendProfile) => {
+        if (!backendProfile) return;
+        this.upsertManagedProfile(this.mapBackendProfileToManagedProfile(backendProfile));
+        this.saveToStorage();
+      });
   }
 
   removeManagedProfile(profileId: string): void {
@@ -192,6 +236,10 @@ export class PatientRepositoryMock {
     ));
 
     this.saveToStorage();
+
+    this.http.delete(`${this.profilesApiUrl}/${profileId}`)
+      .pipe(catchError(() => of(null)))
+      .subscribe();
   }
 
   setFamilyPatientAssociations(familyId: string, patientIds: PatientId[]): void {
@@ -201,6 +249,20 @@ export class PatientRepositoryMock {
       ...Array.from(nextIds).map((patientId) => ({ familyId, patientId })),
     ];
     this.saveToStorage();
+
+    this.http.put<FamilyPatientAssociation[]>(
+      `${this.associationsApiUrl}/family/${familyId}/patients`,
+      { patientIds },
+    )
+      .pipe(catchError(() => of(null)))
+      .subscribe((associations) => {
+        if (!associations) return;
+        this.familyPatientAssociations = [
+          ...this.familyPatientAssociations.filter((association) => association.familyId !== familyId),
+          ...associations,
+        ];
+        this.saveToStorage();
+      });
   }
 
   setPatientFamilyAssociations(patientId: PatientId, familyIds: string[]): void {
@@ -210,6 +272,20 @@ export class PatientRepositoryMock {
       ...Array.from(nextIds).map((familyId) => ({ familyId, patientId })),
     ];
     this.saveToStorage();
+
+    this.http.put<FamilyPatientAssociation[]>(
+      `${this.associationsApiUrl}/patient/${patientId}/families`,
+      { familyIds },
+    )
+      .pipe(catchError(() => of(null)))
+      .subscribe((associations) => {
+        if (!associations) return;
+        this.familyPatientAssociations = [
+          ...this.familyPatientAssociations.filter((association) => association.patientId !== patientId),
+          ...associations,
+        ];
+        this.saveToStorage();
+      });
   }
 
   getPatientById(patientId: PatientId): PatientSummary {
@@ -287,6 +363,38 @@ export class PatientRepositoryMock {
     this.storage.setLocalItem(FAMILY_PATIENT_ASSOCIATIONS_KEY, this.familyPatientAssociations);
   }
 
+  private syncManagedDataFromBackend(): void {
+    forkJoin({
+      profiles: this.http.get<BackendProfileDto[]>(this.profilesApiUrl).pipe(catchError(() => of(null))),
+      associations: this.http.get<FamilyPatientAssociation[]>(this.associationsApiUrl).pipe(catchError(() => of(null))),
+    }).subscribe(({ profiles, associations }) => {
+      const hasRemoteProfiles = Array.isArray(profiles);
+      const hasRemoteAssociations = Array.isArray(associations);
+      if (!hasRemoteProfiles && !hasRemoteAssociations) {
+        return;
+      }
+
+      if (hasRemoteProfiles) {
+        this.managedProfiles = profiles.map((profile) => this.mapBackendProfileToManagedProfile(profile));
+        this.customPatients = this.managedProfiles
+          .filter((profile) => profile.type === 'patient' && !BUILT_IN_IDS.includes(profile.id))
+          .map((profile) => ({
+            id: profile.id,
+            firstName: profile.firstName,
+            displayName: profile.displayName,
+            stageLabel: profile.subtitle,
+            avatarUrl: profile.avatarUrl,
+          }));
+      }
+
+      if (hasRemoteAssociations) {
+        this.familyPatientAssociations = associations;
+      }
+
+      this.saveToStorage();
+    });
+  }
+
   private mapPatientToManagedProfile(patient: PatientSummary): ManagedProfile {
     return {
       id: patient.id,
@@ -297,6 +405,74 @@ export class PatientRepositoryMock {
       subtitle: patient.stageLabel,
       avatarUrl: patient.avatarUrl,
     };
+  }
+
+  private mapBackendProfileToManagedProfile(profile: BackendProfileDto): ManagedProfile {
+    const firstName = profile.firstName.trim();
+    const lastName = profile.lastName.trim();
+    const displayName = profile.displayName?.trim() || `${firstName} ${lastName}`.trim();
+
+    const managedProfile: ManagedProfile = {
+      id: profile.id,
+      type: profile.type,
+      firstName,
+      lastName,
+      displayName,
+      subtitle: this.buildProfileSubtitle(profile),
+      avatarUrl: profile.avatarUrl || undefined,
+      createdByProfessionalId: profile.createdByProfessionalId || undefined,
+      stage: profile.stage || undefined,
+      jobTitle: profile.jobTitle || undefined,
+      organization: profile.organization || undefined,
+      relationship: profile.relationship || undefined,
+      email: profile.email || undefined,
+      phone: profile.phone || undefined,
+    };
+
+    return managedProfile;
+  }
+
+  private mapManagedProfileToBackendPayload(profile: ManagedProfile): Partial<BackendProfileDto> {
+    return {
+      id: profile.id,
+      type: profile.type,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      createdByProfessionalId: profile.createdByProfessionalId || null,
+      stage: profile.stage || null,
+      jobTitle: profile.jobTitle || null,
+      organization: profile.organization || null,
+      relationship: profile.relationship || null,
+      email: profile.email || null,
+      phone: profile.phone || null,
+      avatarUrl: profile.avatarUrl || null,
+    };
+  }
+
+  private buildProfileSubtitle(profile: BackendProfileDto): string {
+    if (profile.type === 'professional') {
+      const title = profile.jobTitle?.trim() || 'Soignant';
+      const organization = profile.organization?.trim();
+      return organization ? `${title} · ${organization}` : title;
+    }
+
+    if (profile.type === 'patient') {
+      if (profile.stage === 'modere') return 'Stade modéré';
+      if (profile.stage === 'avance') return 'Stade avancé';
+      return 'Stade léger';
+    }
+
+    const relationship = profile.relationship?.trim();
+    return relationship ? `Aidant familial · ${relationship}` : 'Aidant familial';
+  }
+
+  private upsertManagedProfile(profile: ManagedProfile): void {
+    const index = this.managedProfiles.findIndex((entry) => entry.id === profile.id);
+    if (index >= 0) {
+      this.managedProfiles[index] = profile;
+      return;
+    }
+    this.managedProfiles.push(profile);
   }
 
   private createDefaultPatientProfile(profile: ManagedProfile): PatientProfile {
