@@ -85,6 +85,7 @@ interface SessionTotals {
 })
 export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   private readonly transmissionStoragePrefix = 'mc_session_transmissions';
+  private readonly transmissionSaveDebounceMs = 300;
   activePatientName = '';
   activePatientId = '';
   sessions: Session[] = [];
@@ -157,6 +158,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   };
 
   private patientSubscription?: Subscription;
+  private transmissionSaveTimeout?: ReturnType<typeof setTimeout>;
   private readonly weeklyGoalMinutes = 45;
   private objectives: ProfileObjectives = { ...DEFAULT_PROFILE_OBJECTIVES };
 
@@ -171,6 +173,7 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     this.patientSubscription = this.patientContextService.activePatient$
       .pipe(
         switchMap((patient) => {
+          this.flushTransmissionSave(this.activePatientId);
           this.activePatientName = patient.firstName;
           this.activePatientId = patient.id;
           this.transmissionNotes = this.loadTransmissionNotes(patient.id);
@@ -209,14 +212,12 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   onTransmissionInput(sessionId: string, event: Event): void {
     const target = event.target as HTMLTextAreaElement | null;
     const content = target?.value ?? '';
-    this.transmissionNotes = {
-      ...this.transmissionNotes,
-      [sessionId]: content,
-    };
-    this.saveTransmissionNotes();
+    this.transmissionNotes[sessionId] = content;
+    this.scheduleTransmissionSave();
   }
 
   ngOnDestroy(): void {
+    this.flushTransmissionSave(this.activePatientId);
     this.patientSubscription?.unsubscribe();
   }
 
@@ -468,10 +469,10 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private saveTransmissionNotes(): void {
-    if (!this.activePatientId) return;
+  private saveTransmissionNotes(patientId: string = this.activePatientId, notes: Record<string, string> = this.transmissionNotes): void {
+    if (!patientId) return;
     try {
-      localStorage.setItem(this.getTransmissionStorageKey(this.activePatientId), JSON.stringify(this.transmissionNotes));
+      localStorage.setItem(this.getTransmissionStorageKey(patientId), JSON.stringify(notes));
     } catch {
       // Ignore localStorage failures (private mode / quota exceeded)
     }
@@ -479,5 +480,23 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
 
   private getTransmissionStorageKey(patientId: string): string {
     return `${this.transmissionStoragePrefix}_${patientId}`;
+  }
+
+  private scheduleTransmissionSave(): void {
+    if (this.transmissionSaveTimeout) {
+      clearTimeout(this.transmissionSaveTimeout);
+    }
+
+    this.transmissionSaveTimeout = setTimeout(() => {
+      this.saveTransmissionNotes();
+      this.transmissionSaveTimeout = undefined;
+    }, this.transmissionSaveDebounceMs);
+  }
+
+  private flushTransmissionSave(patientId: string, notes: Record<string, string> = this.transmissionNotes): void {
+    if (!this.transmissionSaveTimeout) return;
+    clearTimeout(this.transmissionSaveTimeout);
+    this.transmissionSaveTimeout = undefined;
+    this.saveTransmissionNotes(patientId, notes);
   }
 }
