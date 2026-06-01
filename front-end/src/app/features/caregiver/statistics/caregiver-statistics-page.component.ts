@@ -84,11 +84,14 @@ interface SessionTotals {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
+  private readonly transmissionStoragePrefix = 'mc_session_transmissions';
   activePatientName = '';
+  activePatientId = '';
   sessions: Session[] = [];
   dashboard: CaregiverDashboardView = this.buildDashboard([], this.computeTotals([]));
   hasSessions = false;
   isLoading = true;
+  transmissionNotes: Record<string, string> = {};
   radarChartData: ChartData<'radar'> = this.buildRadarData([0, 0, 0, 0]);
   readonly radarChartOptions: ChartOptions<'radar'> = {
     responsive: true,
@@ -169,6 +172,8 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((patient) => {
           this.activePatientName = patient.firstName;
+          this.activePatientId = patient.id;
+          this.transmissionNotes = this.loadTransmissionNotes(patient.id);
           this.objectives = this.getObjectivesForPatient(patient.id);
           this.isLoading = true;
           this.cdr.markForCheck();
@@ -195,6 +200,20 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
 
   trackBySession(_: number, item: RecentSessionView): string {
     return item.id;
+  }
+
+  getTransmissionForSession(sessionId: string): string {
+    return this.transmissionNotes[sessionId] ?? '';
+  }
+
+  onTransmissionInput(sessionId: string, event: Event): void {
+    const target = event.target as HTMLTextAreaElement | null;
+    const content = target?.value ?? '';
+    this.transmissionNotes = {
+      ...this.transmissionNotes,
+      [sessionId]: content,
+    };
+    this.saveTransmissionNotes();
   }
 
   ngOnDestroy(): void {
@@ -434,5 +453,31 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       case 'game-b': return 'Mémoire & réminiscence';
       case 'game-duo': return 'Mode duo';
     }
+  }
+
+  private loadTransmissionNotes(patientId: string): Record<string, string> {
+    if (!patientId) return {};
+
+    try {
+      const raw = localStorage.getItem(this.getTransmissionStorageKey(patientId));
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as Record<string, string>;
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+
+  private saveTransmissionNotes(): void {
+    if (!this.activePatientId) return;
+    try {
+      localStorage.setItem(this.getTransmissionStorageKey(this.activePatientId), JSON.stringify(this.transmissionNotes));
+    } catch {
+      // Ignore localStorage failures (private mode / quota exceeded)
+    }
+  }
+
+  private getTransmissionStorageKey(patientId: string): string {
+    return `${this.transmissionStoragePrefix}_${patientId}`;
   }
 }

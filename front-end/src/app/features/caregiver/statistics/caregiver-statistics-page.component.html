@@ -91,6 +91,14 @@
               <span class="session-pill success">{{ session.successLabel }}</span>
               <span class="session-pill skipped">{{ session.skippedLabel }}</span>
             </div>
+            <label class="session-transmission">
+              <span class="eyebrow">Transmission manuelle</span>
+              <textarea
+                rows="3"
+                [value]="getTransmissionForSession(session.id)"
+                (input)="onTransmissionInput(session.id, $event)"
+                placeholder="Ajouter une note de transmission pour cette séance..."></textarea>
+            </label>
           </article>
         </div>
       </section>
