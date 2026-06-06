@@ -14,7 +14,7 @@
     <section class="method-card glass-card">
       <div>
         <span class="eyebrow">Données réellement traçables</span>
-        <p *ngIf="hasSessions; else emptyDataSummary">{{ dashboard.weeklyRawSummary }}</p>
+        <p *ngIf="hasSessions; else emptyDataSummary">{{ dashboard.dataSummary }}</p>
         <ng-template #emptyDataSummary>
           <p>Aucune séance enregistrée pour le moment. Lancez une activité pour voir les statistiques.</p>
         </ng-template>
@@ -23,45 +23,41 @@
     </section>
 
     <ng-container *ngIf="hasSessions; else emptyState">
-      <section class="kpi-grid" aria-label="Synthèse des indicateurs soignants">
-        <article
-          *ngFor="let card of dashboard.cards; trackBy: trackByCard"
-          class="summary-card glass-card"
-          [ngClass]="'tone-' + card.tone">
-          <div class="card-header">
-            <span class="icon-bubble">
-              <lucide-icon [name]="card.icon"></lucide-icon>
-            </span>
-            <span class="status-badge">{{ card.title }}</span>
-          </div>
-
-          <div class="metric-line">
-            <strong>{{ card.value }}</strong>
-            <span>{{ card.subtitle }}</span>
-          </div>
-
-          <div class="progress-track" aria-hidden="true">
-            <span class="progress-fill" [style.width.%]="card.percent"></span>
-          </div>
-
-          <p>{{ card.detail }}</p>
-          <span class="formula-note">Calcul : {{ card.formula }}</span>
-        </article>
-      </section>
-
-      <section class="radar-card glass-card" aria-label="Comparaison radar des objectifs de séance">
-        <div class="section-heading section-heading--radar">
+      <section
+        *ngFor="let section of dashboard.kpiSections; trackBy: trackByKpiSection"
+        class="gauge-card glass-card"
+        [attr.aria-labelledby]="section.id + '-title'">
+        <div class="section-heading gauge-card__heading">
           <div>
-            <span class="eyebrow">Objectifs vs performance</span>
-            <h2>Radar de séance (toile d’araignée)</h2>
+            <span class="eyebrow">{{ section.eyebrow }}</span>
+            <h2 [id]="section.id + '-title'">{{ section.title }}</h2>
           </div>
-          <span class="sessions-count">Scores normalisés /100</span>
+          <span class="sessions-count">{{ section.subtitle }}</span>
         </div>
-        <p class="radar-card__subtitle">
-          Lecture non clinique : chaque axe traduit les KPIs de jeu en repères simples (Engagement, Autonomie, Réussite, Fluidité).
-        </p>
-        <div class="radar-card__chart">
-          <canvas baseChart [type]="'radar'" [data]="radarChartData" [options]="radarChartOptions"></canvas>
+
+        <div class="gauge-row" aria-label="Indicateurs sous forme de jauges circulaires">
+          <article
+            *ngFor="let gauge of section.gauges; trackBy: trackByGauge"
+            class="gauge-item"
+            [ngClass]="'tone-' + gauge.tone">
+            <div
+              class="donut-gauge"
+              role="img"
+              [attr.aria-label]="gauge.title + ' : ' + gauge.value"
+              [style.background]="getGaugeBackground(gauge)">
+              <div class="donut-gauge__inner">
+                <lucide-icon [name]="gauge.icon"></lucide-icon>
+                <strong>{{ gauge.value }}</strong>
+              </div>
+            </div>
+
+            <div class="gauge-copy">
+              <h3>{{ gauge.title }}</h3>
+              <p class="gauge-subtitle">{{ gauge.subtitle }}</p>
+              <p class="gauge-detail">{{ gauge.detail }}</p>
+              <span class="formula-note">Calcul : {{ gauge.formula }}</span>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -92,7 +88,6 @@
               <span class="session-pill skipped">{{ session.skippedLabel }}</span>
             </div>
 
-            <!-- NOUVELLE ZONE DE NOTE RETRACTABLE -->
             <div class="session-transmission-container" [class.is-expanded]="isNoteExpanded(session.id)">
               <button type="button" class="btn-toggle-note" (click)="toggleNote(session.id)">
                 <lucide-icon name="MessageSquare" class="icon-small"></lucide-icon>
@@ -115,8 +110,6 @@
                 </div>
               </div>
             </div>
-            <!-- FIN NOUVELLE ZONE -->
-
           </article>
         </div>
       </section>
