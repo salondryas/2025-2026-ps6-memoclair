@@ -91,14 +91,32 @@
               <span class="session-pill success">{{ session.successLabel }}</span>
               <span class="session-pill skipped">{{ session.skippedLabel }}</span>
             </div>
-            <label class="session-transmission">
-              <span class="eyebrow">Transmission manuelle</span>
-              <textarea
-                rows="3"
-                [value]="getTransmissionForSession(session.id)"
-                (input)="onTransmissionInput(session.id, $event)"
-                placeholder="Ajouter une note de transmission pour cette séance..."></textarea>
-            </label>
+
+            <!-- NOUVELLE ZONE DE NOTE RETRACTABLE -->
+            <div class="session-transmission-container" [class.is-expanded]="isNoteExpanded(session.id)">
+              <button type="button" class="btn-toggle-note" (click)="toggleNote(session.id)">
+                <lucide-icon name="MessageSquare" class="icon-small"></lucide-icon>
+                <span>{{ getTransmissionForSession(session.id) ? 'Voir / Modifier la note' : 'Ajouter une note soignant' }}</span>
+                <lucide-icon name="ChevronDown" class="icon-chevron"></lucide-icon>
+              </button>
+
+              <div class="collapsible-note">
+                <div class="collapsible-note-inner glass-card">
+                  <textarea
+                    rows="3"
+                    [value]="getTransmissionForSession(session.id)"
+                    (input)="onTransmissionInput(session.id, $event)"
+                    placeholder="Ex: Fractionner les consignes, fatigabilité observée en fin de séance..."></textarea>
+
+                  <button type="button" class="btn-save-note" (click)="saveNote(session.id)">
+                    <lucide-icon name="Save" class="icon-small"></lucide-icon>
+                    <span>Enregistrer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- FIN NOUVELLE ZONE -->
+
           </article>
         </div>
       </section>

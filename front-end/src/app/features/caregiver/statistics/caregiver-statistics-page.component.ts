@@ -93,6 +93,10 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   hasSessions = false;
   isLoading = true;
   transmissionNotes: Record<string, string> = {};
+
+  // --- NOUVEAU : GESTION UI DES NOTES RETRACTABLES ---
+  expandedNotes: Set<string> = new Set<string>();
+
   radarChartData: ChartData<'radar'> = this.buildRadarData([0, 0, 0, 0]);
   readonly radarChartOptions: ChartOptions<'radar'> = {
     responsive: true,
@@ -204,6 +208,25 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   trackBySession(_: number, item: RecentSessionView): string {
     return item.id;
   }
+
+  // --- NOUVEAU : METHODES UI POUR LA NOTE RETRACTABLE ---
+  toggleNote(sessionId: string): void {
+    if (this.expandedNotes.has(sessionId)) {
+      this.expandedNotes.delete(sessionId);
+    } else {
+      this.expandedNotes.add(sessionId);
+    }
+  }
+
+  isNoteExpanded(sessionId: string): boolean {
+    return this.expandedNotes.has(sessionId);
+  }
+
+  saveNote(sessionId: string): void {
+    this.scheduleTransmissionSave();
+    this.expandedNotes.delete(sessionId); // Referme le panneau après clic sur le bouton
+  }
+  // --- FIN METHODES UI ---
 
   getTransmissionForSession(sessionId: string): string {
     return this.transmissionNotes[sessionId] ?? '';
