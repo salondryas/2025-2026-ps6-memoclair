@@ -3,29 +3,28 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { of, Subscription, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ChartData, ChartOptions } from 'chart.js';
 import {
   Battery,
+  ChevronDown,
   CircleHelp,
-  Clock,
   LUCIDE_ICONS,
   LucideAngularModule,
   LucideIconProvider,
+  MessageSquare,
+  Save,
   Target,
 } from 'lucide-angular';
 
 import { PatientContextService } from '../../../core/services/patient-context.service';
-import { DEFAULT_PROFILE_OBJECTIVES, ProfileObjectives } from '../../../models/patient.model';
 import { SessionResult as Session } from '../../../models/session.model';
 import { StatisticsService } from '../services/statistics.service';
 import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
-import { NgChartsModule } from 'ng2-charts';
-import { CaregiverProfileService } from '../services/caregiver-profile.service';
 
 type KpiTone = 'good' | 'medium' | 'attention';
-type KpiIcon = 'clock' | 'battery' | 'target' | 'circle-help';
+type KpiIcon = 'battery' | 'target' | 'circle-help';
+type KpiScope = 'last-session' | 'lifetime';
 
-interface CaregiverKpiCard {
+interface CaregiverKpiGauge {
   title: string;
   value: string;
   subtitle: string;
@@ -34,6 +33,14 @@ interface CaregiverKpiCard {
   percent: number;
   tone: KpiTone;
   icon: KpiIcon;
+}
+
+interface KpiGaugeSection {
+  id: KpiScope;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  gauges: CaregiverKpiGauge[];
 }
 
 interface RecentSessionView {
@@ -47,36 +54,33 @@ interface RecentSessionView {
 }
 
 interface CaregiverDashboardView {
-  cards: CaregiverKpiCard[];
+  kpiSections: KpiGaugeSection[];
   recentSessions: RecentSessionView[];
-  weeklyRawSummary: string;
+  dataSummary: string;
   practicalTip: string;
 }
 
 interface SessionTotals {
-  totalDuration: number;
-  nbrSessionsThisWeek: number;
+  sessionCount: number;
   totalQuestions: number;
   totalGoodAnswers: number;
   totalErrors: number;
   totalIndices: number;
   totalPassed: number;
-  assistanceAverage: number;
+  assistancePercent: number;
   successRate: number;
-  blockingRatio: number;
   blockingPercent: number;
-  participationPercent: number;
 }
 
 @Component({
   selector: 'app-caregiver-statistics-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule, NgChartsModule],
+  imports: [CommonModule, RouterLink, CaregiverShellComponent, LucideAngularModule],
   providers: [
     {
       provide: LUCIDE_ICONS,
       multi: true,
-      useValue: new LucideIconProvider({ Clock, Battery, Target, CircleHelp }),
+      useValue: new LucideIconProvider({ Battery, ChevronDown, CircleHelp, MessageSquare, Save, Target }),
     },
   ],
   templateUrl: './caregiver-statistics-page.component.html',
@@ -89,87 +93,19 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
   activePatientName = '';
   activePatientId = '';
   sessions: Session[] = [];
-  dashboard: CaregiverDashboardView = this.buildDashboard([], this.computeTotals([]));
+  dashboard: CaregiverDashboardView = this.buildDashboard([]);
   hasSessions = false;
   isLoading = true;
   transmissionNotes: Record<string, string> = {};
 
-  // --- NOUVEAU : GESTION UI DES NOTES RETRACTABLES ---
   expandedNotes: Set<string> = new Set<string>();
-
-  radarChartData: ChartData<'radar'> = this.buildRadarData([0, 0, 0, 0]);
-  readonly radarChartOptions: ChartOptions<'radar'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 700,
-      easing: 'easeOutQuart',
-    },
-    scales: {
-      r: {
-        beginAtZero: true,
-        max: 100,
-        ticks: {
-          display: false,
-          stepSize: 20,
-          backdropColor: 'transparent',
-        },
-        grid: {
-          color: 'rgba(107, 143, 113, 0.12)',
-          circular: true,
-        },
-        angleLines: {
-          color: 'rgba(107, 143, 113, 0.14)',
-        },
-        pointLabels: {
-          color: '#315b43',
-          font: {
-            size: 13,
-            family: "'Inter', 'Segoe UI', sans-serif",
-            weight: 700,
-          },
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: '#315b43',
-          usePointStyle: true,
-          boxWidth: 10,
-          font: {
-            size: 12,
-            weight: 600,
-          },
-        },
-      },
-      tooltip: {
-        backgroundColor: 'rgba(31, 51, 40, 0.9)',
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-      },
-    },
-    elements: {
-      line: {
-        borderWidth: 2,
-        tension: 0.25,
-      },
-      point: {
-        radius: 3,
-        hoverRadius: 5,
-      },
-    },
-  };
 
   private patientSubscription?: Subscription;
   private transmissionSaveTimeout?: ReturnType<typeof setTimeout>;
-  private readonly weeklyGoalMinutes = 45;
-  private objectives: ProfileObjectives = { ...DEFAULT_PROFILE_OBJECTIVES };
 
   constructor(
     private readonly patientContextService: PatientContextService,
     private readonly statisticsService: StatisticsService,
-    private readonly caregiverProfileService: CaregiverProfileService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
@@ -181,7 +117,6 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
           this.activePatientName = patient.firstName;
           this.activePatientId = patient.id;
           this.transmissionNotes = this.loadTransmissionNotes(patient.id);
-          this.objectives = this.getObjectivesForPatient(patient.id);
           this.isLoading = true;
           this.cdr.markForCheck();
 
@@ -193,15 +128,17 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
       .subscribe((sessions) => {
         this.sessions = sessions;
         this.hasSessions = sessions.length > 0;
-        const totals = this.computeTotals(sessions);
-        this.dashboard = this.buildDashboard(sessions, totals);
-        this.radarChartData = this.buildRadarData(this.normalizeRadarScores(totals));
+        this.dashboard = this.buildDashboard(sessions);
         this.isLoading = false;
         this.cdr.markForCheck();
       });
   }
 
-  trackByCard(_: number, item: CaregiverKpiCard): string {
+  trackByKpiSection(_: number, item: KpiGaugeSection): string {
+    return item.id;
+  }
+
+  trackByGauge(_: number, item: CaregiverKpiGauge): string {
     return item.title;
   }
 
@@ -209,7 +146,6 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-  // --- NOUVEAU : METHODES UI POUR LA NOTE RETRACTABLE ---
   toggleNote(sessionId: string): void {
     if (this.expandedNotes.has(sessionId)) {
       this.expandedNotes.delete(sessionId);
@@ -224,9 +160,8 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
 
   saveNote(sessionId: string): void {
     this.scheduleTransmissionSave();
-    this.expandedNotes.delete(sessionId); // Referme le panneau après clic sur le bouton
+    this.expandedNotes.delete(sessionId);
   }
-  // --- FIN METHODES UI ---
 
   getTransmissionForSession(sessionId: string): string {
     return this.transmissionNotes[sessionId] ?? '';
@@ -239,145 +174,144 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     this.scheduleTransmissionSave();
   }
 
+  getGaugeBackground(gauge: CaregiverKpiGauge): string {
+    return `conic-gradient(${this.getToneColor(gauge.tone)} ${gauge.percent * 3.6}deg, rgba(34, 48, 42, 0.08) 0deg)`;
+  }
+
   ngOnDestroy(): void {
     this.flushTransmissionSave(this.activePatientId);
     this.patientSubscription?.unsubscribe();
   }
 
-  private buildDashboard(sessions: Session[], totals: SessionTotals): CaregiverDashboardView {
+  private buildDashboard(sessions: Session[]): CaregiverDashboardView {
+    const lastSession = sessions.length ? [sessions[0]] : [];
+    const lastTotals = this.computeTotals(lastSession, 'last-session');
+    const lifetimeTotals = this.computeTotals(sessions, 'lifetime');
+
     return {
-      cards: [
+      kpiSections: [
         {
-          title: 'Participation active',
-          value: `${totals.totalDuration} min`,
-          subtitle: `${totals.nbrSessionsThisWeek} séance(s) cette semaine`,
-          detail: this.buildParticipationDetail(totals.totalDuration, totals.nbrSessionsThisWeek),
-          formula: 'Somme des durées de toutes les sessions',
-          percent: totals.participationPercent,
-          tone: totals.participationPercent >= 80 ? 'good' : totals.participationPercent >= 50 ? 'medium' : 'attention',
-          icon: 'clock',
+          id: 'last-session',
+          eyebrow: 'Dernière séance',
+          title: 'Bilan de la dernière séance',
+          subtitle: sessions[0]
+            ? `${this.formatSessionDate(sessions[0].startedAt)} · ${this.mapGameLabel(sessions[0].gameType)}`
+            : 'Aucune séance disponible',
+          gauges: this.buildKpiGauges(lastTotals, 'last-session'),
         },
         {
-          title: 'Assistance requise',
-          value: this.mapAssistanceLabel(totals.assistanceAverage),
-          subtitle: `${totals.totalIndices} indice(s), ${totals.totalPassed} question(s) passée(s)`,
-          detail: this.buildAssistanceDetail(totals.assistanceAverage),
-          formula: '(indices utilisés + questions passées) / nombre total de séances',
-          percent: Math.min(Math.round((totals.assistanceAverage / 5) * 100), 100),
-          tone: totals.assistanceAverage < 2 ? 'good' : totals.assistanceAverage < 5 ? 'medium' : 'attention',
-          icon: 'battery',
-        },
-        {
-          title: 'Réussite observable',
-          value: `${totals.successRate}%`,
-          subtitle: `${totals.totalGoodAnswers}/${totals.totalQuestions} réponses réussies`,
-          detail: this.buildSuccessDetail(totals.successRate),
-          formula: '(bonnes réponses / questions proposées) × 100',
-          percent: totals.successRate,
-          tone: totals.successRate >= 75 ? 'good' : totals.successRate >= 50 ? 'medium' : 'attention',
-          icon: 'target',
-        },
-        {
-          title: 'Points de blocage',
-          value: this.mapBlockingLabel(totals.blockingRatio),
-          subtitle: `${totals.totalErrors} erreur(s), ${totals.totalPassed} question(s) passée(s)`,
-          detail: this.buildBlockingDetail(totals.blockingRatio),
-          formula: '(erreurs + questions passées) / questions proposées',
-          percent: totals.blockingPercent,
-          tone: totals.blockingRatio < 0.25 ? 'good' : totals.blockingRatio < 0.5 ? 'medium' : 'attention',
-          icon: 'circle-help',
+          id: 'lifetime',
+          eyebrow: 'Toutes les séances',
+          title: 'Tendances globales (Toutes les séances)',
+          subtitle: `${sessions.length} séance(s) prise(s) en compte · moyenne des ratios de chaque séance`,
+          gauges: this.buildKpiGauges(lifetimeTotals, 'lifetime'),
         },
       ],
       recentSessions: sessions.map((session) => this.mapSession(session)),
-      weeklyRawSummary: `${sessions.length} séance(s), ${totals.totalQuestions} question(s), ${totals.totalIndices} indice(s), ${totals.totalPassed} question(s) passée(s).`,
-      practicalTip: this.buildPracticalTip(totals),
+      dataSummary: `${sessions.length} séance(s), ${lifetimeTotals.totalQuestions} question(s), ${lifetimeTotals.totalIndices} indice(s), ${lifetimeTotals.totalPassed} question(s) passée(s).`,
+      practicalTip: this.buildPracticalTip(lifetimeTotals),
     };
   }
 
-  private computeTotals(sessions: Session[]): SessionTotals {
-    const totalDuration = this.sum(sessions, (session) => session.durationMinutes);
+  private buildKpiGauges(totals: SessionTotals, scope: KpiScope): CaregiverKpiGauge[] {
+    const assistanceDetailPrefix = scope === 'lifetime' ? 'En moyenne, ' : '';
+    const successDetailPrefix = scope === 'lifetime' ? 'Sur la tendance globale, ' : '';
+    const blockingDetailPrefix = scope === 'lifetime' ? 'Sur l’ensemble des séances, ' : '';
+
+    return [
+      {
+        title: 'Assistance requise',
+        value: `${totals.assistancePercent}%`,
+        subtitle: `${totals.totalIndices + totals.totalPassed}/${totals.totalQuestions} aide(s) ou passage(s)`,
+        detail: `${assistanceDetailPrefix}${this.buildAssistanceDetail(totals.assistancePercent)}`,
+        formula: '(indices utilisés + questions passées) / questions proposées',
+        percent: totals.assistancePercent,
+        tone: this.getLowerIsBetterTone(totals.assistancePercent),
+        icon: 'battery',
+      },
+      {
+        title: 'Réussite observable',
+        value: `${totals.successRate}%`,
+        subtitle: `${totals.totalGoodAnswers}/${totals.totalQuestions} réussites`,
+        detail: `${successDetailPrefix}${this.buildSuccessDetail(totals.successRate)}`,
+        formula: '(bonnes réponses / questions proposées) × 100',
+        percent: totals.successRate,
+        tone: totals.successRate >= 75 ? 'good' : totals.successRate >= 50 ? 'medium' : 'attention',
+        icon: 'target',
+      },
+      {
+        title: 'Points de blocage',
+        value: `${totals.blockingPercent}%`,
+        subtitle: `${totals.totalErrors + totals.totalPassed}/${totals.totalQuestions} erreur(s) ou passage(s)`,
+        detail: `${blockingDetailPrefix}${this.buildBlockingDetail(totals.blockingPercent)}`,
+        formula: '(erreurs + questions passées) / questions proposées',
+        percent: totals.blockingPercent,
+        tone: this.getLowerIsBetterTone(totals.blockingPercent),
+        icon: 'circle-help',
+      },
+    ];
+  }
+
+  private computeTotals(sessions: Session[], scope: KpiScope): SessionTotals {
     const totalQuestions = this.sum(sessions, (session) => this.getTotalQuestions(session));
     const totalErrors = this.sum(sessions, (session) => session.observation.wrongAnswers);
     const totalPassed = this.sum(sessions, (session) => session.observation.skippedMoments);
     const totalIndices = this.sum(sessions, (session) => session.observation.hintCount);
     const totalGoodAnswers = this.sum(sessions, (session) => this.getCorrectAnswers(session));
-    const assistanceAverage = sessions.length ? (totalIndices + totalPassed) / sessions.length : 0;
-    const successRate = totalQuestions ? Math.round((totalGoodAnswers / totalQuestions) * 100) : 0;
-    const blockingRatio = totalQuestions ? (totalErrors + totalPassed) / totalQuestions : 0;
-    const blockingPercent = Math.min(Math.round(blockingRatio * 100), 100);
+
+    const assistancePercent = scope === 'lifetime'
+      ? this.averageSessionPercent(sessions, (session) => session.observation.hintCount + session.observation.skippedMoments)
+      : this.computePercent(totalIndices + totalPassed, totalQuestions);
+    const successRate = scope === 'lifetime'
+      ? this.averageSessionPercent(sessions, (session) => this.getCorrectAnswers(session))
+      : this.computePercent(totalGoodAnswers, totalQuestions);
+    const blockingPercent = scope === 'lifetime'
+      ? this.averageSessionPercent(sessions, (session) => session.observation.wrongAnswers + session.observation.skippedMoments)
+      : this.computePercent(totalErrors + totalPassed, totalQuestions);
 
     return {
-      totalDuration,
-      nbrSessionsThisWeek: sessions.filter((session) => this.isSessionThisWeek(session)).length,
+      sessionCount: sessions.length,
       totalQuestions,
       totalGoodAnswers,
       totalErrors,
       totalIndices,
       totalPassed,
-      assistanceAverage,
+      assistancePercent,
       successRate,
-      blockingRatio,
       blockingPercent,
-      participationPercent: Math.min(Math.round((totalDuration / this.weeklyGoalMinutes) * 100), 100),
     };
   }
 
-  private normalizeRadarScores(totals: SessionTotals): [number, number, number, number] {
-    return [
-      this.normalizeHigherIsBetter(totals.totalDuration, this.objectives.targetEngagementMinutes),
-      this.normalizeLowerIsBetter(totals.totalIndices, this.objectives.targetAutonomyHintCount),
-      this.normalizeHigherIsBetter(totals.successRate, this.objectives.targetSuccessRate),
-      this.normalizeLowerIsBetter(totals.totalErrors, this.objectives.targetFluidityErrorCount),
-    ];
+  private averageSessionPercent(sessions: Session[], numeratorSelector: (session: Session) => number): number {
+    const ratios = sessions
+      .map((session) => this.computePercent(numeratorSelector(session), this.getTotalQuestions(session)))
+      .filter((percent) => Number.isFinite(percent));
+
+    if (!ratios.length) return 0;
+    return this.clampPercent(Math.round(ratios.reduce((total, percent) => total + percent, 0) / ratios.length));
   }
 
-  private buildRadarData(scores: [number, number, number, number]): ChartData<'radar'> {
-    return {
-      labels: ['Engagement', 'Autonomie', 'Réussite', 'Fluidité'],
-      datasets: [
-        {
-          label: 'Performance actuelle',
-          data: scores,
-          borderColor: '#3a7554',
-          backgroundColor: 'rgba(58, 117, 84, 0.22)',
-          pointBackgroundColor: '#3a7554',
-          pointBorderColor: '#ffffff',
-          pointHoverBackgroundColor: '#ffffff',
-          pointHoverBorderColor: '#3a7554',
-        },
-        {
-          label: 'Objectif',
-          data: [100, 100, 100, 100],
-          borderColor: 'rgba(107, 143, 113, 0.55)',
-          borderDash: [7, 5],
-          backgroundColor: 'rgba(107, 143, 113, 0.06)',
-          pointRadius: 0,
-        },
-      ],
-    };
+  private computePercent(numerator: number, denominator: number): number {
+    if (denominator <= 0) return 0;
+    return this.clampPercent(Math.round((numerator / denominator) * 100));
   }
 
-  private normalizeHigherIsBetter(actual: number, target: number): number {
-    if (target <= 0) return 0;
-    return this.clampScore((actual / target) * 100);
+  private clampPercent(percent: number): number {
+    return Math.max(0, Math.min(100, percent));
   }
 
-  private normalizeLowerIsBetter(actual: number, maxExpected: number): number {
-    if (maxExpected < 0) return 0;
-    if (maxExpected === 0) return actual <= 0 ? 100 : 0;
-    return this.clampScore(100 - (actual / maxExpected) * 100);
+  private getLowerIsBetterTone(percent: number): KpiTone {
+    if (percent < 25) return 'good';
+    if (percent < 50) return 'medium';
+    return 'attention';
   }
 
-  private clampScore(score: number): number {
-    return Math.round(Math.max(0, Math.min(100, score)));
-  }
-
-  private getObjectivesForPatient(patientId: string): ProfileObjectives {
-    const profile = this.caregiverProfileService.getProfile(patientId);
-    return {
-      ...DEFAULT_PROFILE_OBJECTIVES,
-      ...(profile?.objectives ?? {}),
-    };
+  private getToneColor(tone: KpiTone): string {
+    switch (tone) {
+      case 'good': return '#6b8f71';
+      case 'medium': return '#d4a96a';
+      case 'attention': return '#e07070';
+    }
   }
 
   private mapSession(session: Session): RecentSessionView {
@@ -405,60 +339,28 @@ export class CaregiverStatisticsPageComponent implements OnInit, OnDestroy {
     return Math.max(0, (session.totalQuestions ?? 0) - session.observation.wrongAnswers - session.observation.skippedMoments);
   }
 
-  private isSessionThisWeek(session: Session): boolean {
-    const startedAt = new Date(session.startedAt);
-    if (Number.isNaN(startedAt.getTime())) return false;
-
-    const now = new Date();
-    const weekStartsAt = new Date(now);
-    const day = weekStartsAt.getDay() || 7;
-    weekStartsAt.setDate(weekStartsAt.getDate() - day + 1);
-    weekStartsAt.setHours(0, 0, 0, 0);
-
-    return startedAt >= weekStartsAt && startedAt <= now;
-  }
-
-  private mapAssistanceLabel(avgSignals: number): string {
-    if (avgSignals < 2) return 'Légère';
-    if (avgSignals < 5) return 'Modérée';
-    return 'Soutenue';
-  }
-
-  private mapBlockingLabel(blockingRatio: number): string {
-    if (blockingRatio < 0.25) return 'Fluide';
-    if (blockingRatio < 0.5) return 'Quelques arrêts';
-    return 'À alléger';
-  }
-
-  private buildParticipationDetail(totalDuration: number, sessionsCount: number): string {
-    if (totalDuration >= this.weeklyGoalMinutes) return 'Participation solide : conserver le rituel actuel et valoriser la régularité.';
-    if (sessionsCount >= 2) return 'Participation en construction : ajouter une séance courte peut consolider l’habitude.';
-    return 'Participation fragile : privilégier des séquences très courtes et prévisibles.';
-  }
-
-  private buildAssistanceDetail(avgSignals: number): string {
-    if (avgSignals < 2) return 'Peu d’aide nécessaire : lancer avec une consigne simple et laisser du temps.';
-    if (avgSignals < 5) return 'Prévoir une présence proche, reformuler puis laisser essayer seul.';
-    return 'Rester à côté et fractionner les consignes pour limiter la mise en échec.';
+  private buildAssistanceDetail(assistancePercent: number): string {
+    if (assistancePercent < 25) return 'peu d’aide a été nécessaire : laisser du temps et valoriser l’initiative.';
+    if (assistancePercent < 50) return 'prévoir une présence proche, reformuler puis laisser essayer seul.';
+    return 'l’aide est fréquente : fractionner les consignes et limiter la mise en échec.';
   }
 
   private buildSuccessDetail(successRate: number): string {
-    if (successRate >= 75) return 'Le niveau semble accessible : conserver ce format pour valoriser la réussite.';
-    if (successRate >= 50) return 'Le niveau est utilisable avec quelques reformulations bienveillantes.';
-    return 'Réduire le nombre de choix ou choisir une activité plus familière.';
+    if (successRate >= 75) return 'le niveau semble accessible : conserver ce format pour valoriser la réussite.';
+    if (successRate >= 50) return 'le niveau est utilisable avec quelques reformulations bienveillantes.';
+    return 'réduire le nombre de choix ou choisir une activité plus familière.';
   }
 
-  private buildBlockingDetail(blockingRatio: number): string {
-    if (blockingRatio < 0.25) return 'Parcours fluide : garder le rythme et les supports actuels.';
-    if (blockingRatio < 0.5) return 'Quelques arrêts : vérifier la fatigue et simplifier si besoin.';
-    return 'Beaucoup d’arrêts : raccourcir la séance et proposer plus d’indices visuels.';
+  private buildBlockingDetail(blockingPercent: number): string {
+    if (blockingPercent < 25) return 'parcours fluide : garder le rythme et les supports actuels.';
+    if (blockingPercent < 50) return 'quelques arrêts : vérifier la fatigue et simplifier si besoin.';
+    return 'beaucoup d’arrêts : raccourcir la séance et proposer plus d’indices visuels.';
   }
 
   private buildPracticalTip(totals: SessionTotals): string {
-    if (totals.blockingRatio >= 0.5) return 'Pour la prochaine animation : réduire le nombre de choix et accepter plus vite le bouton “indice”.';
-    if (totals.assistanceAverage >= 5) return 'Pour la prochaine animation : démarrer en duo, rester à côté et fractionner chaque consigne.';
+    if (totals.blockingPercent >= 50) return 'Pour la prochaine animation : réduire le nombre de choix et accepter plus vite le bouton “indice”.';
+    if (totals.assistancePercent >= 50) return 'Pour la prochaine animation : démarrer en duo, rester à côté et fractionner chaque consigne.';
     if (totals.successRate > 0 && totals.successRate < 50) return 'Pour la prochaine animation : choisir des supports plus familiers avant d’augmenter la difficulté.';
-    if (totals.participationPercent < 50) return 'Pour la prochaine animation : viser deux séquences de 8 à 10 minutes plutôt qu’une longue séance.';
     return 'Pour la prochaine animation : garder le même niveau et féliciter explicitement les réussites.';
   }
 

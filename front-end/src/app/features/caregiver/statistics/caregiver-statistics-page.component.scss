@@ -21,8 +21,6 @@
 .hero-card,
 .method-card,
 .section-heading,
-.metric-line,
-.card-header,
 .session-card,
 .session-main,
 .session-pills {
@@ -64,26 +62,6 @@
   text-transform: uppercase;
 }
 
-.patient-picker {
-  display: grid;
-  gap: 0.45rem;
-  min-width: 230px;
-  color: #66736e;
-  font-weight: 750;
-
-  select {
-    width: 100%;
-    border: 1px solid rgba(95, 138, 111, 0.22);
-    border-radius: 999px;
-    padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.88);
-    color: #22302a;
-    cursor: pointer;
-    font: inherit;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  }
-}
-
 .method-card {
   justify-content: space-between;
   gap: 1rem;
@@ -115,116 +93,149 @@
   }
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.summary-card {
-  min-height: 304px;
-  padding: 1.25rem;
-  overflow: hidden;
+.gauge-card {
   position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  padding: 1.35rem 1.5rem 1.5rem;
 
+  &::before,
   &::after {
     content: '';
     position: absolute;
-    right: -46px;
-    top: -46px;
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    background: rgba(107, 143, 113, 0.13);
+    border-radius: 999px;
     pointer-events: none;
   }
 
-  p {
-    margin: 0.85rem 0 0;
-    color: #53645d;
-    font-size: 0.95rem;
-    line-height: 1.45;
+  &::before {
+    right: -58px;
+    top: -70px;
+    width: 190px;
+    height: 190px;
+    background: radial-gradient(circle, rgba(107, 143, 113, 0.18), rgba(107, 143, 113, 0));
+  }
+
+  &::after {
+    left: 12%;
+    bottom: -92px;
+    width: 230px;
+    height: 230px;
+    background: radial-gradient(circle, rgba(212, 169, 106, 0.13), rgba(212, 169, 106, 0));
   }
 }
 
-.card-header {
+.gauge-card__heading {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1.25rem;
+}
+
+.section-heading {
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
+  gap: 1rem;
 
-.icon-bubble {
-  display: inline-grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border-radius: 18px;
-  color: #315b43;
-  background: rgba(107, 143, 113, 0.16);
-
-  lucide-icon {
-    width: 25px;
-    height: 25px;
+  h2 {
+    margin: 0.2rem 0 0;
+    color: #1f3328;
+    font-size: 1.25rem;
   }
 }
 
-.status-badge,
-.session-pill,
 .sessions-count {
   border-radius: 999px;
   padding: 0.42rem 0.72rem;
+  color: #466654;
+  background: rgba(107, 143, 113, 0.14);
   font-size: 0.78rem;
   font-weight: 850;
   white-space: nowrap;
 }
 
-.status-badge {
-  color: #315b43;
-  background: rgba(107, 143, 113, 0.13);
+.gauge-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.metric-line {
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 70px;
+.gauge-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.95rem;
+  min-height: 330px;
+  padding: 1.1rem 1rem;
+  border: 1px solid rgba(95, 138, 111, 0.13);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.36));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 16px 34px rgba(47, 66, 56, 0.08);
+}
+
+.donut-gauge {
+  display: grid;
+  width: clamp(132px, 16vw, 174px);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: 0 18px 38px rgba(47, 66, 56, 0.14);
+}
+
+.donut-gauge__inner {
+  display: grid;
+  width: 74%;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(247, 246, 240, 0.82));
+  color: #315b43;
+  box-shadow: inset 0 2px 10px rgba(47, 66, 56, 0.08);
+
+  lucide-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: -0.35rem;
+    color: currentColor;
+  }
 
   strong {
     color: #1f3328;
-    font-size: clamp(1.55rem, 2.8vw, 2.12rem);
-    line-height: 1.02;
-  }
-
-  span {
-    max-width: 112px;
-    color: #7a877f;
-    font-size: 0.84rem;
-    font-weight: 850;
-    line-height: 1.25;
-    text-align: right;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+    line-height: 1;
   }
 }
 
-.progress-track {
-  height: 12px;
-  margin-top: 1rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(34, 48, 42, 0.08);
+.gauge-copy {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 280px;
+  text-align: center;
+
+  h3 {
+    margin: 0;
+    color: #1f3328;
+    font-size: 1.05rem;
+  }
+
+  p {
+    margin: 0;
+  }
 }
 
-.progress-fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #6b8f71, #98b58e);
-  box-shadow: 0 6px 16px rgba(107, 143, 113, 0.24);
+.gauge-subtitle {
+  color: #66736e;
+  font-weight: 850;
+}
+
+.gauge-detail {
+  color: #53645d;
+  font-size: 0.92rem;
+  line-height: 1.42;
 }
 
 .formula-note {
   display: inline-flex;
-  margin-top: 1rem;
+  justify-content: center;
+  margin-top: 0.25rem;
   color: #466654;
   font-size: 0.78rem;
   font-weight: 800;
@@ -232,26 +243,22 @@
 }
 
 .tone-medium {
-  .icon-bubble,
-  .status-badge {
+  .donut-gauge__inner {
     color: #805c18;
-    background: rgba(212, 169, 106, 0.18);
   }
 
-  .progress-fill {
-    background: linear-gradient(90deg, #d4a96a, #e9c98f);
+  .formula-note {
+    color: #805c18;
   }
 }
 
 .tone-attention {
-  .icon-bubble,
-  .status-badge {
+  .donut-gauge__inner {
     color: #9b4b35;
-    background: rgba(224, 112, 112, 0.16);
   }
 
-  .progress-fill {
-    background: linear-gradient(90deg, #e07070, #e9a08f);
+  .formula-note {
+    color: #9b4b35;
   }
 }
 
@@ -267,50 +274,8 @@
   }
 }
 
-.radar-card {
-  margin-bottom: 1rem;
-  padding: 1.25rem 1.5rem 1.4rem;
-}
-
-.section-heading--radar {
-  margin-bottom: 0.65rem;
-}
-
-.radar-card__subtitle {
-  margin: 0 0 1rem;
-  color: #53645d;
-  font-size: 0.95rem;
-  line-height: 1.45;
-}
-
-.radar-card__chart {
-  position: relative;
-  height: clamp(280px, 48vw, 420px);
-  border-radius: 22px;
-  border: 1px solid rgba(95, 138, 111, 0.12);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(240, 247, 242, 0.4));
-  padding: 0.85rem;
-}
-
 .sessions-section {
   padding: 1.35rem;
-}
-
-.section-heading {
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  h2 {
-    margin: 0.2rem 0 0;
-    color: #1f3328;
-    font-size: 1.25rem;
-  }
-}
-
-.sessions-count {
-  color: #466654;
-  background: rgba(107, 143, 113, 0.14);
 }
 
 .session-list {
@@ -348,8 +313,13 @@
 }
 
 .session-pill {
+  border-radius: 999px;
+  padding: 0.42rem 0.72rem;
   color: #315b43;
   background: rgba(107, 143, 113, 0.14);
+  font-size: 0.78rem;
+  font-weight: 850;
+  white-space: nowrap;
 
   &.assistance {
     color: #805c18;
@@ -367,81 +337,11 @@
   }
 }
 
-@media (max-width: 1080px) {
-  .kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .stats-page {
-    padding: 1.25rem 1rem 3rem;
-  }
-
-  .hero-card,
-  .method-card,
-  .section-heading,
-  .session-main {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .patient-picker {
-    min-width: 100%;
-  }
-
-  .kpi-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .metric-line span {
-    max-width: none;
-  }
-
-  .session-date {
-    min-width: 0;
-  }
-}
-
-:host-context(.high-contrast) {
-  .glass-card,
-  .patient-picker select,
-  .session-card {
-    background: rgba(0, 0, 0, 0.9) !important;
-    border-color: rgba(255, 255, 255, 0.44) !important;
-    color: #ffffff !important;
-    backdrop-filter: none !important;
-  }
-
-  h1,
-  h2,
-  p,
-  strong,
-  span,
-  .hero-copy p,
-  .summary-card p,
-  .method-card p,
-  .patient-picker select {
-    color: #ffffff !important;
-  }
-
-  .status-badge,
-  .session-pill,
-  .sessions-count,
-  .icon-bubble {
-    background: rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-  }
-}
-/* ==========================================================================
-   NOUVEAU : COMPOSANT DE NOTE (Divulgation Progressive)
-   ========================================================================== */
-
 .session-transmission-container {
-  width: 100%;
-  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
 .btn-toggle-note {
@@ -449,14 +349,15 @@
   align-items: center;
   align-self: flex-start;
   gap: 0.5rem;
-  background: none;
   border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  background: none;
   color: #53645d;
+  cursor: pointer;
+  font: inherit;
   font-size: 0.85rem;
   font-weight: 750;
-  cursor: pointer;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
   transition: background-color 0.2s ease, color 0.2s ease;
 
   &:hover {
@@ -476,32 +377,31 @@
   }
 }
 
-/* --- Technique d'animation fluide de la hauteur --- */
 .collapsible-note {
   display: grid;
-  grid-template-rows: 0fr; /* Hauteur 0 par défaut */
+  grid-template-rows: 0fr;
   transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .collapsible-note-inner {
-    overflow: hidden;
-    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.5); /* Effet verre plus léger pour l'intérieur */
+    overflow: hidden;
     border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.5);
 
     textarea {
       width: 100%;
-      background: transparent;
       border: none;
-      resize: none;
+      outline: none;
       padding: 0;
+      background: transparent;
+      color: #22302a;
       font-family: inherit;
       font-size: 0.9rem;
-      color: #22302a;
-      outline: none;
+      resize: none;
 
       &::placeholder {
         color: #7a877f;
@@ -510,38 +410,38 @@
   }
 }
 
-/* --- État Déplié --- */
 .is-expanded {
   .icon-chevron {
     transform: rotate(-180deg);
   }
 
   .collapsible-note {
-    grid-template-rows: 1fr; /* Déplie la zone à la taille exacte du contenu */
+    grid-template-rows: 1fr;
     margin-top: 0.5rem;
 
     .collapsible-note-inner {
-      padding: 1rem;
       border-color: rgba(95, 138, 111, 0.25);
+      padding: 1rem;
     }
   }
 }
 
 .btn-save-note {
-  align-self: flex-end;
   display: inline-flex;
   align-items: center;
+  align-self: flex-end;
   gap: 0.4rem;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
   background: #315b43;
   color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
   font-size: 0.8rem;
   font-weight: 800;
-  cursor: pointer;
-  transition: background-color 0.2s;
   box-shadow: 0 4px 10px rgba(49, 91, 67, 0.2);
+  transition: background-color 0.2s;
 
   &:hover {
     background: #24382d;
@@ -553,15 +453,83 @@
   }
 }
 
-/* Support du mode Contraste Élevé pour cette nouvelle zone */
+@media (max-width: 980px) {
+  .gauge-row {
+    grid-template-columns: 1fr;
+  }
+
+  .gauge-item {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .stats-page {
+    padding: 1.25rem 1rem 3rem;
+  }
+
+  .hero-card,
+  .method-card,
+  .section-heading,
+  .session-main {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sessions-count {
+    white-space: normal;
+  }
+
+  .session-date {
+    min-width: 0;
+  }
+}
+
 :host-context(.high-contrast) {
+  .glass-card,
+  .session-card,
+  .gauge-item,
+  .donut-gauge__inner {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.44) !important;
+    color: #ffffff !important;
+    backdrop-filter: none !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  strong,
+  span,
+  .hero-copy p,
+  .method-card p,
+  .gauge-detail,
+  .gauge-subtitle,
+  .formula-note {
+    color: #ffffff !important;
+  }
+
+  .session-pill,
+  .sessions-count {
+    background: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
+  }
+
   .btn-toggle-note {
     color: #ffffff !important;
-    &:hover { background: rgba(255, 255, 255, 0.1) !important; }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
   }
+
   .collapsible-note-inner {
-    background: transparent !important;
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    textarea { color: #ffffff !important; }
+    background: transparent !important;
+
+    textarea {
+      color: #ffffff !important;
+    }
   }
 }
