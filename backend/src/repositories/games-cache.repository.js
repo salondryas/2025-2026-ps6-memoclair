@@ -37,9 +37,19 @@ function getFingerprint(items) {
   return items.map((i) => i.id).sort().join('|')
 }
 
+async function patchCache(cacheDir, patientId, updater) {
+  const existing = await readCache(cacheDir, patientId)
+  if (!existing) return null
+  const updated = updater(existing)
+  const filePath = getCachePath(cacheDir, patientId)
+  await writeFile(filePath, JSON.stringify(updated, null, 2), 'utf8')
+  return updated
+}
+
 module.exports = {
   readCache,
   writeCache,
+  patchCache,
   clearCache,
   getFingerprint,
 }

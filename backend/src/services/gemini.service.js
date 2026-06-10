@@ -65,12 +65,12 @@ function callGemini(parts, options = {}, attempt = 1) {
           logger.log(`[Gemini] ERREUR API: ${JSON.stringify(parsed.error)}`)
         }
 
-        if (res.statusCode === 429 && attempt === 1) {
-          const delay = extractRetryDelay(parsed)
-          logger.log(`[Gemini] 429 rate-limit — attente ${delay} ms avant retry`)
+        if ((res.statusCode === 429 || res.statusCode === 503) && attempt <= 3) {
+          const delay = res.statusCode === 429 ? extractRetryDelay(parsed) : 8000 * attempt
+          logger.log(`[Gemini] ${res.statusCode} — attente ${delay} ms avant retry (tentative ${attempt + 1})`)
           await sleep(delay)
           try {
-            resolve(await callGemini(parts, options, 2))
+            resolve(await callGemini(parts, options, attempt + 1))
           } catch (err) {
             reject(err)
           }

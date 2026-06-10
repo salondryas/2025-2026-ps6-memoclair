@@ -4,7 +4,7 @@ const { readFile, stat } = require('fs/promises')
 const { callGemini, parseGeminiText } = require('./gemini.service')
 const { readMeta } = require('../repositories/media.repository')
 const {
-  readCache, writeCache, getFingerprint,
+  readCache, writeCache, patchCache, getFingerprint,
 } = require('../repositories/games-cache.repository')
 const logger = require('../utils/logger')
 
@@ -303,4 +303,65 @@ async function generateDuoRounds(patientId, patientName, baseUrl) {
   return { rounds }
 }
 
-module.exports = { generateGameBQuestions, generateDuoRounds }
+async function getCachedGameBQuestions(patientId) {
+  const cache = await readCache(GAME_B_CACHE, patientId)
+  if (!cache || !Array.isArray(cache.questions)) return { questions: [] }
+  return { questions: cache.questions }
+}
+
+async function updateGameBQuestion(patientId, questionId, patch) {
+  const ALLOWED = ['question', 'hint', 'caption', 'accepted']
+  const safePatch = Object.fromEntries(
+    Object.entries(patch).filter(([k]) => ALLOWED.includes(k))
+  )
+  return patchCache(GAME_B_CACHE, patientId, (cache) => ({
+    ...cache,
+    questions: cache.questions.map((q) =>
+      q.id === questionId ? { ...q, ...safePatch } : q
+    ),
+  }))
+}
+
+async function deleteGameBQuestion(patientId, questionId) {
+  return patchCache(GAME_B_CACHE, patientId, (cache) => ({
+    ...cache,
+    questions: cache.questions.filter((q) => q.id !== questionId),
+  }))
+}
+
+async function getCachedDuoRounds(patientId) {
+  const cache = await readCache(DUO_CACHE, patientId)
+  if (!cache || !Array.isArray(cache.rounds)) return { rounds: [] }
+  return { rounds: cache.rounds }
+}
+
+async function updateDuoRound(patientId, roundIndex, patch) {
+  const ALLOWED = ['question', 'helper', 'accepted']
+  const safePatch = Object.fromEntries(
+    Object.entries(patch).filter(([k]) => ALLOWED.includes(k))
+  )
+  return patchCache(DUO_CACHE, patientId, (cache) => {
+    const rounds = [...cache.rounds]
+    if (roundIndex < 0 || roundIndex >= rounds.length) return cache
+    rounds[roundIndex] = { ...rounds[roundIndex], ...safePatch }
+    return { ...cache, rounds }
+  })
+}
+
+async function deleteDuoRound(patientId, roundIndex) {
+  return patchCache(DUO_CACHE, patientId, (cache) => ({
+    ...cache,
+    rounds: cache.rounds.filter((_, i) => i !== roundIndex),
+  }))
+}
+
+module.exports = {
+  generateGameBQuestions,
+  generateDuoRounds,
+  getCachedGameBQuestions,
+  updateGameBQuestion,
+  deleteGameBQuestion,
+  getCachedDuoRounds,
+  updateDuoRound,
+  deleteDuoRound,
+}
