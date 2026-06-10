@@ -37,6 +37,8 @@ export interface SessionChoiceDto {
   id: string;
   label: string;
   isCorrect: boolean;
+  isWrong?: boolean;
+  disabled?: boolean;
 }
 
 export interface GameBQuestionDto {
@@ -49,6 +51,7 @@ export interface GameBQuestionDto {
   caption: string;
   hint: string;
   choices: SessionChoiceDto[];
+  accepted?: boolean;
 }
 
 export interface GameBGenerateRequestDto {
@@ -76,6 +79,7 @@ export interface DuoRoundDto {
   choicesAccueilli: string[];
   correctIndex: number;
   feedbackCorrect: string;
+  accepted?: boolean;
 }
 
 export interface DuoGenerateRequestDto {

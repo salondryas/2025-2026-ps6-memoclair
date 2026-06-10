@@ -1,7 +1,7 @@
 <mc-caregiver-shell>
   <main class="profile-page">
   <header class="profile-page__hero">
-    <p class="profile-page__kicker">Espace aidant</p>
+    <p class="profile-page__kicker">{{ caregiverFirstName || 'Espace aidant' }}</p>
     <h1>Profil accueilli aidant</h1>
     <p class="profile-page__subtitle">
       Préparez une séance courte et adaptée en répondant à cinq repères simples.
@@ -68,30 +68,66 @@
     <div class="custom-settings" *ngIf="profile.difficulty === 'personnalise'">
       <div class="profile-card__block">
         <p class="profile-card__label">Nombre de questions</p>
-        <input type="number" class="custom-settings__input" min="1" max="13" [(ngModel)]="profile.questionCount" (ngModelChange)="clearMessages()">
+        <input type="number" class="custom-settings__input" min="1" max="13" [(ngModel)]="profile.questionCount" (ngModelChange)="onQuestionCountChange()">
       </div>
       <div class="profile-card__block">
-        <p class="profile-card__label">Nombre de réponses (2 à 4)</p>
-        <input type="range" min="2" max="4" class="custom-settings__range" [(ngModel)]="profile.answerCount" (ngModelChange)="clearMessages()">
-        <span class="custom-settings__value">{{ profile.answerCount }}</span>
+        <p class="profile-card__label">Nombre de réponses</p>
+        <div class="answer-picker" role="group" aria-label="Nombre de réponses par question">
+          <button
+            *ngFor="let count of answerCountOptions"
+            type="button"
+            class="answer-pill"
+            [class.answer-pill--active]="profile.answerCount === count"
+            [attr.aria-pressed]="profile.answerCount === count"
+            (click)="selectAnswerCount(count)">
+            <span class="answer-pill__cards" aria-hidden="true">
+              <span *ngFor="let d of getAnswerDots(count)" class="answer-pill__card"></span>
+            </span>
+            <span class="answer-pill__count">{{ count }}</span>
+            <span class="answer-pill__label">réponses</span>
+          </button>
+        </div>
       </div>
       <div class="profile-card__block">
-        <p class="profile-card__label">Délai avant l'indice (secondes)</p>
-        <input type="number" class="custom-settings__input" min="1" max="30" [(ngModel)]="profile.hintDelaySeconds" (ngModelChange)="clearMessages()">
+        <p class="profile-card__label">Délai avant l'indice (30–60 s)</p>
+        <div class="timing-input-row">
+          <input type="range" min="30" max="60" step="5" class="timing-slider"
+                 [(ngModel)]="profile.hintDelaySeconds" (ngModelChange)="onHintDelayChange()">
+          <span class="timing-value">{{ profile.hintDelaySeconds }}&nbsp;s</span>
+        </div>
       </div>
     </div>
 
-    <div class="profile-card__block">
+    <div class="profile-card__block timing-section">
       <p class="profile-card__label">Passage à la question suivante</p>
-      <div class="chip-group">
-        <button
-          *ngFor="let option of autoNextOptions"
-          type="button"
-          class="chip"
-          [class.chip--active]="isSelected(profile.autoNextMode, option.value)"
-          (click)="selectAutoNextMode(option.value)">
-          {{ option.label }}
-        </button>
+
+      <div class="timing-row">
+        <div class="timing-row__label">
+          <span>Après une réponse <em>(0–10 s)</em></span>
+        </div>
+        <div class="timing-input-row">
+          <input type="range" min="0" max="10" step="1" class="timing-slider"
+                 [(ngModel)]="profile.answerNextSeconds" (ngModelChange)="onTimingChange()">
+          <span class="timing-value">{{ profile.answerNextSeconds }}&nbsp;s</span>
+        </div>
+      </div>
+
+      <div class="timing-row">
+        <div class="timing-row__label">
+          <span>Après inaction (suite à l'indice) <em>(10–30 s)</em></span>
+        </div>
+        <div class="timing-input-row">
+          <input type="range" min="10" max="30" step="5" class="timing-slider"
+                 [(ngModel)]="profile.inactionNextSeconds" (ngModelChange)="onTimingChange()">
+          <span class="timing-value">{{ profile.inactionNextSeconds }}&nbsp;s</span>
+        </div>
+      </div>
+
+      <div class="timing-summary">
+        <span>Durée max sans action&nbsp;:
+          <strong>{{ profile.hintDelaySeconds + profile.inactionNextSeconds }}&nbsp;s</strong>
+          ({{ profile.hintDelaySeconds }}&nbsp;s avant indice + {{ profile.inactionNextSeconds }}&nbsp;s après)
+        </span>
       </div>
     </div>
   </section>
@@ -120,6 +156,14 @@
     </div>
 
     <div class="profile-card__block">
+      <label class="toggle-control">
+        <span class="profile-card__label">Musique de fond par défaut</span>
+        <input type="checkbox" class="toggle-control__checkbox" [ngModel]="bgMusicDefault" (ngModelChange)="toggleBgMusicDefault($event)">
+      </label>
+      <p class="profile-card__sublabel">Active la musique d'ambiance dès le démarrage d'une séance.</p>
+    </div>
+
+    <div class="profile-card__block">
       <p class="profile-card__label">Taille du texte</p>
       <input type="range" min="1" max="2" step="0.1" class="custom-settings__range" [ngModel]="profile.textSize" (ngModelChange)="updateTextSize($event)">
       <div class="text-sample" [style.fontSize.em]="profile.textSize" [class.high-contrast]="profile.highContrastEnabled">
@@ -128,66 +172,22 @@
     </div>
   </section>
 
-  <section class="profile-card">
+  <!-- Section IA -->
+  <section class="profile-card ia-section">
     <div class="profile-card__header">
       <span class="profile-card__index">3</span>
       <div>
-        <h3>Objectifs de la séance</h3>
-        <p>Définissez des repères simples pour comparer la progression dans les statistiques.</p>
+        <h3>Questions générées par l'IA</h3>
+        <p>
+          L'intelligence artificielle analyse les souvenirs de l'accueilli pour créer
+          des questions de réminiscence personnalisées. En tant qu'aidant, vous pouvez
+          vérifier et ajuster ces questions avant chaque séance.
+        </p>
       </div>
     </div>
-
-    <div class="profile-card__block">
-      <p class="profile-card__label">Engagement cible (minutes de jeu)</p>
-      <input
-        type="range"
-        min="10"
-        max="90"
-        step="5"
-        class="custom-settings__range"
-        [ngModel]="profile.objectives.targetEngagementMinutes"
-        (ngModelChange)="updateObjective('targetEngagementMinutes', $event)" />
-      <span class="custom-settings__value">{{ profile.objectives.targetEngagementMinutes }} min</span>
-    </div>
-
-    <div class="profile-card__block">
-      <p class="profile-card__label">Autonomie cible (indices max)</p>
-      <input
-        type="range"
-        min="0"
-        max="30"
-        step="1"
-        class="custom-settings__range"
-        [ngModel]="profile.objectives.targetAutonomyHintCount"
-        (ngModelChange)="updateObjective('targetAutonomyHintCount', $event)" />
-      <span class="custom-settings__value">{{ profile.objectives.targetAutonomyHintCount }} indice(s)</span>
-    </div>
-
-    <div class="profile-card__block">
-      <p class="profile-card__label">Réussite cible (%)</p>
-      <input
-        type="range"
-        min="40"
-        max="100"
-        step="5"
-        class="custom-settings__range"
-        [ngModel]="profile.objectives.targetSuccessRate"
-        (ngModelChange)="updateObjective('targetSuccessRate', $event)" />
-      <span class="custom-settings__value">{{ profile.objectives.targetSuccessRate }}%</span>
-    </div>
-
-    <div class="profile-card__block">
-      <p class="profile-card__label">Fluidité cible (erreurs max)</p>
-      <input
-        type="range"
-        min="0"
-        max="20"
-        step="1"
-        class="custom-settings__range"
-        [ngModel]="profile.objectives.targetFluidityErrorCount"
-        (ngModelChange)="updateObjective('targetFluidityErrorCount', $event)" />
-      <span class="custom-settings__value">{{ profile.objectives.targetFluidityErrorCount }} erreur(s)</span>
-    </div>
+    <a routerLink="/caregiver/questions-review" class="btn-review-questions">
+      Vérifier les questions générées
+    </a>
   </section>
 
   <div class="profile-page__actions">

@@ -1,4 +1,9 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+import { StorageService } from './storage.service';
+
+const BG_MUSIC_DEFAULT_KEY = 'mc_bg_music_default';
 
 @Injectable({ providedIn: 'root' })
 export class SoundEffectsService {
@@ -8,6 +13,9 @@ export class SoundEffectsService {
   isBgMusicPlaying = false;
   bgVolume = 0.01;
   private wasPlayingBeforeSuspend = false;
+  private bgMusicDefault = false;
+  private readonly bgMusicDefaultSubject = new BehaviorSubject<boolean>(false);
+  readonly bgMusicDefault$ = this.bgMusicDefaultSubject.asObservable();
 
   private sounds = {
     success: new Audio('assets/sfx/success-soft.mp3'),
@@ -18,9 +26,37 @@ export class SoundEffectsService {
     sessionEnd: new Audio('assets/sfx/session-end-soft.mp3')
   };
 
-  constructor() {
+  constructor(private readonly storage: StorageService) {
     this.bgMusic.loop = true;
     this.bgMusic.volume = this.bgVolume;
+    this.bgMusicDefault = this.storage.getLocalItem<boolean>(BG_MUSIC_DEFAULT_KEY) ?? false;
+    this.bgMusicDefaultSubject.next(this.bgMusicDefault);
+  }
+
+  get defaultBgMusicEnabled(): boolean {
+    return this.bgMusicDefault;
+  }
+
+  setDefaultBgMusic(enabled: boolean): void {
+    this.bgMusicDefault = enabled;
+    this.bgMusicDefaultSubject.next(enabled);
+    this.storage.setLocalItem(BG_MUSIC_DEFAULT_KEY, enabled);
+    if (enabled && !this.isBgMusicPlaying) {
+      this.bgMusic.play()
+        .then(() => { this.isBgMusicPlaying = true; })
+        .catch(() => { this.isBgMusicPlaying = false; });
+    } else if (!enabled && this.isBgMusicPlaying) {
+      this.bgMusic.pause();
+      this.isBgMusicPlaying = false;
+    }
+  }
+
+  applyDefaultBgMusic(): void {
+    if (this.bgMusicDefault && !this.isBgMusicPlaying) {
+      this.bgMusic.play()
+        .then(() => { this.isBgMusicPlaying = true; })
+        .catch(() => { this.isBgMusicPlaying = false; });
+    }
   }
 
   play(name: keyof typeof this.sounds): void {
@@ -43,9 +79,7 @@ export class SoundEffectsService {
       this.isBgMusicPlaying = false;
     } else {
       this.bgMusic.play()
-        .then(() => {
-          this.isBgMusicPlaying = true;
-        })
+        .then(() => { this.isBgMusicPlaying = true; })
         .catch(err => {
           console.warn('BGM play prevented:', err);
           this.isBgMusicPlaying = false;
@@ -73,9 +107,7 @@ export class SoundEffectsService {
   resumeBgMusic(): void {
     if (this.wasPlayingBeforeSuspend && !this.isBgMusicPlaying) {
       this.bgMusic.play()
-        .then(() => {
-          this.isBgMusicPlaying = true;
-        })
+        .then(() => { this.isBgMusicPlaying = true; })
         .catch(err => {
           console.warn('BGM resume prevented:', err);
           this.isBgMusicPlaying = false;

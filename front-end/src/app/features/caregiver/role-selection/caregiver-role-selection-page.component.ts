@@ -29,6 +29,13 @@ export class CaregiverRoleSelectionPageComponent implements OnInit {
 
   chooseRole(role: CaregiverRole): void {
     this.caregiverRoleService.setRole(role);
+    
+    // Pour les soignants professionnels, naviguer directement vers la sélection des patients
+    if (role === 'professional') {
+      void this.router.navigateByUrl('/games/patient-selection?from=caregiver-professional');
+      return;
+    }
+    
     void this.router.navigateByUrl(this.caregiverRoleService.getHomePathForRole(role));
   }
 

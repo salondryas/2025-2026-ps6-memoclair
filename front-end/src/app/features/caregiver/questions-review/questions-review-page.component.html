@@ -1,0 +1,138 @@
+<mc-caregiver-shell>
+  <main class="review-page">
+
+    <header class="review-page__header">
+      <button type="button" class="btn-back" (click)="goBack()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Retour
+      </button>
+      <div>
+        <h1>Vérification des questions</h1>
+        <p class="review-page__subtitle">
+          Chaque souvenir peut générer une question de réminiscence par intelligence artificielle.
+          Vérifiez, modifiez ou validez les questions avant la séance.
+        </p>
+      </div>
+    </header>
+
+    <!-- Chargement -->
+    <div *ngIf="loading" class="review-state">
+      <div class="review-spinner"></div>
+      <p>Chargement des souvenirs…</p>
+    </div>
+
+    <!-- Aucun média -->
+    <div *ngIf="!loading && cards.length === 0" class="review-state review-state--empty">
+      <p>Aucun souvenir ajouté pour cet accueilli.</p>
+      <p class="review-state__hint">Ajoutez des médias dans la médiathèque pour générer des questions.</p>
+    </div>
+
+    <!-- Grille de cartes -->
+    <div *ngIf="!loading && cards.length > 0" class="review-list">
+      <article
+        *ngFor="let card of cards; trackBy: trackById"
+        class="review-card"
+        [class.review-card--accepted]="card.round?.accepted"
+        [class.review-card--no-question]="!card.round">
+
+        <!-- Vignette -->
+        <div class="review-card__media">
+          <img
+            *ngIf="card.media.kind === 'image'"
+            [src]="card.previewUrl"
+            [alt]="card.media.title"
+            class="review-card__img">
+          <div *ngIf="card.media.kind === 'audio'" class="review-card__audio-icon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </div>
+          <span *ngIf="card.round?.accepted" class="review-card__badge">Validée</span>
+        </div>
+
+        <!-- Contenu -->
+        <div class="review-card__body">
+          <p class="review-card__caption">{{ card.media.title }}</p>
+
+          <!-- Aucune question -->
+          <p *ngIf="!card.round" class="review-card__no-question">
+            Aucune question générée — lancez une séance Duo pour en créer.
+          </p>
+
+          <!-- Question en lecture -->
+          <p *ngIf="card.round && !card.editing" class="review-card__question">
+            {{ card.round.question }}
+          </p>
+
+          <!-- Question en édition -->
+          <textarea
+            *ngIf="card.round && card.editing"
+            class="review-card__textarea"
+            [(ngModel)]="card.editText"
+            rows="3"
+            [disabled]="card.saving">
+          </textarea>
+
+          <!-- Bonne réponse -->
+          <p *ngIf="card.round" class="review-card__hint">
+            Bonne réponse : {{ card.round.choicesAccueilli[card.round.correctIndex] }}
+          </p>
+
+          <!-- Conseil aidant -->
+          <p *ngIf="card.round && card.round.helper" class="review-card__helper">
+            Conseil : {{ card.round.helper }}
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="review-card__actions" *ngIf="card.round">
+          <ng-container *ngIf="!card.editing">
+            <button type="button" class="btn-action btn-action--edit"
+                    (click)="startEdit(card)" [disabled]="card.saving">
+              Modifier
+            </button>
+            <button type="button" class="btn-action btn-action--accept"
+                    [class.btn-action--accepted]="card.round.accepted"
+                    (click)="accept(card)"
+                    [disabled]="card.saving || card.round.accepted">
+              {{ card.round.accepted ? 'Validée' : 'Valider' }}
+            </button>
+            <button type="button" class="btn-action btn-action--delete"
+                    (click)="deleteRound(card)" [disabled]="card.saving">
+              Supprimer
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="card.editing">
+            <button type="button" class="btn-action btn-action--accept"
+                    (click)="saveEdit(card)" [disabled]="card.saving">
+              {{ card.saving ? 'Sauvegarde…' : 'Sauvegarder' }}
+            </button>
+            <button type="button" class="btn-action btn-action--edit"
+                    (click)="cancelEdit(card)" [disabled]="card.saving">
+              Annuler
+            </button>
+          </ng-container>
+        </div>
+
+      </article>
+    </div>
+
+    <!-- Valider tout -->
+    <div *ngIf="!loading && unacceptedCount > 0" class="review-bulk-actions">
+      <button
+        type="button"
+        class="btn-accept-all"
+        (click)="acceptAll()"
+        [disabled]="acceptingAll">
+        {{ acceptingAll ? 'Validation en cours…' : 'Valider toutes les questions (' + unacceptedCount + ')' }}
+      </button>
+    </div>
+
+  </main>
+</mc-caregiver-shell>

@@ -141,13 +141,22 @@
   font-weight: 800;
 }
 
-.profile-card__block + .profile-card__block {
-  margin-top: 1rem;
+.profile-card__block + .profile-card__block,
+.custom-settings + .profile-card__block,
+.difficulty-details + .profile-card__block {
+  margin-top: 1.5rem;
 }
 
 .profile-card__label {
   margin: 0 0 0.75rem;
   font-weight: 800;
+}
+
+.profile-card__sublabel {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: #66736e;
+  line-height: 1.5;
 }
 
 .chip-group {
@@ -295,6 +304,32 @@
   font-weight: 600;
 }
 
+.ia-section p {
+  color: #66736e;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.btn-review-questions {
+  display: inline-block;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.4rem;
+  border: 2px solid #5f8a6f;
+  border-radius: 14px;
+  background: transparent;
+  color: #466654;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+
+  &:hover {
+    background: #5f8a6f;
+    color: #fff;
+  }
+}
+
 .profile-page__actions {
   display: flex;
   flex-direction: column;
@@ -411,18 +446,151 @@
     font: inherit;
     font-weight: 700;
   }
+}
 
-  &__range {
-    width: 100%;
-    margin: 0.5rem 0;
-    accent-color: #5f8a6f;
-    cursor: pointer;
+/* ── Sélecteur visuel du nombre de réponses ── */
+.answer-picker {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.answer-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 5.5rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid rgba(95, 138, 111, 0.2);
+  border-radius: 18px;
+  background: #f8fbf8;
+  color: #22302a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+              transform 0.15s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    border-color: #9fc4ae;
+    background: #f0f7f2;
+    transform: translateY(-2px);
   }
 
-  &__value {
-    font-weight: 800;
-    color: #5f8a6f;
-    margin-left: 0.5rem;
+  &:focus-visible {
+    outline: 3px solid #5f8a6f;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: #5f8a6f;
+    border-color: #5f8a6f;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(70, 102, 84, 0.22);
+    transform: translateY(-1px);
+
+    .answer-pill__card {
+      background: rgba(255, 255, 255, 0.45);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.answer-pill__cards {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+}
+
+.answer-pill__card {
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(95, 138, 111, 0.25);
+  border: 1px solid rgba(95, 138, 111, 0.18);
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.answer-pill__count {
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.answer-pill__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* ── Contrôles de timing (indice + passages auto) ── */
+.timing-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.timing-slider {
+  flex: 1;
+  accent-color: #5f8a6f;
+  cursor: pointer;
+  height: 6px;
+}
+
+.timing-value {
+  min-width: 3.5rem;
+  text-align: right;
+  font-weight: 800;
+  color: #5f8a6f;
+  font-size: 1.05rem;
+}
+
+.timing-section {
+  border-top: 1px solid rgba(95, 138, 111, 0.12);
+  padding-top: 1rem;
+}
+
+.timing-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1.1rem;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+    color: #3a5046;
+
+    em {
+      color: #88a090;
+      font-style: normal;
+      font-size: 0.88rem;
+    }
+  }
+}
+
+.timing-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: #f0f7f2;
+  border: 1px solid rgba(95, 138, 111, 0.2);
+  border-radius: 14px;
+  font-size: 0.9rem;
+  color: #3a5046;
+  line-height: 1.5;
+
+  strong {
+    color: #466654;
+    font-size: 1rem;
   }
 }
 
@@ -495,6 +663,22 @@
   }
 
   .chip--active {
+    background: rgba(50, 120, 70, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .answer-pill {
+    background: rgba(30, 60, 40, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+
+    .answer-pill__card {
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+
+  .answer-pill--active {
     background: rgba(50, 120, 70, 0.95) !important;
     border-color: rgba(255, 255, 255, 0.5) !important;
   }

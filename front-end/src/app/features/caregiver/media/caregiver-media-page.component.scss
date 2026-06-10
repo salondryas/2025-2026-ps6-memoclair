@@ -266,6 +266,26 @@
   color: #466654;
 }
 
+.media-message--generating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5f8a6f;
+}
+
+.media-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #c5dfc9;
+  border-top-color: #5f8a6f;
+  border-radius: 50%;
+  animation: spin-media 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin-media { to { transform: rotate(360deg); } }
+
 .media-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15.625rem, 1fr));
@@ -412,6 +432,29 @@
     border-radius: 999px;
     transition: width 0.4s ease;
     min-width: 4px;
+  }
+}
+
+.btn-regenerate {
+  display: block;
+  margin: 0 1.5rem 1rem;
+  padding: 0.55rem 1.2rem;
+  background: #3d6b51;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #2e5040;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 }
 

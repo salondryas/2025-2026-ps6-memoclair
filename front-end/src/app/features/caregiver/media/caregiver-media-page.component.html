@@ -3,7 +3,7 @@
 
     <!-- Titre seul -->
     <header class="media-page__hero">
-      <p class="media-page__kicker">Espace aidant</p>
+      <p class="media-page__kicker">{{ caregiverFirstName || 'Espace aidant' }}</p>
       <h1>Médiathèque souvenir</h1>
     </header>
 
@@ -13,6 +13,14 @@
       <div class="duo-progress-bar">
         <div class="duo-progress-bar__fill" [style.width.%]="(mediaItems.length / duoRequired) * 100"></div>
       </div>
+      <button
+        *ngIf="duoReady"
+        type="button"
+        class="btn-regenerate"
+        [disabled]="generating || uploading"
+        (click)="regenerateQuestions()">
+        {{ generating ? 'Génération en cours…' : 'Régénérer les questions IA' }}
+      </button>
     </section>
 
     <!-- Formulaire d'ajout -->
@@ -63,10 +71,13 @@
           {{ validationMessage }}
         </p>
 
-        <button type="submit" class="media-form__submit" [disabled]="uploading">
+        <button type="submit" class="media-form__submit" [disabled]="uploading || generating">
           {{ uploading ? 'Envoi en cours…' : 'Ajouter à la médiathèque' }}
         </button>
-        <p *ngIf="saveStatus" class="media-message media-message--success">{{ saveStatus }}</p>
+        <p *ngIf="generating" class="media-message media-message--generating">
+          <span class="media-spinner"></span> {{ saveStatus }}
+        </p>
+        <p *ngIf="!generating && saveStatus" class="media-message media-message--success">{{ saveStatus }}</p>
       </form>
     </section>
 

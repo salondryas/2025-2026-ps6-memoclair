@@ -27,6 +27,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.prefsSub = this.accessibilityPrefs.prefs$.subscribe((prefs) => {
       this.document.body.classList.toggle('high-contrast', prefs.highContrastEnabled);
     });
+
+    const applyOnFirstInteraction = () => {
+      this.soundEffects.applyDefaultBgMusic();
+      this.document.removeEventListener('click', applyOnFirstInteraction, { capture: true });
+    };
+    this.document.addEventListener('click', applyOnFirstInteraction, { capture: true, once: true });
   }
 
   ngOnDestroy(): void {

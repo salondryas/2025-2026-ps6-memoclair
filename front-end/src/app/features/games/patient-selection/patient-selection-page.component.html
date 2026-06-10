@@ -1,31 +1,22 @@
 <main class="selection">
 
-  <a (click)="goBack()" class="btn-back">{{ backButtonText }}</a>
-
-  <!-- Indicateurs d'étape pour contexte caregiver-professional -->
-  <div class="step-indicators" *ngIf="context === 'caregiver-professional'">
-    <div class="step-indicator" [ngClass]="{'step-indicator--completed': activeStep === 'professional', 'step-indicator--active': activeStep === 'professional'}">
-      <span class="step-number">1</span>
-      <span class="step-text">Choisir le soignant</span>
-    </div>
-    <div class="step-indicator" [ngClass]="{'step-indicator--completed': activeStep === 'patient', 'step-indicator--active': activeStep === 'patient'}">
-      <span class="step-number">2</span>
-      <span class="step-text">Choisir l'accueilli</span>
-    </div>
+  <div class="selection-nav">
+    <a routerLink="/" class="btn-home" aria-label="Retour à l'accueil">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Accueil
+    </a>
+    <a (click)="goBack()" class="btn-back">{{ backButtonText }}</a>
   </div>
 
   <h1 class="selection-title">{{ selectionTitle }}</h1>
 
-  <!-- Boutons gérer juste sous le titre pour caregiver-professional -->
-  <div class="selection-actions selection-actions--top" *ngIf="context === 'caregiver-professional' && activeStep === 'professional'">
-    <a routerLink="/caregiver/professional-profile-management" class="btn-manage-profiles">
-      ⚙ Gérer les profils soignants
-    </a>
-  </div>
-
-  <div class="selection-actions selection-actions--top" *ngIf="context === 'caregiver-professional' && activeStep === 'patient'">
+  <div class="selection-actions selection-actions--top" *ngIf="context === 'caregiver-professional'">
     <a routerLink="/caregiver/profile-management" class="btn-manage-profiles">
-      ⚙ Gérer les accueillis et aidants
+      ⚙ Gérer les accueillis
     </a>
   </div>
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -73,18 +73,19 @@ export class PatientSelectionPageComponent implements OnInit {
     // Charger les dernières sélections
     this.loadLastSelections();
     
+    // Pour caregiver-professional, sélectionner automatiquement le seul soignant
+    if (this.context === 'caregiver-professional' && this.professionalCards.length > 0) {
+      this.selectedProfessional = this.professionalCards[0];
+      this.profileSelection.setActiveProfessionalId(this.selectedProfessional.profile.id);
+    }
+
     // Logique simplifiée basée sur le path de la route
     const currentPath = this.route.snapshot.routeConfig?.path;
-    
+
     if (currentPath === 'patient-selection-patient') {
       this.activeStep = 'patient';
     } else {
-      // patient-selection (path principal)
-      this.activeStep = this.context === 'caregiver-professional'
-        ? 'professional'
-        : this.context === 'caregiver-family'
-          ? 'family'
-          : 'patient';
+      this.activeStep = this.context === 'caregiver-family' ? 'family' : 'patient';
     }
     
     this.evaluateEdgeCases();
@@ -92,16 +93,12 @@ export class PatientSelectionPageComponent implements OnInit {
   }
 
   get backButtonText(): string {
-    return this.context === 'games' ? '← Accueil' : '← Retour';
+    return '← Retour';
   }
 
   get selectionTitle(): string {
-    if (this.context === 'caregiver-professional') {
-      return this.activeStep === 'professional' ? 'Quel soignant ?' : 'Quel accueilli ?';
-    }
-    if (this.context === 'caregiver-family') {
-      return 'Quel aidant familial ?';
-    }
+    if (this.context === 'caregiver-professional') return 'Quel accueilli ?';
+    if (this.context === 'caregiver-family') return 'Quel aidant familial ?';
     return 'Pour qui ?';
   }
 
@@ -255,29 +252,15 @@ export class PatientSelectionPageComponent implements OnInit {
     
     // Pour la route principale patient-selection
     if (currentPath === 'patient-selection') {
-      // Si on est à l'étape patient dans un contexte caregiver, revenir à l'étape précédente
-      if (this.activeStep === 'patient') {
-        if (this.context === 'caregiver-professional') {
-          // Revenir à l'étape de sélection du soignant
-          this.activeStep = 'professional';
-          this.selectedPatient = null;
-          return;
-        }
-        if (this.context === 'caregiver-family') {
-          // Revenir à l'étape de sélection de l'aidant familial
-          this.activeStep = 'family';
-          this.selectedPatient = null;
-          return;
-        }
+      if (this.activeStep === 'patient' && this.context === 'caregiver-family') {
+        this.activeStep = 'family';
+        this.selectedPatient = null;
+        return;
       }
-      
-      // Si on est à l'étape professional ou family, rediriger vers role-selection
-      if (this.activeStep === 'professional' || this.activeStep === 'family') {
+      if (this.activeStep === 'family') {
         void this.router.navigateByUrl('/caregiver/role-selection');
         return;
       }
-      
-      // Pour games, rediriger vers la home page
       if (this.context === 'games') {
         void this.router.navigateByUrl('/');
         return;
@@ -303,19 +286,9 @@ export class PatientSelectionPageComponent implements OnInit {
     if (this.context === 'games' && this.cards.length === 0) {
       this.edgeCaseDialog = {
         title: 'Aucun profil accueilli',
-        message: 'Aucun profil accueilli n’est encore disponible. Demandez au soignant référent de créer un profil avant de lancer une séance.',
+        message: "Aucun profil accueilli n'est encore disponible. Demandez au soignant référent de créer un profil avant de lancer une séance.",
         primaryLabel: 'OK',
         primaryRoute: '/',
-      };
-      return;
-    }
-
-    if (this.context === 'caregiver-professional' && this.professionalCards.length === 0) {
-      this.edgeCaseDialog = {
-        title: 'Créer un profil soignant',
-        message: 'Aucun profil soignant n’est encore enregistré. Créez un soignant avant d’ouvrir l’espace professionnel.',
-        primaryLabel: 'Créer un soignant',
-        primaryRoute: '/caregiver/professional-profile-management?from=professional-selection',
       };
       return;
     }
@@ -323,7 +296,7 @@ export class PatientSelectionPageComponent implements OnInit {
     if (this.context === 'caregiver-professional' && this.cards.length === 0) {
       this.edgeCaseDialog = {
         title: 'Créer un profil accueilli',
-        message: 'Un profil soignant existe, mais aucun accueilli n’est encore enregistré.',
+        message: "Aucun accueilli n'est encore enregistré.",
         primaryLabel: 'Créer un accueilli',
         primaryRoute: '/caregiver/profile-management?from=professional-selection',
       };
@@ -333,7 +306,7 @@ export class PatientSelectionPageComponent implements OnInit {
     if (this.context === 'caregiver-family' && this.familyCards.length === 0) {
       this.edgeCaseDialog = {
         title: 'Aucun profil familial',
-        message: 'Aucun profil d’aidant familial n’a encore été créé. Demandez à un soignant de créer votre profil.',
+        message: "Aucun profil d'aidant familial n'a encore été créé. Demandez à un soignant de créer votre profil.",
         primaryLabel: 'OK',
         primaryRoute: '/caregiver',
       };

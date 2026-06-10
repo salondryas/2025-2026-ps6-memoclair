@@ -17,7 +17,6 @@ import { PatientContextService } from '../../../core/services/patient-context.se
 import { ProfileSelectionService } from '../services/profile-selection.service';
 
 type ManagementMode = 'professionals' | 'managed';
-type ProfileTypeFilter = 'all' | 'patient' | 'professional';
 
 @Component({
   selector: 'app-profile-management-page',
@@ -44,13 +43,13 @@ export class ProfileManagementPageComponent implements OnInit {
   patients: PatientSummary[] = [];
   familyProfiles: ManagedProfile[] = [];
   filteredProfiles: ManagedProfile[] = [];
+  filteredFamilyProfiles: ManagedProfile[] = [];
+  filteredPatientProfiles: ManagedProfile[] = [];
   returnPath: string = '/games/patient-selection';
   isAddModalOpen = false;
   newProfile: ManagedProfileDraft = this.createEmptyDraft('patient');
   formError = '';
   searchQuery: string = '';
-  selectedProfileType: ProfileTypeFilter = 'all';
-  selectedStages: string[] = [];
   associationSearchQuery: string = '';
   filteredPatientsForAssociation: PatientSummary[] = [];
   familyAssociationSearchQuery: string = '';
@@ -105,10 +104,6 @@ export class ProfileManagementPageComponent implements OnInit {
       : 'Créez les profils liés au soignant actif et gérez les associations famille-accueilli.';
   }
 
-  get canChooseProfileType(): boolean {
-    return this.mode === 'managed';
-  }
-
   get isFormValid(): boolean {
     const firstName = this.newProfile.firstName.trim();
     const lastName = this.newProfile.lastName.trim();
@@ -123,11 +118,7 @@ export class ProfileManagementPageComponent implements OnInit {
     }
 
     if (this.newProfile.type === 'family') {
-      const relationship = this.newProfile.relationship.trim();
-      if (!relationship) return false;
-      
-      // Les aidants familiaux doivent avoir au moins une association
-      return this.newProfile.associatedPatientIds.length > 0;
+      return Boolean(this.newProfile.relationship.trim());
     }
 
     return true;
@@ -155,27 +146,22 @@ export class ProfileManagementPageComponent implements OnInit {
     this.refreshLists();
   }
 
-  openAddModal(type?: ManagedProfileType): void {
-    // Check if no patients exist when trying to add family caregiver
-    if (type === 'family' && this.patients.length === 0) {
-      this.formError = 'Aucun profil accueilli disponible. Veuillez créer un profil accueilli avant d\'ajouter un aidant familial.';
-      return;
-    }
+  chainMessage = '';
 
+  openAddModal(type?: ManagedProfileType): void {
     this.isAddModalOpen = true;
     this.formError = '';
     this.newProfile = this.createEmptyDraft(type ?? (this.mode === 'professionals' ? 'professional' : 'patient'));
-    
-    // Initialize filtered lists for associations
     this.associationSearchQuery = '';
     this.familyAssociationSearchQuery = '';
-    this.updateFilteredPatientsForAssociation();
-    this.updateFilteredFamilyProfilesForAssociation();
+    this.filteredPatientsForAssociation = [...this.patients];
+    this.filteredFamilyProfilesForAssociation = [...this.familyProfiles];
   }
 
   closeAddModal(): void {
     this.isAddModalOpen = false;
     this.formError = '';
+    this.chainMessage = '';
     this.newProfile = this.createEmptyDraft(this.mode === 'professionals' ? 'professional' : 'patient');
   }
 
@@ -225,12 +211,6 @@ export class ProfileManagementPageComponent implements OnInit {
       return;
     }
 
-    // Check if family profile has at least one associated patient
-    if (this.newProfile.type === 'family' && this.newProfile.associatedPatientIds.length === 0) {
-      this.formError = 'Veuillez associer au moins un accueilli à ce profil aidant.';
-      return;
-    }
-
     // Check for duplicate names across all profile types
     const firstName = this.newProfile.firstName.trim().toLowerCase();
     const lastName = this.newProfile.lastName.trim().toLowerCase();
@@ -258,6 +238,9 @@ export class ProfileManagementPageComponent implements OnInit {
 
     this.patientRepository.addManagedProfile(profile, patientProfile);
 
+    const familyCreatedWithoutPatient =
+      profile.type === 'family' && this.newProfile.associatedPatientIds.length === 0;
+
     if (profile.type === 'family') {
       this.patientRepository.setFamilyPatientAssociations(profile.id, this.newProfile.associatedPatientIds);
     }
@@ -275,6 +258,13 @@ export class ProfileManagementPageComponent implements OnInit {
 
     this.closeAddModal();
     this.refreshLists();
+
+    if (familyCreatedWithoutPatient) {
+      this.chainMessage = `Aidant "${profile.displayName}" créé. Ajoutez maintenant un accueilli à lui associer.`;
+      this.openAddModal('patient');
+    } else {
+      this.chainMessage = '';
+    }
   }
 
   goBack(): void {
@@ -284,28 +274,16 @@ export class ProfileManagementPageComponent implements OnInit {
   private refreshLists(): void {
     this.patients = this.patientContextService.getPatients();
     this.familyProfiles = this.patientRepository.getFamilyCaregivers();
-    this.profiles = this.mode === 'professionals' 
+    this.profiles = this.mode === 'professionals'
       ? this.patientRepository.getProfessionals()
       : this.patientRepository.getPatientManagedProfiles();
     this.updateFilteredProfiles();
-    
-    // Initialize filtered association lists
-    this.updateFilteredPatientsForAssociation();
-    this.updateFilteredFamilyProfilesForAssociation();
+    this.filteredPatientsForAssociation = [...this.patients];
+    this.filteredFamilyProfilesForAssociation = [...this.familyProfiles];
   }
 
-  onSearchChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchQuery = target.value.toLowerCase();
+  onSearchChange(query: string): void {
     this.updateFilteredProfiles();
-  }
-
-  onFilterChange(type: ProfileTypeFilter): void {
-    this.selectedProfileType = type;
-    this.selectedStages = type === 'patient' ? this.selectedStages : [];
-    this.cdr.detectChanges();
-    this.updateFilteredProfiles();
-    queueMicrotask(() => this.cdr.detectChanges());
   }
 
   hasProfileAvatar(profile: ManagedProfile): boolean {
@@ -317,92 +295,46 @@ export class ProfileManagementPageComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  toggleStage(stage: string): void {
-    const index = this.selectedStages.indexOf(stage);
-    if (index > -1) {
-      this.selectedStages.splice(index, 1);
-    } else {
-      this.selectedStages.push(stage);
-    }
-    this.updateFilteredProfiles();
+  onAssociationSearchChange(query: string): void {
+    const q = query.toLowerCase();
+    this.filteredPatientsForAssociation = q
+      ? this.patients.filter(p =>
+          p.firstName.toLowerCase().includes(q) ||
+          p.displayName.toLowerCase().includes(q)
+        )
+      : [...this.patients];
+    this.cdr.detectChanges();
   }
 
-  onAssociationSearchChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.associationSearchQuery = target.value.toLowerCase();
-    this.updateFilteredPatientsForAssociation();
-  }
-
-  private updateFilteredPatientsForAssociation(): void {
-    if (!this.associationSearchQuery) {
-      this.filteredPatientsForAssociation = this.patients;
-    } else {
-      this.filteredPatientsForAssociation = this.patients.filter(patient => 
-        patient.firstName.toLowerCase().includes(this.associationSearchQuery) ||
-        patient.displayName.toLowerCase().includes(this.associationSearchQuery)
-      );
-    }
-  }
-
-  onFamilyAssociationSearchChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.familyAssociationSearchQuery = target.value.toLowerCase();
-    this.updateFilteredFamilyProfilesForAssociation();
-  }
-
-  private updateFilteredFamilyProfilesForAssociation(): void {
-    if (!this.familyAssociationSearchQuery) {
-      this.filteredFamilyProfilesForAssociation = this.familyProfiles;
-    } else {
-      this.filteredFamilyProfilesForAssociation = this.familyProfiles.filter(family => 
-        family.firstName.toLowerCase().includes(this.familyAssociationSearchQuery) ||
-        family.displayName.toLowerCase().includes(this.familyAssociationSearchQuery)
-      );
-    }
+  onFamilyAssociationSearchChange(query: string): void {
+    const q = query.toLowerCase();
+    this.filteredFamilyProfilesForAssociation = q
+      ? this.familyProfiles.filter(f =>
+          f.firstName.toLowerCase().includes(q) ||
+          f.lastName.toLowerCase().includes(q) ||
+          f.displayName.toLowerCase().includes(q)
+        )
+      : [...this.familyProfiles];
+    this.cdr.detectChanges();
   }
 
   private updateFilteredProfiles(): void {
-    let profiles = this.mode === 'professionals'
-      ? this.patientRepository.getProfessionals()
-      : this.patientRepository.getManagedProfiles();
+    const q = this.searchQuery.toLowerCase();
 
-    // Apply search filter
-    if (this.searchQuery) {
-      profiles = profiles.filter(profile =>
-        profile.firstName.toLowerCase().includes(this.searchQuery) ||
-        profile.displayName.toLowerCase().includes(this.searchQuery)
-      );
+    const matchesSearch = (profile: ManagedProfile): boolean =>
+      !q ||
+      profile.firstName.toLowerCase().includes(q) ||
+      profile.lastName.toLowerCase().includes(q) ||
+      profile.displayName.toLowerCase().includes(q);
+
+    if (this.mode === 'professionals') {
+      this.filteredProfiles = this.patientRepository.getProfessionals().filter(matchesSearch);
+      return;
     }
 
-    profiles = profiles.filter(profile => {
-      if (this.mode === 'professionals') return true;
-      if (this.selectedProfileType === 'all') {
-        // "Tous" affiche accueillis (patient) et aidants familiaux (family), pas les soignants (professional)
-        return profile.type === 'patient' || profile.type === 'family';
-      }
-      // "Aidants" (professional dans le filtre) affiche les aidants familiaux (family)
-      if (this.selectedProfileType === 'professional') {
-        return profile.type === 'family';
-      }
-      return profile.type === this.selectedProfileType;
-    });
-
-    if (this.selectedProfileType === 'patient' && this.selectedStages.length > 0) {
-      profiles = profiles.filter(profile => {
-        const patient = this.patients.find(p => p.id === profile.id);
-        if (patient) {
-          let stageKey = '';
-          if (patient.stageLabel === 'Stade léger') stageKey = 'leger';
-          else if (patient.stageLabel === 'Stade modéré') stageKey = 'modere';
-          else if (patient.stageLabel === 'Stade avancé') stageKey = 'avance';
-          
-          return this.selectedStages.includes(stageKey);
-        }
-        return false;
-      });
-    }
-
-    this.filteredProfiles = profiles;
+    const allManaged = this.patientRepository.getManagedProfiles();
+    this.filteredFamilyProfiles = allManaged.filter(p => p.type === 'family' && matchesSearch(p));
+    this.filteredPatientProfiles = allManaged.filter(p => p.type === 'patient' && matchesSearch(p));
   }
 
   private buildManagedProfile(): ManagedProfile {
@@ -455,6 +387,10 @@ export class ProfileManagementPageComponent implements OnInit {
       questionCount: preset.questionCount,
       answerCount: preset.answerCount,
       hintDelaySeconds: preset.hintDelaySeconds,
+      maxHintsPerQuestion: 2,
+      maxHintsPerSession: 15,
+      answerNextSeconds: 5,
+      inactionNextSeconds: 20,
       autoNextMode: '5s',
       audioReadingEnabled: true,
       highContrastEnabled: false,

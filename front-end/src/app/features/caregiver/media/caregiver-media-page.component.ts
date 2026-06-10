@@ -1,14 +1,17 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 
 import { MediaItem, MediaKind, MemoryCueType } from '../../../models/media.model';
 import { PatientId, PatientSummary } from '../../../models/patient.model';
 import { PatientContextService } from '../../../core/services/patient-context.service';
 import { MediaLibraryService } from '../services/media-library.service';
 import { CaregiverShellComponent } from '../../../shared/components/layout/caregiver-shell/caregiver-shell.component';
+import { ProfileSelectionService } from '../services/profile-selection.service';
+import { CaregiverRoleService } from '../services/caregiver-role.service';
 import { environment } from '../../../../environments/environment';
 
 const DUO_REQUIRED = 9;
@@ -35,6 +38,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
   saveStatus = '';
   validationMessage = '';
   uploading = false;
+  generating = false;
 
   readonly duoRequired = DUO_REQUIRED;
 
@@ -66,7 +70,10 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
   constructor(
     private readonly patientContextService: PatientContextService,
     private readonly mediaLibraryService: MediaLibraryService,
+    private readonly http: HttpClient,
     private readonly cdr: ChangeDetectorRef,
+    private readonly profileSelection: ProfileSelectionService,
+    private readonly caregiverRole: CaregiverRoleService,
   ) {}
 
   ngOnInit(): void {
@@ -124,7 +131,7 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
         this.fileInputLabel = 'Aucun fichier choisi';
         this.saveStatus = `Média ajouté pour ${this.currentPatient.firstName}.`;
         this.uploading = false;
-        this.loadMedia(this.selectedPatientId);
+        this.loadMedia(this.selectedPatientId, true);
       },
       error: () => {
         this.validationMessage = 'Erreur lors de l\'upload. Vérifiez que le backend est démarré.';
@@ -159,6 +166,10 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     return this.cueLabels[cueType];
   }
 
+  get caregiverFirstName(): string | null {
+    return this.profileSelection.getActiveCaregiverFirstName(this.caregiverRole.getRoleSnapshot());
+  }
+
   get currentPatient(): PatientSummary {
     return (
       this.patients.find((p) => p.id === this.selectedPatientId)
@@ -181,11 +192,15 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     return this.mediaItems.length >= DUO_REQUIRED;
   }
 
+  regenerateQuestions(): void {
+    this.generateCache(this.selectedPatientId);
+  }
+
   ngOnDestroy(): void {
     this.patientSubscription?.unsubscribe();
   }
 
-  private loadMedia(patientId: PatientId): void {
+  private loadMedia(patientId: PatientId, triggerGeneration = false): void {
     this.mediaLibraryService.getMediaItems(patientId).subscribe({
       next: (items) => {
         this.mediaItems = items;
@@ -194,6 +209,9 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
         this.fileInputLabel = 'Aucun fichier choisi';
         this.clearMessages();
         this.cdr.markForCheck();
+        if (triggerGeneration && items.length >= DUO_REQUIRED) {
+          this.generateCache(patientId);
+        }
       },
       error: () => {
         this.mediaItems = [];
@@ -202,10 +220,39 @@ export class CaregiverMediaPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private generateCache(patientId: PatientId): void {
+    this.generating = true;
+    this.saveStatus = 'Génération des questions en cours…';
+    this.cdr.markForCheck();
+
+    const patientName = this.currentPatient.firstName;
+    const base = `${environment.backendUrl}/api`;
+
+    this.http
+      .post<unknown>(`${base}/duo/generate/${patientId}`, { patientName })
+      .pipe(
+        switchMap(() =>
+          this.http.post<unknown>(`${base}/game-b/generate/${patientId}`, { patientName })
+        ),
+      )
+      .subscribe({
+        next: () => {
+          this.generating = false;
+          this.saveStatus = 'Questions générées. Vérifiez-les avant la séance dans "Profil aidant".';
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.generating = false;
+          this.saveStatus = 'Média ajouté. La génération des questions a échoué (backend requis).';
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
   private validateForm(): string[] {
     const errors: string[] = [];
-    if (!this.form.description.trim()) errors.push('Ajoutez une description pour ce souvenir.');
-    if (!this.selectedFile) errors.push('Choisissez un fichier avant de l\'ajouter.');
+    if (!this.form.description.trim()) errors.push('Ajouter une description pour ce souvenir.');
+    if (!this.selectedFile) errors.push('Choisir un fichier avant de l\'ajouter.');
     return errors;
   }
 

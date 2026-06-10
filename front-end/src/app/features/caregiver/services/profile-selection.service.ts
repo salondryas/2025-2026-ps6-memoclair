@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { StorageService } from '../../../core/services/storage.service';
+import { PatientRepositoryMock } from '../../../mocks/patient-repository.mock';
+import { CaregiverRole } from '../../../models/caregiver-role.model';
 
 const ACTIVE_PROFESSIONAL_KEY = 'mc_active_professional_id';
 const ACTIVE_FAMILY_KEY = 'mc_active_family_id';
@@ -9,7 +11,10 @@ const ACTIVE_FAMILY_KEY = 'mc_active_family_id';
   providedIn: 'root',
 })
 export class ProfileSelectionService {
-  constructor(private readonly storage: StorageService) {}
+  constructor(
+    private readonly storage: StorageService,
+    private readonly patientRepository: PatientRepositoryMock,
+  ) {}
 
   getActiveProfessionalId(): string | null {
     return this.storage.getSessionItem<string>(ACTIVE_PROFESSIONAL_KEY)
@@ -39,5 +44,19 @@ export class ProfileSelectionService {
   clearActiveFamilyId(): void {
     this.storage.removeSessionItem(ACTIVE_FAMILY_KEY);
     this.storage.removeLocalItem(ACTIVE_FAMILY_KEY);
+  }
+
+  getActiveCaregiverFirstName(role: CaregiverRole | null): string | null {
+    if (role === 'professional') {
+      const id = this.getActiveProfessionalId();
+      if (!id) return null;
+      return this.patientRepository.getProfessionals().find((p) => p.id === id)?.firstName ?? null;
+    }
+    if (role === 'family') {
+      const id = this.getActiveFamilyId();
+      if (!id) return null;
+      return this.patientRepository.getFamilyCaregivers().find((p) => p.id === id)?.firstName ?? null;
+    }
+    return null;
   }
 }

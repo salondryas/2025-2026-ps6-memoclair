@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 
-export type GameBAutoNextMode = 'manual' | '5s' | '8s';
-
 interface ManagedTimeout {
   key: string;
   callback: () => void;
@@ -20,8 +18,7 @@ interface CountdownState {
 
 export interface GameBQuestionFlowConfig {
   hintDelayMs: number;
-  revealDelayMs: number;
-  autoNextMode: GameBAutoNextMode;
+  inactionNextMs: number;
   onHint: () => void;
   onAutoReveal: () => void;
   onAutoNext: () => void;
@@ -29,7 +26,7 @@ export interface GameBQuestionFlowConfig {
 }
 
 export interface GameBResolutionFlowConfig {
-  autoNextMode: GameBAutoNextMode;
+  answerNextMs: number;
   onAutoNext: () => void;
   onCountdownTick: (seconds: number | null) => void;
 }
@@ -43,20 +40,17 @@ export class GameBFlowService {
   startQuestionFlow(config: GameBQuestionFlowConfig): void {
     this.clear();
 
+    const revealAndNextMs = config.hintDelayMs + config.inactionNextMs;
+
     this.scheduleTimeout('hint', config.hintDelayMs, config.onHint);
-    this.scheduleTimeout('reveal', config.revealDelayMs, config.onAutoReveal);
 
-    const autoNextDelay = this.resolveAutoNextDelay(config.autoNextMode);
-    if (autoNextDelay === null) {
-      config.onCountdownTick(null);
-      return;
-    }
-
-    this.scheduleTimeout(`countdown-start`, config.revealDelayMs, () => {
-      this.startCountdown(autoNextDelay, config.onCountdownTick);
+    this.scheduleTimeout('countdown-start', config.hintDelayMs, () => {
+      this.startCountdown(config.inactionNextMs, config.onCountdownTick);
     });
 
-    this.scheduleTimeout('auto-next', config.revealDelayMs + autoNextDelay, () => {
+    this.scheduleTimeout('reveal', revealAndNextMs, config.onAutoReveal);
+
+    this.scheduleTimeout('auto-next', revealAndNextMs, () => {
       config.onCountdownTick(null);
       config.onAutoNext();
     });
@@ -65,14 +59,14 @@ export class GameBFlowService {
   startResolutionFlow(config: GameBResolutionFlowConfig): void {
     this.clear();
 
-    const autoNextDelay = this.resolveAutoNextDelay(config.autoNextMode);
-    if (autoNextDelay === null) {
+    if (config.answerNextMs <= 0) {
       config.onCountdownTick(null);
+      config.onAutoNext();
       return;
     }
 
-    this.startCountdown(autoNextDelay, config.onCountdownTick);
-    this.scheduleTimeout('auto-next', autoNextDelay, () => {
+    this.startCountdown(config.answerNextMs, config.onCountdownTick);
+    this.scheduleTimeout('auto-next', config.answerNextMs, () => {
       config.onCountdownTick(null);
       config.onAutoNext();
     });
@@ -116,11 +110,6 @@ export class GameBFlowService {
     this.timeouts.clear();
     this.clearCountdown(false);
     this.paused = false;
-  }
-
-  private resolveAutoNextDelay(mode: GameBAutoNextMode): number | null {
-    if (mode === 'manual') return null;
-    return mode === '8s' ? 8000 : 5000;
   }
 
   private scheduleTimeout(key: string, delayMs: number, callback: () => void): void {

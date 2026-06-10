@@ -14,103 +14,99 @@
     </div>
   </header>
 
-  <div class="profile-actions profile-actions--top">
-    <button type="button" class="btn-add-profile" (click)="openAddModal('professional')" *ngIf="mode === 'professionals'">
-      + Ajouter un profil soignant
-    </button>
-    <button type="button" class="btn-add-profile" (click)="openAddModal('patient')" *ngIf="mode === 'managed'">
-      + Ajouter un accueilli
-    </button>
-    <button type="button" class="btn-add-profile" (click)="openAddModal('family')" *ngIf="mode === 'managed'">
-      + Ajouter un aidant familial
-    </button>
-  </div>
+  <!-- Mode soignants : liste unique + bouton de création -->
+  <ng-container *ngIf="mode === 'professionals'">
+    <div class="profile-actions profile-actions--top">
+      <button type="button" class="btn-add-profile" (click)="openAddModal('professional')">
+        + Ajouter un profil soignant
+      </button>
+    </div>
 
-  <div class="profile-management-page__search">
-    <input type="text" placeholder="Rechercher par nom ou prénom..." [(ngModel)]="searchQuery" (input)="onSearchChange($event)" class="search-input">
-  </div>
+    <div class="profile-management-page__search">
+      <input type="text" placeholder="Rechercher par nom ou prénom..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)" class="search-input">
+    </div>
 
-  <div class="profile-management-page__filters" *ngIf="mode === 'managed'">
-    <div class="filter-row">
-      <div class="filter-group">
-        <label class="filter-label">Type de profil:</label>
-        <div class="filter-options">
-          <label class="filter-option">
-            <input type="radio" name="profileTypeFilter" value="all" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
-            <span>Tous</span>
-          </label>
-          <label class="filter-option">
-            <input type="radio" name="profileTypeFilter" value="patient" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
-            <span>Accueillis</span>
-          </label>
-          <label class="filter-option">
-            <input type="radio" name="profileTypeFilter" value="professional" [(ngModel)]="selectedProfileType" (ngModelChange)="onFilterChange($event)">
-            <span>Aidants</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="filter-group" *ngIf="selectedProfileType === 'patient'">
-        <label class="filter-label">Stade:</label>
-        <div class="filter-options">
-          <label class="filter-option">
-            <input type="checkbox" [checked]="selectedStages.includes('leger')" (change)="toggleStage('leger')" [disabled]="selectedProfileType !== 'patient'">
-            <span>Léger</span>
-          </label>
-          <label class="filter-option">
-            <input type="checkbox" [checked]="selectedStages.includes('modere')" (change)="toggleStage('modere')" [disabled]="selectedProfileType !== 'patient'">
-            <span>Modéré</span>
-          </label>
-          <label class="filter-option">
-            <input type="checkbox" [checked]="selectedStages.includes('avance')" (change)="toggleStage('avance')" [disabled]="selectedProfileType !== 'patient'">
-            <span>Avancé</span>
-          </label>
-        </div>
+    <div class="profile-list-container">
+      <div class="profile-list" [class.enable-scroll]="filteredProfiles.length > 3">
+        <ng-container *ngTemplateOutlet="profileCardsTpl; context: { profiles: filteredProfiles }"></ng-container>
+        <p *ngIf="filteredProfiles.length === 0" class="profile-empty">Aucun profil soignant trouvé.</p>
       </div>
     </div>
-  </div>
+  </ng-container>
 
-  <div class="profile-list-container">
-    <div class="profile-list" 
-         [attr.data-mode]="mode"
-         [class.enable-scroll]="filteredProfiles.length > 3">
-      <div *ngFor="let profile of filteredProfiles" class="profile-card">
-        <div class="profile-card__avatar">
-          <img
-            *ngIf="hasProfileAvatar(profile); else fallbackInitial"
-            class="profile-card__avatar-image"
-            [src]="profile.avatarUrl"
-            (error)="markAvatarBroken(profile.id)"
-            alt="" />
-          <ng-template #fallbackInitial>
-            {{ profile.firstName[0] }}
-          </ng-template>
+  <!-- Mode managed : deux colonnes (Aidants familiaux | Accueillis) -->
+  <ng-container *ngIf="mode === 'managed'">
+    <div class="profile-management-page__search">
+      <input type="text" placeholder="Rechercher par nom ou prénom..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)" class="search-input">
+    </div>
+
+    <div class="two-column-layout">
+
+      <!-- Colonne Aidants familiaux -->
+      <div class="column-section">
+        <div class="column-header">
+          <h2 class="column-title">Aidants familiaux</h2>
+          <button type="button" class="btn-add-profile btn-add-profile--inline" (click)="openAddModal('family')">
+            + Ajouter
+          </button>
         </div>
-
-        <div class="profile-card__info">
-          <h2>{{ profile.displayName }}</h2>
-          <p>{{ profile.subtitle }}</p>
+        <div class="profile-list" [class.enable-scroll]="filteredFamilyProfiles.length > 3">
+          <ng-container *ngTemplateOutlet="profileCardsTpl; context: { profiles: filteredFamilyProfiles }"></ng-container>
+          <p *ngIf="filteredFamilyProfiles.length === 0" class="profile-empty">Aucun aidant familial.</p>
         </div>
-
-        <button
-          type="button"
-          class="profile-card__delete"
-          (click)="deleteProfile(profile)"
-          [disabled]="!canDelete(profile)"
-          [attr.aria-label]="'Supprimer ' + profile.displayName">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
       </div>
 
-      <p *ngIf="filteredProfiles.length === 0" class="profile-empty">
-        Aucun profil trouvé pour cette recherche.
-      </p>
+      <!-- Colonne Accueillis -->
+      <div class="column-section">
+        <div class="column-header">
+          <h2 class="column-title">Accueillis</h2>
+          <button type="button" class="btn-add-profile btn-add-profile--inline" (click)="openAddModal('patient')">
+            + Ajouter
+          </button>
+        </div>
+        <div class="profile-list" [class.enable-scroll]="filteredPatientProfiles.length > 3">
+          <ng-container *ngTemplateOutlet="profileCardsTpl; context: { profiles: filteredPatientProfiles }"></ng-container>
+          <p *ngIf="filteredPatientProfiles.length === 0" class="profile-empty">Aucun accueilli trouvé.</p>
+        </div>
+      </div>
+
     </div>
-  </div>
+  </ng-container>
+
+  <!-- Template réutilisable pour les cartes -->
+  <ng-template #profileCardsTpl let-profiles="profiles">
+    <div *ngFor="let profile of profiles" class="profile-card">
+      <div class="profile-card__avatar">
+        <img
+          *ngIf="hasProfileAvatar(profile); else fallbackInitial"
+          class="profile-card__avatar-image"
+          [src]="profile.avatarUrl"
+          (error)="markAvatarBroken(profile.id)"
+          alt="" />
+        <ng-template #fallbackInitial>
+          {{ profile.firstName[0] }}
+        </ng-template>
+      </div>
+
+      <div class="profile-card__info">
+        <h2>{{ profile.displayName }}</h2>
+        <p>{{ profile.subtitle }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="profile-card__delete"
+        (click)="deleteProfile(profile)"
+        [disabled]="!canDelete(profile)"
+        [attr.aria-label]="'Supprimer ' + profile.displayName">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+    </div>
+  </ng-template>
 
 </div>
 
@@ -121,8 +117,10 @@
       <button type="button" class="add-profile-modal__close" (click)="closeAddModal()">✕</button>
     </div>
 
+    <p *ngIf="chainMessage" class="chain-message">{{ chainMessage }}</p>
+
     <form class="add-profile-form" (ngSubmit)="submitAddProfile()">
-      
+
       <div class="form-field form-field--photo">
         <label>Photo (optionnel)</label>
         <div class="photo-picker" (click)="triggerPhotoInput()" role="button" tabindex="0"
@@ -189,26 +187,28 @@
 
       <div class="association-block" *ngIf="newProfile.type === 'family' && patients.length">
         <p class="association-title">Associer à un ou plusieurs accueillis</p>
-        <input type="text" placeholder="Rechercher..." [(ngModel)]="associationSearchQuery" (input)="onAssociationSearchChange($event)" class="association-search-input">
-        <div id="patient-association-list" class="association-list-container" style="align-items: flex-start; margin-top: 1rem;">
+        <input type="text" placeholder="Rechercher..." [(ngModel)]="associationSearchQuery" (ngModelChange)="onAssociationSearchChange($event)" class="association-search-input">
+        <div class="association-list-container">
           <div class="association-list">
             <label *ngFor="let patient of filteredPatientsForAssociation" class="association-option">
               <input type="checkbox" [checked]="isPatientAssociated(patient.id)" (change)="togglePatientAssociation(patient.id)">
               <span>{{ patient.displayName }}</span>
             </label>
+            <p *ngIf="filteredPatientsForAssociation.length === 0" class="association-empty">Aucun résultat.</p>
           </div>
         </div>
       </div>
 
       <div class="association-block" *ngIf="newProfile.type === 'patient' && familyProfiles.length">
         <p class="association-title">Associer à un ou plusieurs aidants familiaux (optionnel)</p>
-        <input type="text" placeholder="Rechercher..." [(ngModel)]="familyAssociationSearchQuery" (input)="onFamilyAssociationSearchChange($event)" class="association-search-input">
-        <div id="family-association-list" class="association-list-container" style="align-items: flex-start; margin-top: 1rem;">
+        <input type="text" placeholder="Rechercher..." [(ngModel)]="familyAssociationSearchQuery" (ngModelChange)="onFamilyAssociationSearchChange($event)" class="association-search-input">
+        <div class="association-list-container">
           <div class="association-list">
             <label *ngFor="let family of filteredFamilyProfilesForAssociation" class="association-option">
               <input type="checkbox" [checked]="isFamilyAssociated(family.id)" (change)="toggleFamilyAssociation(family.id)">
               <span>{{ family.displayName }}</span>
             </label>
+            <p *ngIf="filteredFamilyProfilesForAssociation.length === 0" class="association-empty">Aucun résultat.</p>
           </div>
         </div>
       </div>

@@ -95,6 +95,8 @@
           <button *ngFor="let c of round.choicesAidant; let i = index"
                   class="pill"
                   [class.pill--active]="state.aidantChoice === i"
+                  [class.correct]="isPillCorrectAidant(i)"
+                  [class.wrong]="isPillWrongAidant(i)"
                   [disabled]="state.showFeedback"
                   (click)="pickAidant(i)" type="button">
             {{ c }}
@@ -110,6 +112,8 @@
           <button *ngFor="let c of round.choicesAccueilli; let i = index"
                   class="pill pill--patient"
                   [class.pill--active]="state.accueilliChoice === i"
+                  [class.correct]="isPillCorrectAccueilli(i)"
+                  [class.wrong]="isPillWrongAccueilli(i)"
                   [disabled]="state.showFeedback"
                   (click)="pickAccueilli(i)" type="button">
             {{ c }}
@@ -132,7 +136,7 @@
 
         <ng-container *ngIf="!state.passed && state.isCorrect">
           <div class="fb-icon">🎉</div>
-          <h2>Bonne réponse !</h2>
+          <h2>Bonne réponse&nbsp;!</h2>
           <p>{{ round.feedbackCorrect }}</p>
         </ng-container>
 

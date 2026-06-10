@@ -1,2 +1,2 @@
 <router-outlet></router-outlet>
-<app-bg-music-control></app-bg-music-control>
+<app-bg-music-control *ngIf="soundEffects.bgMusicDefault$ | async"></app-bg-music-control>

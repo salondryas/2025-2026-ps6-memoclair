@@ -162,18 +162,30 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
   onChoose(choiceId: string): void {
     if (this.locked || this.finished) return;
+
+    const choice = this.currentQuestion.choices.find((c) => c.id === choiceId);
+
+    if (choice && !choice.isCorrect) {
+      // Mauvaise réponse : retirer le choix et continuer
+      this.wrongAnswers++;
+      this.soundEffects.play('gentleError');
+      this.tts.cancel();
+      this.questions[this.currentQuestionIndex] = {
+        ...this.currentQuestion,
+        choices: this.currentQuestion.choices.filter(c => c.id !== choiceId),
+      };
+      this.startAssistFlow();
+      return;
+    }
+
+    // Bonne réponse
     this.recordLatency();
     this.clearAssistFlow();
     this.locked = true;
     this.selectedChoiceId = choiceId;
     this.hintMessage = null;
-
-    const choice = this.currentQuestion.choices.find((c) => c.id === choiceId);
-    if (choice && !choice.isCorrect) this.wrongAnswers++;
-    this.soundEffects.play(choice?.isCorrect ? 'success' : 'gentleError');
-    this.feedbackMessage = choice?.isCorrect
-      ? 'Très bien 🌿'
-      : "D'accord, regardons ensemble la bonne réponse 🌿";
+    this.soundEffects.play('success');
+    this.feedbackMessage = 'Très bien 🌿';
     this.startResolutionFlow();
   }
 
@@ -261,14 +273,11 @@ export class GameBPageComponent implements OnInit, OnDestroy {
     this.clearAssistFlow();
     this.isAutoRevealed = false;
     this.questionStartTime = Date.now();
-    const autoNextMode = this.resolveAutoNextMode();
     const hintDelay = this.profile.hintDelaySeconds * 1000;
-    const revealDelay = hintDelay + 20000;
 
     this.gameBFlow.startQuestionFlow({
       hintDelayMs: hintDelay,
-      revealDelayMs: revealDelay,
-      autoNextMode,
+      inactionNextMs: this.profile.inactionNextSeconds * 1000,
       onHint: () => {
         this.ngZone.run(() => {
           if (this.locked || this.finished || this.isPaused) return;
@@ -307,7 +316,7 @@ export class GameBPageComponent implements OnInit, OnDestroy {
 
   private startResolutionFlow(): void {
     this.gameBFlow.startResolutionFlow({
-      autoNextMode: this.resolveAutoNextMode(),
+      answerNextMs: this.profile.answerNextSeconds * 1000,
       onAutoNext: () => {
         this.ngZone.run(() => {
           if (!this.finished && !this.isPaused) this.onNext();
@@ -390,12 +399,6 @@ export class GameBPageComponent implements OnInit, OnDestroy {
   private clearAssistFlow(): void {
     this.gameBFlow.clear();
     this.autoNextCountdownSeconds = null;
-  }
-
-  private resolveAutoNextMode(): 'manual' | '5s' | '8s' {
-    const mode = this.profile.autoNextMode;
-    if (mode === 'manual' || mode === '8s') return mode;
-    return '5s';
   }
 
   onImageError(): void {

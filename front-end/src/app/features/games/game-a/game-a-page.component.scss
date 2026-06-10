@@ -179,6 +179,9 @@
   font-weight: 900;
   color: $color-neutral-950;
   letter-spacing: -0.02em;
+  max-width: 48rem;
+  text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .prompt-image {
@@ -406,8 +409,9 @@
 }
 /* Taille réduite spécifiquement pour les questions chronologiques */
 .question-text.chrono-title {
-  font-size: clamp($space-6, 2.5vw, $space-8); /* Police plus petite */
-  margin-bottom: -$space-1-25; /* On réduit l'écart en dessous pour rapprocher les grilles */
+  font-size: clamp($space-6, 2.5vw, $space-8);
+  margin-bottom: -$space-1-25;
+  max-width: 42rem;
 }
 
 @keyframes floatAnimation {

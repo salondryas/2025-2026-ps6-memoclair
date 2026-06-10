@@ -37,6 +37,10 @@ export interface PatientProfile {
   questionCount: number;
   answerCount: number;
   hintDelaySeconds: number;
+  maxHintsPerQuestion: number;
+  maxHintsPerSession: number;
+  answerNextSeconds: number;
+  inactionNextSeconds: number;
   autoNextMode: GameBAutoNextMode;
   audioReadingEnabled: boolean;
   highContrastEnabled: boolean;

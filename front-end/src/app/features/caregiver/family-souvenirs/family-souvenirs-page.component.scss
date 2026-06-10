@@ -253,7 +253,27 @@
 
   &--error { color: #a33a2a; }
   &--success { color: #466654; }
+
+  &--generating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #5f8a6f;
+  }
 }
+
+.media-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #c5dfc9;
+  border-top-color: #5f8a6f;
+  border-radius: 50%;
+  animation: spin-media 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin-media { to { transform: rotate(360deg); } }
 
 /* ── Grille médias ── */
 .media-grid {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -41,6 +41,10 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
   showCreateForm = false;
   newFirstName = '';
   createError = '';
+  caregiverFirstName = '';
+  bgMusicDefault = false;
+
+  readonly answerCountOptions = [2, 3, 4];
 
   readonly difficultyOptions: ReadonlyArray<SelectOption<GameDifficulty>> = [
     { value: 'facile', label: 'Facile' },
@@ -67,7 +71,6 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     private readonly patientContextService: PatientContextService,
     private readonly caregiverProfileService: CaregiverProfileService,
     private readonly accessibilityPrefs: AccessibilityPreferencesService,
-    private readonly router: Router
   ) {
     this.stageOptions = this.caregiverProfileService.stageOptions;
     this.visionOptions = this.caregiverProfileService.visionOptions;
@@ -102,67 +105,50 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     this.profile = { ...this.profile, difficulty };
     if (difficulty !== 'personnalise') {
       const preset = DIFFICULTY_PRESETS[difficulty];
-      this.profile = {
-        ...this.profile,
-        ...preset,
-      };
+      this.profile = { ...this.profile, ...preset };
     }
-    this.clearMessages();
+    this.autoSave();
   }
 
   toggleAudio(enabled: boolean): void {
     this.profile = { ...this.profile, audioReadingEnabled: enabled };
-    this.clearMessages();
+    this.autoSave();
   }
 
   selectAutoNextMode(mode: GameBAutoNextMode): void {
     this.profile = { ...this.profile, autoNextMode: mode };
-    this.clearMessages();
+    this.autoSave();
   }
 
   toggleHighContrast(enabled: boolean): void {
     this.profile = { ...this.profile, highContrastEnabled: enabled };
     this.accessibilityPrefs.setHighContrast(enabled);
-    this.clearMessages();
+    this.autoSave();
   }
 
   updateTextSize(size: number): void {
     this.profile = { ...this.profile, textSize: size };
-    this.clearMessages();
+    this.autoSave();
   }
 
   selectStage(stage: ClinicalStage): void {
     this.profile = { ...this.profile, stage };
-    this.clearMessages();
+    this.autoSave();
   }
 
   selectVision(vision: VisionLevel): void {
     this.profile = { ...this.profile, vision };
-    this.clearMessages();
+    this.autoSave();
   }
 
   selectMotor(motor: MotorLevel): void {
     this.profile = { ...this.profile, motor };
-    this.clearMessages();
+    this.autoSave();
   }
 
   selectAttention(attentionSpanMinutes: PatientProfile['attentionSpanMinutes']): void {
     this.profile = { ...this.profile, attentionSpanMinutes };
-    this.clearMessages();
-  }
-
-  updateObjective(
-    objective: keyof PatientProfile['objectives'],
-    value: number,
-  ): void {
-    this.profile = {
-      ...this.profile,
-      objectives: {
-        ...this.profile.objectives,
-        [objective]: Number(value),
-      },
-    };
-    this.clearMessages();
+    this.autoSave();
   }
 
   toggleTheme(theme: ThemeTag): void {
@@ -181,7 +167,7 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
         : [...this.profile.themes, theme],
     };
 
-    this.clearMessages();
+    this.autoSave();
   }
 
   saveProfile(): void {
@@ -194,14 +180,13 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     }
 
     this.profile = this.caregiverProfileService.saveProfile(this.profile);
-    const currentPatient = this.currentPatient;
     this.validationMessage = '';
-    this.saveStatus = `Profil de ${currentPatient.firstName} enregistré pour les prochaines séances.`;
+    this.saveStatus = `Profil de ${this.currentPatient.firstName} enregistré.`;
+  }
 
-    // Rediriger vers l'accueil après un court délai pour laisser l'utilisateur voir le message
-    setTimeout(() => {
-      void this.router.navigateByUrl('/');
-    }, 800);
+  private autoSave(): void {
+    this.clearMessages();
+    this.caregiverProfileService.saveProfile(this.profile);
   }
 
   isThemeSelected(theme: ThemeTag): boolean {
@@ -277,7 +262,11 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
       questionCount: 10,
       answerCount: 3,
       hintDelaySeconds: 20,
+      maxHintsPerQuestion: 2,
+      maxHintsPerSession: 15,
       autoNextMode: '5s',
+      answerNextSeconds: 5,
+      inactionNextSeconds: 15,
       audioReadingEnabled: true,
       highContrastEnabled: false,
       textSize: 1,
@@ -291,6 +280,32 @@ export class CaregiverProfilePageComponent implements OnInit, OnDestroy {
     this.loadProfile(id);
     this.showCreateForm = false;
     this.saveStatus = `Profil de ${firstName} créé. Personnalisez ses réglages puis enregistrez.`;
+  }
+
+  selectAnswerCount(count: number): void {
+    this.profile = { ...this.profile, answerCount: count };
+    this.autoSave();
+  }
+
+  onQuestionCountChange(): void {
+    this.autoSave();
+  }
+
+  onHintDelayChange(): void {
+    this.autoSave();
+  }
+
+  onTimingChange(): void {
+    this.autoSave();
+  }
+
+  getAnswerDots(count: number): number[] {
+    return Array.from({ length: count }, (_, i) => i);
+  }
+
+  toggleBgMusicDefault(enabled: boolean): void {
+    this.bgMusicDefault = enabled;
+    this.clearMessages();
   }
 
   clearMessages(): void {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -26,7 +26,7 @@ export class GamesCatalogPageComponent {
   private readonly patientContext = inject(PatientContextService);
   private readonly catalog = inject(GameCatalogService);
   private readonly http = inject(HttpClient);
-  private readonly location = inject(Location);
+  private readonly router = inject(Router);
 
   readonly activePatient = toSignal(this.patientContext.activePatient$, {
     initialValue: this.patientContext.getActivePatientSnapshot(),
@@ -46,7 +46,7 @@ export class GamesCatalogPageComponent {
   });
 
   goBack(): void {
-    this.location.back();
+    void this.router.navigate(['/games/patient-selection'], { queryParams: { from: 'games' } });
   }
 
   getThumbnail(gameId: string): string {

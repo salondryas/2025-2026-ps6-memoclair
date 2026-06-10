@@ -120,7 +120,7 @@ export class GameASessionService {
     return {
       ...state,
       hint: q.hint,
-      feedback: 'Prenez votre temps, un indice peut aider.',
+      feedback: 'Pas de précipitation — un indice peut aider.',
     };
   }
 
@@ -288,7 +288,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'q01',
     type: 'multiple-choice',
-    prompt: 'Quel objet va naturellement avec cette tasse ?',
+    prompt: 'Quel objet va naturellement avec cette tasse ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q01/prompt-tasse.png',
     choices: [
       { id: 'a', label: 'Soucoupe', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/soucoupe.png' },
@@ -296,14 +296,14 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
       { id: 'c', label: 'Petite assiette', image: 'assets/games/game-a/questions/questions-choix-multiple/q01/petite-assiette.png' },
     ],
     correctChoiceId: 'a',
-    hint: 'Pensez à ce qui se place naturellement sous une tasse.',
-    goodFeedback: 'Très bien !',
+    hint: 'Penser à ce qui se place naturellement sous une tasse.',
+    goodFeedback: 'Très bien !',
     gentleFeedback: 'Pas de souci, on continue calmement.',
   },
   {
     id: 'q02',
     type: 'multiple-choice',
-    prompt: 'Pour l\'hygiène dentaire, quel objet accompagne cette brosse à dents ?',
+    prompt: 'Pour l\'hygiène dentaire, quel objet accompagne cette brosse à dents ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q02/prompt-dentifrice.png',
     choices: [
       { id: 'a', label: 'Dentifrice', image: 'assets/games/game-a/questions/questions-choix-multiple/q02/dentifrice.png' },
@@ -333,7 +333,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'q04',
     type: 'multiple-choice',
-    prompt: 'Après usage, où range-t-on le mieux ces lunettes ?',
+    prompt: 'Après usage, où range-t-on le mieux ces lunettes ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q04/prompt-lunettes.png',
     choices: [
       { id: 'a', label: 'Étui à lunettes', image: 'assets/games/game-a/questions/questions-choix-multiple/q04/etui-a-lunettes.png' },
@@ -408,7 +408,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'q09',
     type: 'multiple-choice',
-    prompt: 'Pour lire ce livre dans de bonnes conditions, quel objet aide le plus ?',
+    prompt: 'Pour lire ce livre dans de bonnes conditions, quel objet aide le plus ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q09/prompt-livre.png',
     choices: [
       { id: 'a', label: 'Lampe de lecture', image: 'assets/games/game-a/questions/questions-choix-multiple/q09/lampe-de-lecteur.png' },
@@ -423,7 +423,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'mc-q10',
     type: 'multiple-choice',
-    prompt: 'Avec quoi utilisez-vous un timbre ?',
+    prompt: 'Avec quoi utilisez-vous un timbre ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q10/prompt-timbre.png',
     choices: [
       { id: 'a', label: 'Une enveloppe', image: 'assets/games/game-a/questions/questions-choix-multiple/q10/enveloppe.png' },
@@ -438,7 +438,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'mc-q11',
     type: 'multiple-choice',
-    prompt: 'Où posez-vous une casserole pour faire chauffer l\'eau ?',
+    prompt: 'Où posez-vous une casserole pour faire chauffer l\'eau ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q11/prompt-casserole.png',
     choices: [
       { id: 'a', label: 'Sur une cuisinière', image: 'assets/games/game-a/questions/questions-choix-multiple/q11/cuisiniere.png' },
@@ -453,7 +453,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'mc-q12',
     type: 'multiple-choice',
-    prompt: 'Où placez-vous votre oreiller ?',
+    prompt: 'Où placez-vous votre oreiller ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q12/prompt-oreiller.png',
     choices: [
       { id: 'a', label: 'Sur le lit', image: 'assets/games/game-a/questions/questions-choix-multiple/q12/lit.png' },
@@ -468,7 +468,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'mc-q13',
     type: 'multiple-choice',
-    prompt: 'Avec quoi ramassez-vous la poussière après avoir passé le balai ?',
+    prompt: 'Avec quoi ramassez-vous la poussière après avoir passé le balai ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q13/prompt-balai.png',
     choices: [
       { id: 'a', label: 'Une pelle à poussière', image: 'assets/games/game-a/questions/questions-choix-multiple/q13/pelle-a-poussiere.png' },
@@ -483,7 +483,7 @@ const MULTIPLE_CHOICE_QUESTIONS: GameAQuestion[] = [
   {
     id: 'mc-q14',
     type: 'multiple-choice',
-    prompt: 'Sur quoi tapez-vous avec un marteau ?',
+    prompt: 'Sur quoi tapez-vous avec un marteau ?',
     promptImage: 'assets/games/game-a/questions/questions-choix-multiple/q14/prompt-marteau.png',
     choices: [
       { id: 'a', label: 'Un clou', image: 'assets/games/game-a/questions/questions-choix-multiple/q14/clou.png' },
@@ -501,7 +501,7 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
   {
     id: 'q10',
     type: 'chrono-order',
-    prompt: 'Placez les étapes dans l\'ordre chronologique pour préparer un café.',
+    prompt: 'Placer les étapes dans l\'ordre chronologique pour préparer un café.',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q01/q01-step1.png',
     steps: [
       { id: 'q10-s1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q01/q01-step1.png' },
@@ -510,14 +510,14 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
       { id: 'q10-s4', image: 'assets/games/game-a/questions/questions-ordre-chrono/q01/q01-step4.png' },
     ],
     correctOrder: ['q10-s1', 'q10-s2', 'q10-s3', 'q10-s4'],
-    hint: 'Commencez par la toute première action de la séquence.',
-    goodFeedback: 'Excellent ordre chronologique !',
+    hint: 'Commencer par la toute première action de la séquence.',
+    goodFeedback: 'Excellent ordre chronologique !',
     gentleFeedback: 'Pas de souci, on continue ensemble.',
   },
   {
     id: 'q11',
     type: 'chrono-order',
-    prompt: 'Replacez ces images dans le bon ordre pour envoyer une lettre.',
+    prompt: 'Remettre ces images dans le bon ordre pour envoyer une lettre.',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q02/q02-step1.png',
     steps: [
       { id: 'q11-s1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q02/q02-step1.png' },
@@ -526,14 +526,14 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
       { id: 'q11-s4', image: 'assets/games/game-a/questions/questions-ordre-chrono/q02/q02-step4.png' },
     ],
     correctOrder: ['q11-s1', 'q11-s2', 'q11-s3', 'q11-s4'],
-    hint: 'Repérez l\'image qui décrit le tout début.',
+    hint: 'Repérer l\'image qui décrit le tout début.',
     goodFeedback: 'Bravo, l\'ordre est parfait.',
     gentleFeedback: 'Très bien, on avance tranquillement.',
   },
   {
     id: 'q12',
     type: 'chrono-order',
-    prompt: 'Choisissez l\'ordre logique de ces 4 étapes pour planter une fleur.',
+    prompt: 'Choisir l\'ordre logique de ces 4 étapes pour planter une fleur.',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q03/q03-step1.png',
     steps: [
       { id: 'q12-s1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q03/q03-step1.png' },
@@ -542,14 +542,14 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
       { id: 'q12-s4', image: 'assets/games/game-a/questions/questions-ordre-chrono/q03/q03-step4.png' },
     ],
     correctOrder: ['q12-s1', 'q12-s2', 'q12-s3', 'q12-s4'],
-    hint: 'Cherchez ce qui se passe avant toutes les autres étapes.',
-    goodFeedback: 'Très bon enchaînement !',
+    hint: 'Chercher ce qui se passe avant toutes les autres étapes.',
+    goodFeedback: 'Très bon enchaînement !',
     gentleFeedback: 'Ce n\'est pas grave, on continue.',
   },
   {
     id: 'q13',
     type: 'chrono-order',
-    prompt: 'Remettez les actions dans leur ordre naturel pour nourrir le chat.',
+    prompt: 'Remettre les actions dans leur ordre naturel pour nourrir le chat.',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q04/q04-step1.png',
     steps: [
       { id: 'q13-s1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q04/q04-step1.png' },
@@ -558,14 +558,14 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
       { id: 'q13-s4', image: 'assets/games/game-a/questions/questions-ordre-chrono/q04/q04-step4.png' },
     ],
     correctOrder: ['q13-s1', 'q13-s2', 'q13-s3', 'q13-s4'],
-    hint: 'Pensez à la première action indispensable.',
+    hint: 'Penser à la première action indispensable.',
     goodFeedback: 'Parfait, ordre respecté.',
     gentleFeedback: 'On garde le rythme, c\'est très bien.',
   },
   {
     id: 'chrono-q05',
     type: 'chrono-order',
-    prompt: 'Remettez dans l\'ordre les étapes pour se laver les mains :',
+    prompt: 'Remettre dans l\'ordre les étapes pour se laver les mains :',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q05/q05-step1.png',
     steps: [
       { id: 's1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q05/q05-step1.png' },
@@ -581,7 +581,7 @@ const CHRONO_ORDER_QUESTIONS: GameAQuestion[] = [
   {
     id: 'chrono-q06',
     type: 'chrono-order',
-    prompt: 'Remettez dans l\'ordre les étapes pour faire la vaisselle :',
+    prompt: 'Remettre dans l\'ordre les étapes pour faire la vaisselle :',
     promptImage: 'assets/games/game-a/questions/questions-ordre-chrono/q06/q06-step1.png',
     steps: [
       { id: 's1', image: 'assets/games/game-a/questions/questions-ordre-chrono/q06/q06-step1.png' },

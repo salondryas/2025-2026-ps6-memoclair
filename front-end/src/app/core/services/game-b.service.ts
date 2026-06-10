@@ -95,7 +95,7 @@ export class GameBService {
     if (personalized && themes.includes('famille')) {
       // Contenu personnalisé avec photos de famille
       return {
-        question: 'Qui est sur cette photo ?',
+        question: 'Qui est sur cette photo ?',
         options: [
           { id: 'opt1', text: 'Papa', image: 'assets/images/family/pere.jpg', isCorrect: true },
           { id: 'opt2', text: 'Oncle', image: 'assets/images/family/oncle.jpg', isCorrect: false },
@@ -107,7 +107,7 @@ export class GameBService {
       // Contenu générique
       const image = this.genericImages[Math.floor(Math.random() * this.genericImages.length)];
       return {
-        question: 'À quelle époque cette image vous fait-elle penser ?',
+        question: 'À quelle époque cette image vous fait-elle penser ?',
         mainImage: image.url,
         options: [
           { id: 'opt1', text: 'Années 1950', isCorrect: image.era === '1950s' },
@@ -123,7 +123,7 @@ export class GameBService {
   private generateEraIdentificationQuestion(themes: string[], personalized: boolean) {
     const object = this.genericImages[Math.floor(Math.random() * this.genericImages.length)];
     return {
-      question: 'Quel objet typique de cette époque est représenté ?',
+      question: 'Quel objet typique de cette époque est représenté ?',
       mainImage: object.url,
       options: [
         { id: 'opt1', text: 'Téléphone à cadran', isCorrect: object.era === '1950s' },
@@ -138,7 +138,7 @@ export class GameBService {
   private generateSongAssociationQuestion(themes: string[], personalized: boolean) {
     const song = this.genericSongs[Math.floor(Math.random() * this.genericSongs.length)];
     return {
-      question: 'Cette chanson vous rappelle-t-elle quelque chose ?',
+      question: 'Cette chanson vous rappelle-t-elle quelque chose ?',
       audioFile: song.file,
       options: [
         { id: 'opt1', text: 'Les bals du samedi soir', isCorrect: true },
@@ -152,7 +152,7 @@ export class GameBService {
 
   private generateObjectMemoryQuestion(themes: string[], personalized: boolean) {
     return {
-      question: 'Quel objet utilisiez-vous le plus souvent ?',
+      question: 'Quel objet utilisiez-vous le plus souvent ?',
       options: [
         { id: 'opt1', text: 'Machine à laver', image: 'assets/images/objects/machine-a-laver.jpg', isCorrect: true },
         { id: 'opt2', text: 'Lave-vaisselle', image: 'assets/images/objects/lave-vaisselle.jpg', isCorrect: false },

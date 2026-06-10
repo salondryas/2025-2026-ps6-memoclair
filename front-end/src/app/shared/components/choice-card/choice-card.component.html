@@ -21,4 +21,24 @@
   <span *ngIf="imageLoadFailed" class="image-placeholder">🖼️</span>
   <span class="choice-label">{{ choice.label }}</span>
   <span class="check" *ngIf="isCorrect">✓</span>
+  
+  <!-- Confettis pour les réussites -->
+  <div class="confetti-container" *ngIf="isCorrect">
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+  </div>
+  
+  <!-- Particules lumineuses -->
+  <div class="sparkle" *ngIf="isCorrect"></div>
+  <div class="sparkle" *ngIf="isCorrect"></div>
+  <div class="sparkle" *ngIf="isCorrect"></div>
+  <div class="sparkle" *ngIf="isCorrect"></div>
+  <div class="sparkle" *ngIf="isCorrect"></div>
 </button>

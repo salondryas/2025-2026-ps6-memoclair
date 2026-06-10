@@ -7,6 +7,7 @@ import { CaregiverProfilePageComponent } from './profile/caregiver-profile-page.
 import { ProfileManagementPageComponent } from './profile-management/profile-management-page.component';
 import { CaregiverRoleSelectionPageComponent } from './role-selection/caregiver-role-selection-page.component';
 import { CaregiverStatisticsPageComponent } from './statistics/caregiver-statistics-page.component';
+import { QuestionsReviewPageComponent } from './questions-review/questions-review-page.component';
 
 export const CAREGIVER_ROUTES: Routes = [
   {
@@ -55,5 +56,10 @@ export const CAREGIVER_ROUTES: Routes = [
     path: 'statistics',
     component: CaregiverStatisticsPageComponent,
     title: 'MemoClair - Statistiques aidant',
+  },
+  {
+    path: 'questions-review',
+    component: QuestionsReviewPageComponent,
+    title: 'MemoClair - Vérification des questions',
   },
 ];

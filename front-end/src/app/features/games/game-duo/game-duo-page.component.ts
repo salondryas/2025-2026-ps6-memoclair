@@ -61,6 +61,30 @@ export class GameDuoPageComponent implements OnInit {
   get isLastRound(): boolean { return this.state.roundIndex === this.state.rounds.length - 1; }
   get dots(): number[] { return Array.from({ length: this.state.rounds.length }, (_, i) => i); }
 
+  isPillCorrectAidant(index: number): boolean {
+    return this.state.showFeedback && 
+           this.state.aidantChoice === index && 
+           index === this.round.correctIndex;
+  }
+
+  isPillWrongAidant(index: number): boolean {
+    return this.state.showFeedback && 
+           this.state.aidantChoice === index && 
+           index !== this.round.correctIndex;
+  }
+
+  isPillCorrectAccueilli(index: number): boolean {
+    return this.state.showFeedback && 
+           this.state.accueilliChoice === index && 
+           index === this.round.correctIndex;
+  }
+
+  isPillWrongAccueilli(index: number): boolean {
+    return this.state.showFeedback && 
+           this.state.accueilliChoice === index && 
+           index !== this.round.correctIndex;
+  }
+
   pickAidant(index: number): void { this.state = this.duo.pickAidant(this.state, index); }
   pickAccueilli(index: number): void { this.state = this.duo.pickAccueilli(this.state, index); }
 

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 
 import { MediaItem, MediaKind, MemoryCueType } from '../../../models/media.model';
 import { PatientId, PatientSummary } from '../../../models/patient.model';
@@ -34,6 +35,7 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
   saveStatus = '';
   validationMessage = '';
   uploading = false;
+  generating = false;
 
   readonly duoRequired = DUO_REQUIRED;
 
@@ -57,6 +59,7 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
   constructor(
     private readonly patientContextService: PatientContextService,
     private readonly mediaLibraryService: MediaLibraryService,
+    private readonly http: HttpClient,
     private readonly cdr: ChangeDetectorRef,
     private readonly location: Location,
   ) {}
@@ -125,7 +128,7 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
         this.fileInputLabel = 'Aucun fichier choisi';
         this.saveStatus = `Souvenir ajouté pour ${this.currentPatient.firstName} !`;
         this.uploading = false;
-        this.loadMedia(this.selectedPatientId);
+        this.loadMedia(this.selectedPatientId, true);
       },
       error: () => {
         this.validationMessage = 'Impossible d\'enregistrer le souvenir. Vérifiez votre connexion.';
@@ -189,7 +192,7 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
     return this.mediaItems.length >= DUO_REQUIRED;
   }
 
-  private loadMedia(patientId: PatientId): void {
+  private loadMedia(patientId: PatientId, triggerGeneration = false): void {
     this.mediaLibraryService.getMediaItems(patientId).subscribe({
       next: (items) => {
         this.mediaItems = items;
@@ -198,6 +201,9 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
         this.fileInputLabel = 'Aucun fichier choisi';
         this.clearMessages();
         this.cdr.markForCheck();
+        if (triggerGeneration && items.length >= DUO_REQUIRED) {
+          this.generateCache(patientId);
+        }
       },
       error: () => {
         this.mediaItems = [];
@@ -206,10 +212,39 @@ export class FamilySouvenirsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private generateCache(patientId: PatientId): void {
+    this.generating = true;
+    this.saveStatus = 'Génération des questions en cours…';
+    this.cdr.markForCheck();
+
+    const patientName = this.currentPatient.firstName;
+    const base = `${environment.backendUrl}/api`;
+
+    this.http
+      .post<unknown>(`${base}/duo/generate/${patientId}`, { patientName })
+      .pipe(
+        switchMap(() =>
+          this.http.post<unknown>(`${base}/game-b/generate/${patientId}`, { patientName })
+        ),
+      )
+      .subscribe({
+        next: () => {
+          this.generating = false;
+          this.saveStatus = 'Questions générées. Le soignant peut les vérifier dans "Profil aidant".';
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.generating = false;
+          this.saveStatus = 'Souvenir ajouté. La génération des questions a échoué (backend requis).';
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
   private validate(): string[] {
     const errors: string[] = [];
-    if (!this.form.description.trim()) errors.push('Décrivez ce souvenir avant de l\'ajouter.');
-    if (!this.selectedFile) errors.push('Choisissez un fichier photo ou audio.');
+    if (!this.form.description.trim()) errors.push('Décrire ce souvenir avant de l\'ajouter.');
+    if (!this.selectedFile) errors.push('Choisir un fichier photo ou audio.');
     return errors;
   }
 

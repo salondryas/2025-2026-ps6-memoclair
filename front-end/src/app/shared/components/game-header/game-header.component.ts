@@ -13,6 +13,7 @@ export class GameHeaderComponent {
   @Input() patientName = '';
   @Input() title = '';
   @Input() canGoNext = false;
+  @Input() showNextButton = true;
 
   @Output() nextClicked = new EventEmitter<void>();
 

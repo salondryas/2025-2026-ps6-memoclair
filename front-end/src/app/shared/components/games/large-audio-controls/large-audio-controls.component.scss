@@ -14,8 +14,8 @@
 /* ═══════════════ Vinyle ═══════════════ */
 .vinyl-zone {
   position: relative;
-  width: clamp(200px, 20vh, 350px);
-  height: clamp(200px, 20vh, 350px);
+  width: clamp(140px, 15vh, 200px);
+  height: clamp(140px, 15vh, 200px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,8 +23,8 @@
 
 .vinyl {
   position: absolute;
-  width: clamp(200px, 20vh, 350px);
-  height: clamp(200px, 20vh, 350px);
+  width: clamp(140px, 15vh, 200px);
+  height: clamp(140px, 15vh, 200px);
   border-radius: 50%;
   background:
     radial-gradient(circle at center,
@@ -40,15 +40,15 @@
       #252525 78%, #252525 80%,
       #111 80%
     );
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.05);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.05);
 
   &--spinning { animation: spin-vinyl 4s linear infinite; }
 }
 
 .vinyl-label {
   position: absolute;
-  width: clamp(88px, 12vh, 130px);
-  height: clamp(88px, 12vh, 130px);
+  width: clamp(60px, 8vh, 85px);
+  height: clamp(60px, 8vh, 85px);
   border-radius: 50%;
   background: radial-gradient(circle at 38% 38%, #e74c3c 0%, #922b21 100%);
   top: 50%; left: 50%;
@@ -58,8 +58,8 @@
 
 .vinyl-hole {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #050505;
   top: 50%; left: 50%;
@@ -76,8 +76,8 @@
 .btn-play {
   position: relative;
   z-index: 3;
-  width: clamp(80px, 10vh, 110px);
-  height: clamp(80px, 10vh, 110px);
+  width: clamp(55px, 7vh, 80px);
+  height: clamp(55px, 7vh, 80px);
   border-radius: 50%;
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   border: 3px solid rgba(255,255,255,0.85);
@@ -85,37 +85,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 5px rgba(59,130,246,0.25), 0 8px 28px rgba(59,130,246,0.5);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.2), 0 6px 20px rgba(59,130,246,0.4);
   transition: transform 0.15s, box-shadow 0.15s;
 
   &:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 0 8px rgba(59,130,246,0.3), 0 12px 32px rgba(59,130,246,0.6);
+    box-shadow: 0 0 0 6px rgba(59,130,246,0.25), 0 8px 24px rgba(59,130,246,0.5);
   }
 
   &:active { transform: scale(0.95); }
 
-  svg polygon { transform: translateX(2px); }
+  svg {
+    width: 35%;
+    height: 35%;
+  }
+
+  svg polygon { transform: translateX(1px); }
 }
 
 /* ═══════════════ Skip + Waveform ═══════════════ */
 .skip-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .btn-skip {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: #3b82f6;
   border: none;
-  border-radius: 20px;
-  padding: 18px 28px;
+  border-radius: 16px;
+  padding: 12px 22px;
   cursor: pointer;
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 800;
   font-family: inherit;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -124,7 +129,7 @@
   &:hover { background: #2563eb; transform: scale(1.05); }
   &:active { transform: scale(0.95); }
 
-  svg { stroke: #fff; flex-shrink: 0; }
+  svg { width: 1.2rem; height: 1.2rem; stroke: #fff; flex-shrink: 0; }
 }
 
 /* ═══════════════ Waveform CSS ═══════════════ */
@@ -132,25 +137,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  height: 54px;
-  width: 150px;
+  gap: 3px;
+  height: 40px;
+  width: 120px;
 }
 
 .wave-bar {
-  width: 4px;
+  width: 3px;
   border-radius: 999px;
   background: linear-gradient(180deg, #3b82f6, #10b981);
-  height: 6px;
+  height: 4px;
   opacity: 0.5;
   transition: height 0.2s;
 }
 
 /* Barres statiques avec hauteurs variées */
-.wave-bar:nth-child(odd)  { height: 14px; }
-.wave-bar:nth-child(even) { height: 22px; }
-.wave-bar:nth-child(3n)   { height: 32px; }
-.wave-bar:nth-child(5n)   { height: 18px; }
+.wave-bar:nth-child(odd)  { height: 10px; }
+.wave-bar:nth-child(even) { height: 16px; }
+.wave-bar:nth-child(3n)   { height: 24px; }
+.wave-bar:nth-child(5n)   { height: 14px; }
 
 /* Animation active */
 .waveform--active .wave-bar {
@@ -159,27 +164,27 @@
 }
 
 @keyframes wave-pulse {
-  from { height: 6px; }
-  to   { height: 38px; }
+  from { height: 5px; }
+  to   { height: 30px; }
 }
 
 /* ═══════════════ Barre de progression ═══════════════ */
 .progress-zone {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: clamp(280px, 38vh, 420px);
+  gap: 10px;
+  width: clamp(240px, 30vh, 350px);
 }
 
 .time {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #1e293b;
   background: rgba(255,255,255,0.88);
-  padding: 6px 14px;
-  border-radius: 10px;
+  padding: 4px 10px;
+  border-radius: 8px;
   white-space: nowrap;
-  min-width: 64px;
+  min-width: 55px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }

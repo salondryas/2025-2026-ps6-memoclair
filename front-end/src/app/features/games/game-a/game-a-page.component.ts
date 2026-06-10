@@ -141,14 +141,23 @@ export class GameAPageComponent implements OnInit, OnDestroy {
     if (this.state.locked || this.state.finished) return;
     this.readingChoiceId = null;
     this.tts.cancel();
-    this.recordLatency();
-    this.clearAssistFlow();
-
     this.shuffledChoices.forEach(c => (c as any).isHinted = false);
 
     const q = this.question;
-    if (q?.correctChoiceId && choiceId !== q.correctChoiceId) this.wrongAnswers++;
-    this.soundEffects.play(q?.correctChoiceId === choiceId ? 'success' : 'gentleError');
+
+    if (q?.correctChoiceId && choiceId !== q.correctChoiceId) {
+      // Mauvaise réponse : retirer le choix et continuer
+      this.wrongAnswers++;
+      this.soundEffects.play('gentleError');
+      this.shuffledChoices = this.shuffledChoices.filter(c => c.id !== choiceId);
+      this.startAssistFlow(false);
+      return;
+    }
+
+    // Bonne réponse
+    this.recordLatency();
+    this.clearAssistFlow();
+    this.soundEffects.play('success');
     this.state = this.session.choose(this.state, choiceId);
     if (this.state.locked) {
       if (this.autoNextQuestionTimeoutId) {

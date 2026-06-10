@@ -9,6 +9,9 @@ import {
   LUCIDE_ICONS,
 } from 'lucide-angular';
 
+import { ProfileSelectionService } from '../services/profile-selection.service';
+import { CaregiverRoleService } from '../services/caregiver-role.service';
+
 @Component({
   selector: 'app-family-dashboard-page',
   standalone: true,
@@ -25,4 +28,13 @@ import {
 })
 export class FamilyDashboardPageComponent {
   readonly icons = { Gamepad2, ImageIcon };
+
+  constructor(
+    private readonly profileSelection: ProfileSelectionService,
+    private readonly caregiverRole: CaregiverRoleService,
+  ) {}
+
+  get caregiverFirstName(): string | null {
+    return this.profileSelection.getActiveCaregiverFirstName(this.caregiverRole.getRoleSnapshot());
+  }
 }

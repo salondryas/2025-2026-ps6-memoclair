@@ -273,6 +273,44 @@
 }
 
 /* ══════════════════════════════════════════
+   Two-column layout (managed mode)
+══════════════════════════════════════════ */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.column-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 1.25rem;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.column-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e3028;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════
    Actions
 ══════════════════════════════════════════ */
 .profile-actions {
@@ -311,6 +349,13 @@
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  &--inline {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    white-space: nowrap;
   }
 }
 
@@ -370,6 +415,18 @@
     background: #e5e7eb;
     color: #374151;
   }
+}
+
+.chain-message {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .add-profile-form {
@@ -561,6 +618,14 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
+}
+
+.association-empty {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .association-option {
